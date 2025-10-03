@@ -2,6 +2,7 @@
 
 import { serve } from 'std/http/server.ts';
 import { createClient } from '@supabase/supabase-js';
+import { decode } from "std/encoding/base64.ts";
 
 // ⚠️ CORS Origin 설정: 당신의 GitHub Pages 주소
 const ALLOWED_ORIGIN = 'https://pogoksci.github.io'; 
@@ -83,78 +84,127 @@ async function handleGetLocationData() {
 // ------------------------------------------------------------------
 
 async function handlePostInventory(req: Request) {
-    const results = [];
-    
     try {
         const { casRns, inventoryDetails } = await req.json();
-        console.log("Received Inventory Data:", inventoryDetails);
-        
-        const casRn = casRns[0]; 
+        const casRn = casRns[0];
 
         let substanceId: number;
         let isNewSubstance = false;
 
-        // 1. Substance 테이블에서 CAS RN 존재 확인 및 Substance ID 획득 로직 유지
+        // 1. Substance 테이블에서 CAS RN 존재 확인
         const { data: existingSubstance, error: checkError } = await supabase
             .from('Substance')
-            .select('id') 
+            .select('id')
             .eq('cas_rn', casRn)
             .single();
 
-        // (checkError 처리 로직 유지)
-        if (checkError && checkError.code !== 'PGRST116') { throw new Error(`DB 조회 오류: ${checkError.message}`); }
+        if (checkError && checkError.code !== 'PGRST116') { // '결과 없음' 오류는 정상
+            throw new Error(`DB 조회 오류: ${checkError.message}`);
+        }
 
         if (existingSubstance) {
             substanceId = existingSubstance.id;
         } else {
-            // ... Substance API 호출 및 보조 테이블 삽입 로직 유지 ...
             isNewSubstance = true;
+            // 2. CAS API에서 물질 정보 조회
             const fullData = await fetchCasDetail(casRn);
 
-            // SubstanceData 생성 및 삽입 로직 유지 (synonyms, citations 등 포함)
+            // 3. 새 물질 정보 삽입
             const substanceData = {
-                cas_rn: fullData.rn, name: fullData.name, uri: fullData.uri, inchikey: fullData.inchiKey, 
+                cas_rn: fullData.rn, name: fullData.name, uri: fullData.uri, inchikey: fullData.inchiKey,
                 molecular_formula: fullData.molecularFormula.replace(/<\/?sub>|<\/?sup>|<\/?em>/g, ''),
-                molecular_mass: parseFloat(fullData.molecularMass), has_molfile: fullData.hasMolfile, 
+                molecular_mass: parseFloat(fullData.molecularMass), has_molfile: fullData.hasMolfile,
                 svg_image: fullData.images ? fullData.images[0] : null,
             };
-            
             const { data: subInsert, error: subError } = await supabase.from('Substance').insert([substanceData]).select('id').single();
             if (subError) throw new Error(`Substance 삽입 오류: ${subError.message}`);
             substanceId = subInsert.id;
-
-            // ... 보조 테이블 삽입 로직 (Synonyms, Citations, Properties, ReplacedRns) 유지 ...
-            // (then((res: { error: { message: string } | null }) => ... 형식 유지)
+            
+            // ... (Synonyms, Citations 등 보조 테이블 삽입 로직) ...
         }
-        
-        // 3. Inventory 테이블에 새 시약병 정보 삽입
-        const bottleIdentifier = `${casRn}-${crypto.randomUUID()}`; 
 
-        const inventoryData = {
-            substance_id: substanceId,
-            bottle_identifier: bottleIdentifier, 
-            
-            // 🔑 InventoryDetails에서 6단계 위치 정보와 폼 필드를 모두 가져와 삽입
-            initial_amount: inventoryDetails.purchase_volume, unit: inventoryDetails.unit, 
-            current_amount: inventoryDetails.current_amount, location_area: inventoryDetails.location_area,
-            door_vertical: inventoryDetails.door_vertical, door_horizontal: inventoryDetails.door_horizontal,
-            internal_shelf_level: inventoryDetails.internal_shelf_level, storage_column: inventoryDetails.storage_column,
-            cabinet_id: inventoryDetails.cabinet_id, // FK
-            
-            // 나머지 폼 필드
-            classification: inventoryDetails.classification, state: inventoryDetails.state,
-            concentration_value: inventoryDetails.concentration_value, concentration_unit: inventoryDetails.concentration_unit, 
-            manufacturer: inventoryDetails.manufacturer, purchase_date: inventoryDetails.purchase_date,
-            
-            photo_storage_url: null, // Storage 제거됨
-        };
+        // 4. Inventory 테이블에 새 시약병 정보 삽입 후 ID 반환받기
+        const { data: invInsert, error: invError } = await supabase
+            .from('Inventory')
+            .insert([{
+                substance_id: substanceId,
+                bottle_identifier: `${casRn}-${crypto.randomUUID()}`,
+                initial_amount: inventoryDetails.purchase_volume,
+                unit: inventoryDetails.unit,
+                current_amount: inventoryDetails.current_amount,
+                location_area: inventoryDetails.location_area,
+                door_vertical: inventoryDetails.door_vertical,
+                door_horizontal: inventoryDetails.door_horizontal,
+                internal_shelf_level: inventoryDetails.internal_shelf_level,
+                storage_column: inventoryDetails.storage_columns, // 'storage_column'으로 수정 (DB 스키마에 맞게)
+                cabinet_id: inventoryDetails.cabinet_id,
+                classification: inventoryDetails.classification,
+                state: inventoryDetails.state,
+                concentration_value: inventoryDetails.concentration_value,
+                concentration_unit: inventoryDetails.concentration_unit,
+                manufacturer: inventoryDetails.manufacturer,
+                purchase_date: inventoryDetails.purchase_date,
+            }])
+            .select('id')
+            .single();
 
-        const { error: invError } = await supabase.from('Inventory').insert([inventoryData]);
         if (invError) throw new Error(`Inventory 삽입 오류: ${invError.message}`);
-        
-        results.push({ casRn, status: 'success', id: substanceId, inventoryId: bottleIdentifier, isNewSubstance });
+        const inventoryId = invInsert.id;
 
-        return withCorsHeaders(new Response(JSON.stringify(results), { status: 200 }));
+        // 5. 사진이 있으면 Storage에 업로드하고 URL을 DB에 업데이트
+        const photoUrls: { url_320: string | null; url_160: string | null } = { url_320: null, url_160: null };
+        const uploadPromises = [];
+
+        // 320px 이미지 처리
+        if (inventoryDetails.photo_320_base64) {
+            const path_320 = `${inventoryId}_${casRn}_320.png`;
+            const imageData320 = decode(inventoryDetails.photo_320_base64.split(',')[1]);
+            uploadPromises.push(
+                supabase.storage.from('reagent-photos').upload(path_320, imageData320, { contentType: 'image/png', upsert: true })
+            );
+        }
+        // 160px 이미지 처리
+        if (inventoryDetails.photo_160_base64) {
+            const path_160 = `${inventoryId}_${casRn}_160.png`;
+            const imageData160 = decode(inventoryDetails.photo_160_base64.split(',')[1]);
+            uploadPromises.push(
+                supabase.storage.from('reagent-photos').upload(path_160, imageData160, { contentType: 'image/png', upsert: true })
+            );
+        }
+
+        const uploadResults = await Promise.all(uploadPromises);
+
+        for (const result of uploadResults) {
+            if (result.error) console.error("Storage 업로드 오류:", result.error.message);
+            if (!result.data) continue;
+            
+            if (result.data.path.includes('_320.png')) {
+                photoUrls.url_320 = supabase.storage.from('reagent-photos').getPublicUrl(result.data.path).data.publicUrl;
+            }
+            if (result.data.path.includes('_160.png')) {
+                photoUrls.url_160 = supabase.storage.from('reagent-photos').getPublicUrl(result.data.path).data.publicUrl;
+            }
+        }
+
+        if (photoUrls.url_320 || photoUrls.url_160) {
+            const { error: updateError } = await supabase
+                .from('Inventory')
+                .update({ 
+                    photo_url_320: photoUrls.url_320,
+                    photo_url_160: photoUrls.url_160
+                })
+                .eq('id', inventoryId);
+
+            if (updateError) console.error("사진 URL 업데이트 오류:", updateError.message);
+        }
+
+        // 6. 최종 성공 결과 반환
+        return withCorsHeaders(new Response(JSON.stringify([{ 
+            casRn, 
+            status: 'success', 
+            inventoryId: inventoryId, // bottle_identifier 대신 숫자 ID 반환
+            isNewSubstance: isNewSubstance
+        }]), { status: 200 }));
 
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e);
