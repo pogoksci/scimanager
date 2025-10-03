@@ -1,7 +1,7 @@
 // index.ts (Supabase Edge Function: casimport)
 
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'std/http/server.ts';
+import { createClient } from '@supabase/supabase-js';
 
 // ⚠️ CORS Origin 설정: 당신의 GitHub Pages 주소
 const ALLOWED_ORIGIN = 'https://pogoksci.github.io'; 
