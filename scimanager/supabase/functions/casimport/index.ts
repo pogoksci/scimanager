@@ -25,7 +25,7 @@ const corsHeaders = {
 
 // 환경 변수에서 키 가져오기
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY')!;
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const CAS_API_KEY = Deno.env.get('CAS_API_KEY')!;
 
 // Supabase 클라이언트 초기화

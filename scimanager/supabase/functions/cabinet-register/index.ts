@@ -7,7 +7,7 @@ import { decode } from "std/encoding/base64.ts";
 const ALLOWED_ORIGIN = 'https://pogoksci.github.io'; 
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY')!;
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
