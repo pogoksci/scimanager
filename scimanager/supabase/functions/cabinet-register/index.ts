@@ -2,6 +2,7 @@
 
 import { serve } from 'std/http/server.ts';
 import { createClient } from '@supabase/supabase-js';
+import { decode } from "std/encoding/base64.ts";
 
 const ALLOWED_ORIGIN = 'https://pogoksci.github.io'; 
 
@@ -37,7 +38,7 @@ async function handleCabinetRegistration(req: Request) {
         const cabinetName = cabinetData?.cabinet_name?.trim() || '';
 
         if (areaName.length === 0 || cabinetName.length === 0) {
-            throw new Error("필수 데이터 (약품실 또는 보관장 이름)가 누락되었습니다.");
+            throw new Error("필수 데이터 (약품실 또는 시약장 이름)가 누락되었습니다.");
         }
         
         // 1. Area ID 확보 (기존 로직 유지)
@@ -64,7 +65,7 @@ async function handleCabinetRegistration(req: Request) {
         }
 
         if (existingCabinet) {
-            throw new Error(`'${areaName}'에 '${cabinetName}' 이름의 보관장이 이미 존재합니다.`);
+            throw new Error(`'${areaName}'에 '${cabinetName}' 이름의 시약장이 이미 존재합니다.`);
         }
 
         // 3. 중복이 없을 경우에만 캐비닛 데이터 삽입 (기존 로직 유지)
@@ -77,12 +78,52 @@ async function handleCabinetRegistration(req: Request) {
             storage_columns: cabinetData.storage_columns || 6,
         };
 
-        const { data: cabinetInsert, error: cabinetError } = await supabase.from('Cabinet').insert([newCabinetData]).select('id, name').single();
+        // 1. 먼저 사진 URL 없이 캐비닛 정보만 삽입하고 id를 받아옵니다.
+        const { data: cabinetInsert, error: cabinetError } = await supabase
+            .from('Cabinet').insert([newCabinetData]).select('id, name').single();
         if (cabinetError) throw new Error(`Cabinet 삽입 오류: ${cabinetError.message}`);
+        
+        const cabinetId = cabinetInsert.id;
+
+        // 2. 사진 업로드 및 URL 업데이트 로직 (casimport 함수와 동일)
+        const photoUrls: { url_320: string | null; url_160: string | null } = { url_320: null, url_160: null };
+        const uploadPromises = [];
+
+        if (cabinetData.photo_320_base64) {
+            const path_320 = `${cabinetId}_320.png`; // 파일 이름 규칙
+            const imageData320 = decode(cabinetData.photo_320_base64.split(',')[1]);
+            uploadPromises.push(supabase.storage.from('cabinet-photos').upload(path_320, imageData320, { contentType: 'image/png', upsert: true }));
+        }
+        if (cabinetData.photo_160_base64) {
+            const path_160 = `${cabinetId}_160.png`;
+            const imageData160 = decode(cabinetData.photo_160_base64.split(',')[1]);
+            uploadPromises.push(supabase.storage.from('cabinet-photos').upload(path_160, imageData160, { contentType: 'image/png', upsert: true }));
+        }
+
+        const uploadResults = await Promise.all(uploadPromises);
+
+        for (const result of uploadResults) {
+            if (result.error) console.error("Storage 업로드 오류:", result.error.message);
+            if (!result.data) continue;
+            if (result.data.path.includes('_320.png')) {
+                photoUrls.url_320 = supabase.storage.from('cabinet-photos').getPublicUrl(result.data.path).data.publicUrl;
+            }
+            if (result.data.path.includes('_160.png')) {
+                photoUrls.url_160 = supabase.storage.from('cabinet-photos').getPublicUrl(result.data.path).data.publicUrl;
+            }
+        }
+
+        if (photoUrls.url_320 || photoUrls.url_160) {
+            const { error: updateError } = await supabase.from('Cabinet').update({ 
+                photo_url_320: photoUrls.url_320,
+                photo_url_160: photoUrls.url_160
+            }).eq('id', cabinetId);
+            if (updateError) console.error("사진 URL 업데이트 오류:", updateError.message);
+        }
 
         return withCorsHeaders(new Response(JSON.stringify({ 
             status: 'success', 
-            cabinetId: cabinetInsert.id,
+            cabinetId: cabinetId,
             cabinetName: cabinetInsert.name
         }), { status: 200 }));
 
