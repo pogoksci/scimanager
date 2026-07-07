@@ -684,10 +684,36 @@
                     th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
                     .footer { margin-top: 30px; text-align: center; font-size: 14px; }
                     .signature { text-align: right; margin-top: 20px; font-size: 14px; }
+                    
+                    /* Page Break Settings */
+                    .page {
+                        page-break-after: always;
+                        position: relative;
+                        clear: both;
+                    }
+                    .page:last-child {
+                        page-break-after: avoid;
+                    }
+                    
                     @media print {
                         body { padding: 0; -webkit-print-color-adjust: exact; }
                         th { background-color: #eee !important; }
                         body * { visibility: visible !important; }
+                        
+                        /* Repeat table headers when table splits across pages */
+                        table {
+                            page-break-inside: auto;
+                        }
+                        thead {
+                            display: table-header-group;
+                        }
+                        tr {
+                            page-break-inside: avoid;
+                            page-break-after: auto;
+                        }
+                        .footer {
+                            page-break-inside: avoid;
+                        }
                     }
                 </style>
             </head>
