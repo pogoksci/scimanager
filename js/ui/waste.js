@@ -672,9 +672,18 @@
                 <title>폐수 처리 내역서</title>
                 <link rel="stylesheet" href="/css/styles.css">
                 <style>
-                    /* Fallback or specific override if needed */
+                    body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
+                    h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
+                    .meta-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; color: #555; }
+                    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+                    th, td { border: 1px solid #000; padding: 8px; vertical-align: middle; }
+                    th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 14px; }
+                    .signature { text-align: right; margin-top: 20px; font-size: 14px; }
                     @media print {
-                        body { -webkit-print-color-adjust: exact; }
+                        body { padding: 0; -webkit-print-color-adjust: exact; }
+                        th { background-color: #eee !important; }
+                        body * { visibility: visible !important; }
                     }
                 </style>
             </head>

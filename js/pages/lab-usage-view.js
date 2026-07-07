@@ -478,9 +478,18 @@
                 <title>${title}</title>
                 <link rel="stylesheet" href="/css/styles.css">
                 <style>
-                    /* Fallback to ensure print styles are active if external load fails or for specific overrides */
+                    body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
+                    h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
+                    .meta { text-align: right; margin-bottom: 20px; font-size: 14px; color: #555; }
+                    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+                    th, td { border: 1px solid #000; padding: 8px; vertical-align: middle; }
+                    th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+                    .center { text-align: center; }
+                    .left { text-align: left; }
                     @media print {
-                         body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
+                        body { padding: 0; }
+                        th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+                        body * { visibility: visible !important; }
                     }
                 </style>
             </head>

@@ -8449,7 +8449,7 @@ input[type="text"].date-input-month-day {
     overflow: hidden !important;
   }
 
-  body * {
+  body:not(.usage-print-body):not(.waste-print-body) * {
     visibility: hidden;
   }
 
