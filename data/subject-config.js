@@ -4,14 +4,14 @@
             // aliases의 첫번째 과목명은 약칭 과목명로 사용할 '2글자'로 배치할 것.
             // grade는 해당 과목의 개설 학년임. ex) grades: [2]
             // level_grades 사용예시: 생명과학I은 2학년, 생명과학II는 3학년 과목인 경우, level_grades: { 'I': 2, 'II': 3 }
-            '생명과학': { aliases: ['생명'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
-            '물리학': { aliases: ['물리', '물'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
-            '화학': { aliases: ['화학', '화'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
-            '지구과학': { aliases: ['지구', '지학', '지'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
-            '과학탐구실험': { aliases: ['과탐', '탐구', '실험', '과학탐구실험', '과탐실'], grades: [1] },
+            '생명과학': { aliases: ['생명', 'Bio'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
+            '물리학': { aliases: ['물리', '물', 'Phys'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
+            '화학': { aliases: ['화학', '화', 'Chem'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
+            '지구과학': { aliases: ['지구', '지학', '지', 'Earth'], level_grades: { 'I': 2, 'II': 3 }, grades: [2] },
+            '과학탐구실험': { aliases: ['과탐', '탐구', '실험', '과학탐구실험', '과탐실'], level_grades: { 'I': 1 }, grades: [1] },
             '융합과학': { aliases: ['융과', '융합', '융', '융합과학'], grades: [3] },
             '생활과 과학': { aliases: ['생과', '생활과 과학', '생활과과학'], grades: [3] },
-            '통합과학': { aliases: ['통과', '통합', '통'], grades: [1] },
+            '통합과학': { aliases: ['통과', '통합', '통'], level_grades: { 'I': 1 }, grades: [1] },
             '지구시스템과학': { aliases: ['지시', '지구시스템'], grades: [2] },
             '역학과 에너지': { aliases: ['역학', '역에', '역학과에너지'], grades: [2] },
             '물질과 에너지': { aliases: ['물질', '물에', '물질과에너지'], grades: [2] },

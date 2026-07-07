@@ -51,6 +51,7 @@
     "./js/pages/lunch-lab-view.js",
     "./js/pages/safety-edu.js?v=20251227",
     "./js/pages/lab-manual.js?v=20251227",
+    "./js/ui/chatbot.js",
   ];
   const componentModules = [
     "./js/components/sort-dropdown.js", // 🔹 여기 추가됨
@@ -180,6 +181,11 @@
         }
     };
     checkApiExp();
+
+    // 🤖 챗봇 초기화
+    if (App.Chatbot && typeof App.Chatbot.init === "function") {
+      App.Chatbot.init();
+    }
 
     console.log("✅ 초기화 완료 — App 실행 중");
 

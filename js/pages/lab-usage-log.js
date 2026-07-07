@@ -9,6 +9,7 @@
     let weekDates = []; // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
     let showWeekend = false;
     let allSemesters = [];
+    let isSaving = false;
 
     let subjectMap = {};
     let teacherMap = {};
@@ -413,13 +414,13 @@
 
                     // 2. Add potential classes from TEMPLATES (Only those not already in logs)
                     cellTemplates.forEach(t => {
-                        // Check if this specific class/teacher is already in logs for this room/date/period
                         // Since multiple teachers might have same grade/class, teacher_id + subject_id + grade + class_number is the unique combo.
+                        // Use String() for all comparisons to avoid type mismatches (Number vs String)
                         const isAlreadyLogged = cellLogs.some(l =>
-                            l.teacher_id === t.teacher_id &&
-                            l.subject_id === t.subject_id &&
-                            l.grade === t.grade &&
-                            l.class_number === t.class_number
+                            String(l.teacher_id || '') === String(t.teacher_id || '') &&
+                            String(l.subject_id || '') === String(t.subject_id || '') &&
+                            String(l.grade || '') === String(t.grade || '') &&
+                            String(l.class_number || '') === String(t.class_number || '')
                         );
 
                         if (!isAlreadyLogged) {
@@ -619,76 +620,151 @@
             container.appendChild(form);
         }
 
-        async function saveWeeklyLog() {
-            if (!weekDates || weekDates.length === 0) return;
-            if (!confirm('현재 화면의 내용을 저장하시겠습니까?\n(체크된 항목만 저장되며, 기존 데이터는 덮어씌워집니다)')) return;
-
-            const supabase = globalThis.App?.supabase;
-            if (!supabase || !currentRoomId) {
-                alert('데이터베이스 연결에 문제가 있습니다.');
-                return;
-            }
-
-            try {
-                // 1. Collect Data from UI
-                const checkedEls = document.querySelectorAll('.activity-container .activity-item.checked');
-                const newRows = [];
-                const start = getYYYYMMDD(weekDates[0]);
-                const end = getYYYYMMDD(weekDates[6]);
-
-                checkedEls.forEach(el => {
-                    const raw = el.dataset.item;
-                    if (!raw) return;
-                    const d = JSON.parse(raw);
-
-                    // Find Semester for this date
-                    const usageDateObj = new Date(d.usage_date);
-                    const sem = findSemesterForDate(usageDateObj);
-
-                    const row = {
-                        lab_room_id: currentRoomId,
-                        usage_date: d.usage_date,
-                        period: parseInt(d.period),
-                        activity_type: d.activity_type,
-                        safety_education: '실시', // Default
-                        remarks: '승인',
-                        semester_id: sem ? sem.id : currentSemesterId
-                    };
-
-                    // Copy optional fields
-                    if (d.grade) row.grade = d.grade;
-                    if (d.class_number) row.class_number = d.class_number;
-                    if (d.subject_id) row.subject_id = d.subject_id;
-                    if (d.teacher_id) row.teacher_id = d.teacher_id;
-                    if (d.club_id) row.club_id = d.club_id;
-                    if (d.content) row.content = d.content;
-
-                    newRows.push(row);
-                });
-
-                // 2. Delete Existing Logs (Overwrite strategy for this room/week)
-                const { error: delError } = await supabase.from('lab_usage_log')
-                    .delete()
-                    .eq('lab_room_id', currentRoomId)
-                    .gte('usage_date', start)
-                    .lte('usage_date', end);
-
-                if (delError) throw delError;
-
-                // 3. Insert New
-                if (newRows.length > 0) {
-                    const { error: insError } = await supabase.from('lab_usage_log').insert(newRows);
-                    if (insError) throw insError;
+            async function saveWeeklyLog() {
+                if (!supabase || !currentRoomId) {
+                    alert('저장할 수 없습니다. (데이터베이스 또는 과학실 정보 누락)');
+                    return;
                 }
 
-                alert('저장되었습니다.');
-                refresh();
+                if (!weekDates || weekDates.length === 0) return;
+                if (!confirm('현재 화면의 내용을 저장하시겠습니까?\n(체크된 항목만 저장되며, 기존 데이터는 덮어씌워집니다)')) return;
 
-            } catch (err) {
-                console.error("Save failed:", err);
-                alert('저장 중 오류가 발생했습니다: ' + err.message);
+                if (isSaving) return;
+                isSaving = true;
+
+                try {
+                    const start = getYYYYMMDD(weekDates[0]);
+                    const end = getYYYYMMDD(weekDates[6]);
+
+                    // 1. Fetch Existing Logs from DB
+                    const { data: dbRows, error: fetchError } = await supabase.from('lab_usage_log')
+                        .select('*')
+                        .eq('lab_room_id', currentRoomId)
+                        .gte('usage_date', start)
+                        .lte('usage_date', end);
+
+                    if (fetchError) throw fetchError;
+
+                    // 2. Map existing rows for quick lookup
+                    const dbMap = new Map();
+                    dbRows.forEach(r => {
+                        const key = `${r.usage_date}_${r.period}`;
+                        dbMap.set(key, r);
+                    });
+
+                    // 3. Collect & Merge Checked UI Items
+                    const checkedEls = document.querySelectorAll('.activity-container .activity-item.checked');
+                    const uiMap = new Map();
+
+                    checkedEls.forEach(el => {
+                        const raw = el.dataset.raw || el.dataset.item; // Fallback for various versions
+                        if (!raw) return;
+                        const d = JSON.parse(raw);
+                        const key = `${d.usage_date}_${d.period}`;
+
+                        if (!uiMap.has(key)) {
+                            const sem = findSemesterForDate(new Date(d.usage_date));
+                            const newRow = {
+                                lab_room_id: currentRoomId,
+                                usage_date: d.usage_date,
+                                period: parseInt(d.period),
+                                activity_type: d.activity_type,
+                                safety_education: '실시', // Default
+                                remarks: '승인',
+                                semester_id: sem ? sem.id : currentSemesterId,
+                                content: d.content || '',
+                                grade: d.grade || null,
+                                class_number: d.class_number || null,
+                                subject_id: d.subject_id || null,
+                                teacher_id: d.teacher_id || null,
+                                club_id: d.club_id || null
+                            };
+                            // If this slot already exists in DB, REUSE its ID to force an UPDATE
+                            const existing = dbMap.get(key);
+                            if (existing) {
+                                newRow.id = existing.id;
+                            }
+                            uiMap.set(key, newRow);
+                        } else {
+                            // Merge logic for multiple checked items in same slot
+                            const existingInUI = uiMap.get(key);
+                            if (d.content) {
+                                existingInUI.content = existingInUI.content ? `${existingInUI.content}, ${d.content}` : d.content;
+                            }
+                            if (d.activity_type && d.activity_type !== existingInUI.activity_type) {
+                                existingInUI.activity_type = '복합활동';
+                            }
+                            // Fallback for other fields if empty
+                            existingInUI.grade = existingInUI.grade || d.grade;
+                            existingInUI.class_number = existingInUI.class_number || d.class_number;
+                            existingInUI.subject_id = existingInUI.subject_id || d.subject_id;
+                            existingInUI.teacher_id = existingInUI.teacher_id || d.teacher_id;
+                            existingInUI.club_id = existingInUI.club_id || d.club_id;
+                        }
+                    });
+
+                    // 4. Determine items to delete
+                    const idsToDelete = dbRows
+                        .filter(r => !uiMap.has(`${r.usage_date}_${r.period}`))
+                        .map(r => r.id);
+
+                    // 5. Execute Transactional Sync
+                    if (idsToDelete.length > 0) {
+                        const { error: delError } = await supabase.from('lab_usage_log')
+                            .delete()
+                            .in('id', idsToDelete);
+                        if (delError) throw delError;
+                    }
+
+                    const rowsToUpdate = [];
+                    const rowsToInsert = [];
+                    
+                    Array.from(uiMap.values()).forEach(row => {
+                        if (row.id) {
+                            rowsToUpdate.push(row);
+                        } else {
+                            const { id, ...rest } = row;
+                            rowsToInsert.push(rest);
+                        }
+                    });
+
+                    if (rowsToUpdate.length > 0) {
+                        console.log("📤 Syncing (Update existing):", rowsToUpdate);
+                        const { error: updateError } = await supabase.from('lab_usage_log').upsert(rowsToUpdate, { onConflict: 'id' });
+                        if (updateError) {
+                            console.error("❌ Sync (Update) failed:", updateError);
+                            throw new Error("기존 데이터 업데이트 중 오류(Update): " + updateError.message);
+                        }
+                    }
+                    
+                    if (rowsToInsert.length > 0) {
+                        console.log("📤 Syncing (Insert new):", rowsToInsert);
+                        
+                        // [DB 시퀀스 꼬임 방지 로직] 수동으로 가장 큰 ID를 찾아 +1 한 값을 부여
+                        const { data: maxIdData } = await supabase.from('lab_usage_log').select('id').order('id', { ascending: false }).limit(1);
+                        let nextId = (maxIdData && maxIdData.length > 0) ? parseInt(maxIdData[0].id) + 1 : 1;
+                        
+                        rowsToInsert.forEach(row => {
+                            row.id = nextId++;
+                        });
+
+                        const { error: insertError } = await supabase.from('lab_usage_log').insert(rowsToInsert);
+                        if (insertError) {
+                            console.error("❌ Sync (Insert) failed:", insertError);
+                            throw new Error("새로운 데이터 추가 중 오류(Insert): " + insertError.message);
+                        }
+                    }
+
+                    alert('저장되었습니다.');
+                    refresh();
+
+                } catch (err) {
+                    console.error("Perfect Sync failed:", err);
+                    alert('저장 중 오류가 발생했습니다:\n' + (err.message || JSON.stringify(err)));
+                } finally {
+                    isSaving = false;
+                }
             }
-        }
 
         function getGradeForSubject(fullName) {
             const config = globalThis.App?.SubjectConfig;

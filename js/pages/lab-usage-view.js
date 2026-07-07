@@ -478,9 +478,23 @@
                 <title>${title}</title>
                 <link rel="stylesheet" href="/css/styles.css">
                 <style>
-                    /* Fallback to ensure print styles are active if external load fails or for specific overrides */
+                    html, body {
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
+                    body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
+                    h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
+                    .meta { text-align: right; margin-bottom: 20px; font-size: 14px; color: #555; }
+                    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+                    th, td { border: 1px solid #000; padding: 8px; vertical-align: middle; }
+                    th { background-color: #f2f2f2; text-align: center; font-weight: bold; white-space: nowrap; }
+                    th:nth-child(7) { white-space: normal; }
+                    .center { text-align: center; white-space: nowrap; }
+                    .left { text-align: left; }
                     @media print {
-                         body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
+                        body { padding: 0; }
+                        th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+                        body * { visibility: visible !important; }
                     }
                 </style>
             </head>
@@ -489,14 +503,14 @@
                 <div class="meta usage-print-meta">출력일자: ${today}</div>
                 <table class="usage-print-table">
                     <colgroup>
-                        <col style="width: 30px;">
-                        <col style="width: 75px;">
                         <col style="width: 40px;">
-                        <col style="width: 80px;">
-                        <col style="width: 50px;">
+                        <col style="width: 100px;">
+                        <col style="width: 60px;">
+                        <col style="width: 110px;">
+                        <col style="width: 60px;">
                         <col style="width: 90px;">
                         <col style="width: auto;">
-                        <col style="width: 40px;">
+                        <col style="width: 60px;">
                     </colgroup>
                     <thead>
                         <tr>

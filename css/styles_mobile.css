@@ -964,3 +964,45 @@ body {
   font-size: 0.7rem !important;
   text-align: center !important;
 }
+
+/* =================================================================
+   21. Usage Register Detail Page Layout (Mobile)
+   ================================================================= */
+#usage-detail-section .form-row {
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#usage-detail-section .usage-row-flex {
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#usage-detail-section .usage-or-divider {
+  padding: 5px 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+#usage-detail-section .usage-col-flex {
+  width: 100% !important;
+}
+
+/* Ensure the calendar button and input fit together nicely */
+#usage-detail-section .date-input-group {
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+#usage-detail-section .date-input-box {
+  flex: 1 1 auto !important;
+}
+
+#usage-detail-section .btn-search-schedule-custom {
+  flex: 1 1 100% !important;
+  margin-left: 0 !important;
+  margin-top: 5px !important;
+  text-align: center !important;
+  justify-content: center !important;
+}

@@ -641,7 +641,7 @@
 
         // 1. 화면 전환
         document.getElementById("usage-list-section").style.display = "none";
-        document.getElementById("usage-detail-section").style.display = ""; // CSS class controls flex
+        document.getElementById("usage-detail-section").style.display = "flex"; // CSS class controls flex
 
         // 2. 선택된 아이템 정보 렌더링
         const displayContainer = document.getElementById("selected-item-display");

@@ -62,6 +62,9 @@
         return;
       }
 
+      // ✅ Sync with localStorage immediately so reload / back / forward works
+      localStorage.setItem("selected_inventory_id", inventoryId);
+
       const { data, error } = await supabase
         .from("Inventory")
         .select(`
@@ -981,7 +984,10 @@
       }
     } catch (err) {
       console.error("상세 페이지 로드 오류:", err);
-      document.getElementById("detail-page-container").innerHTML = `<p>오류: ${err.message}</p>`;
+      const detailPage = document.getElementById("inventory-detail-page");
+      if (detailPage) {
+        detailPage.innerHTML = `<p style="padding: 20px; color: red;">오류: ${err.message}</p>`;
+      }
     }
   }
 

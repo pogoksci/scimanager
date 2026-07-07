@@ -362,6 +362,14 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '신청 중...';
 
+            // [DB 시퀀스 꼬임 방지 로직] 수동으로 가장 큰 ID를 찾아 +1 한 값을 부여
+            const { data: maxIdData } = await supabase.from('lab_usage_log').select('id').order('id', { ascending: false }).limit(1);
+            if (maxIdData && maxIdData.length > 0) {
+                payload.id = parseInt(maxIdData[0].id) + 1;
+            } else {
+                payload.id = 1;
+            }
+
             const { error } = await supabase.from('lab_usage_log').insert(payload);
 
             if (error) throw error;

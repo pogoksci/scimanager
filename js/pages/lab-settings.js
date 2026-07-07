@@ -73,8 +73,48 @@
         // ==========================================
         const btnSaveSchoolInfo = document.getElementById('btn-save-school-info');
 
+        function toggleChatbotFields() {
+            const providerSelect = document.getElementById('chatbot-provider-select');
+            const keyLabel = document.getElementById('chatbot-key-label');
+            const urlGroup = document.getElementById('chatbot-api-url-group');
+            const modelGroup = document.getElementById('chatbot-model-group');
+
+            if (!providerSelect) return;
+            const val = providerSelect.value;
+
+            if (val === 'gemini') {
+                if (keyLabel) keyLabel.textContent = 'Gemini API Key';
+                if (urlGroup) urlGroup.style.display = 'none';
+                if (modelGroup) modelGroup.style.display = 'none';
+            } else if (val === 'openai') {
+                if (keyLabel) keyLabel.textContent = 'OpenAI API Key';
+                if (urlGroup) urlGroup.style.display = 'none';
+                if (modelGroup) modelGroup.style.display = 'block';
+            } else if (val === 'custom') {
+                if (keyLabel) keyLabel.textContent = 'API Key (또는 토큰)';
+                if (urlGroup) urlGroup.style.display = 'block';
+                if (modelGroup) modelGroup.style.display = 'block';
+            }
+        }
+
         // Load School Info
         async function loadSchoolInfo() {
+            // Load Chatbot settings
+            const providerSelect = document.getElementById('chatbot-provider-select');
+            const apiKeyInput = document.getElementById('chatbot-api-key-input');
+            const apiUrlInput = document.getElementById('chatbot-api-url-input');
+            const modelInput = document.getElementById('chatbot-model-input');
+
+            if (providerSelect) {
+                providerSelect.value = localStorage.getItem('chatbot_provider') || 'gemini';
+                providerSelect.onchange = toggleChatbotFields;
+            }
+            if (apiKeyInput) apiKeyInput.value = localStorage.getItem('chatbot_api_key') || '';
+            if (apiUrlInput) apiUrlInput.value = localStorage.getItem('chatbot_api_url') || '';
+            if (modelInput) modelInput.value = localStorage.getItem('chatbot_model') || '';
+
+            toggleChatbotFields();
+
             const { data, error } = await supabase
                 .from('global_settings')
                 .select('key, value');
@@ -135,6 +175,52 @@
                         window.APP_CONFIG.SCHOOL = newName;
                     }
                     alert('학교 정보가 저장되었습니다.');
+                }
+            });
+        }
+
+        // Save Chatbot Settings (Multi-Provider Support)
+        const btnSaveChatbotSettings = document.getElementById('btn-save-chatbot-settings');
+        if (btnSaveChatbotSettings) {
+            btnSaveChatbotSettings.addEventListener('click', () => {
+                const providerSelect = document.getElementById('chatbot-provider-select');
+                const apiKeyInput = document.getElementById('chatbot-api-key-input');
+                const apiUrlInput = document.getElementById('chatbot-api-url-input');
+                const modelInput = document.getElementById('chatbot-model-input');
+
+                const provider = providerSelect ? providerSelect.value : 'gemini';
+                const apiKey = apiKeyInput ? apiKeyInput.value.trim() : '';
+                const apiUrl = apiUrlInput ? apiUrlInput.value.trim() : '';
+                const model = modelInput ? modelInput.value.trim() : '';
+
+                if (apiKey) {
+                    localStorage.setItem('chatbot_provider', provider);
+                    localStorage.setItem('chatbot_api_key', apiKey);
+                    localStorage.setItem('chatbot_api_url', apiUrl);
+                    localStorage.setItem('chatbot_model', model);
+
+                    if (globalThis.App.Chatbot) {
+                        globalThis.App.Chatbot.provider = provider;
+                        globalThis.App.Chatbot.apiKey = apiKey;
+                        globalThis.App.Chatbot.apiUrl = apiUrl;
+                        globalThis.App.Chatbot.model = model;
+                        globalThis.App.Chatbot.updateStatus();
+                    }
+                    alert('AI 비서 설정이 저장되었습니다.');
+                } else {
+                    localStorage.removeItem('chatbot_provider');
+                    localStorage.removeItem('chatbot_api_key');
+                    localStorage.removeItem('chatbot_api_url');
+                    localStorage.removeItem('chatbot_model');
+
+                    if (globalThis.App.Chatbot) {
+                        globalThis.App.Chatbot.provider = 'gemini';
+                        globalThis.App.Chatbot.apiKey = null;
+                        globalThis.App.Chatbot.apiUrl = '';
+                        globalThis.App.Chatbot.model = '';
+                        globalThis.App.Chatbot.updateStatus();
+                    }
+                    alert('API 설정이 삭제되었습니다. DB 검색 모드로 복원됩니다.');
                 }
             });
         }
