@@ -245,6 +245,7 @@
       .select(`
         id, bottle_identifier, current_amount, initial_amount, unit, classification, created_at, photo_url_320, photo_url_160,
         concentration_value, concentration_unit, status, edited_name_kor,
+        school_hazardous_chemical, toxic_substance,
         door_vertical, door_horizontal, internal_shelf_level, storage_column,
         Substance ( substance_name, cas_rn, molecular_formula, molecular_mass, chem_name_kor, chem_name_kor_mod, substance_name_mod, molecular_formula_mod, Synonyms ( synonyms_name, synonyms_eng ), ReplacedRns!ReplacedRns_substance_id_fkey ( replaced_rn ) ),
         Cabinet ( cabinet_name, door_horizontal_count, area_id:lab_rooms!fk_cabinet_lab_rooms ( id, room_name ) )
@@ -389,6 +390,8 @@
         replaced_rn: replacedRns,
         is_low_stock: row.is_low_stock,
         initial_amount: row.initial_amount, // ✅ 수정 시 초기 구입량 표시를 위해 추가
+        school_hazardous_chemical: row.school_hazardous_chemical,
+        toxic_substance: row.toxic_substance,
       };
     });
 
@@ -1097,12 +1100,38 @@
           `;
     });
 
+    const formulaStr = (info.formula && info.formula !== "-") ? `(${info.formula})` : "";
+    const isHazardousStr = (info.school_hazardous_chemical === '○' || info.toxic_substance === '○') ? 'O' : 'X';
+
     return `
           <div style="border: 2px solid #000; padding: 5px; height: 100%; box-sizing: border-box; overflow: hidden;">
               <div class="item-header" style="border:none; background:none; border-bottom:1px solid #000; margin-bottom:5px;">
                   <span style="font-size: 1.1em;">(No.${info.id}) ${nameKor}</span>
                   <span style="white-space: nowrap; margin-left: 10px;">CAS: ${info.cas_rn || '-'} / 단위: ${unit}</span>
               </div>
+              
+              <!-- Chemical Info Table -->
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1px solid #000; font-size: 11px; font-family: 'Noto Sans KR', sans-serif;">
+                  <tr>
+                      <td style="width: 20%; background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">약품명</td>
+                      <td style="width: 30%; border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">${nameKor}${formulaStr}</td>
+                      <td style="width: 20%; background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">유효기간</td>
+                      <td style="width: 30%; border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;"></td>
+                  </tr>
+                  <tr>
+                      <td style="background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">농도</td>
+                      <td style="border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">${info.concentration_text || '-'}</td>
+                      <td style="background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">주용도</td>
+                      <td style="border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">실험용</td>
+                  </tr>
+                  <tr>
+                      <td style="background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">유해화학물질 여부</td>
+                      <td style="border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">${isHazardousStr}</td>
+                      <td style="background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">단위</td>
+                      <td style="border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">${unit || '-'}</td>
+                  </tr>
+              </table>
+
               <table class="item-table" style="margin:0; border:none;">
                   <thead>
                       <tr>
