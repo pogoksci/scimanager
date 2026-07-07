@@ -478,6 +478,10 @@
                 <title>${title}</title>
                 <link rel="stylesheet" href="/css/styles.css">
                 <style>
+                    html, body {
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
                     body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
                     h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
                     .meta { text-align: right; margin-bottom: 20px; font-size: 14px; color: #555; }

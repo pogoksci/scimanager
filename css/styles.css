@@ -8441,8 +8441,8 @@ input[type="text"].date-input-month-day {
     margin: 15mm;
   }
 
-  html,
-  body {
+  html:not(:has(.usage-print-body)):not(:has(.waste-print-body)),
+  body:not(.usage-print-body):not(.waste-print-body) {
     height: 100%;
     margin: 0 !important;
     padding: 0 !important;

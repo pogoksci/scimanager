@@ -672,6 +672,10 @@
                 <title>폐수 처리 내역서</title>
                 <link rel="stylesheet" href="/css/styles.css">
                 <style>
+                    html, body {
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
                     body { font-family: "Malgun Gothic", sans-serif; padding: 20px; }
                     h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
                     .meta-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; color: #555; }
