@@ -49,7 +49,7 @@ GitHub에 있는 코드를 내 컴퓨터로 가져오기 위한 도구입니다.
    - 아래 명령어를 정확히 입력하고 엔터를 칩니다. (뒤에 `scimanager`이
      붙어있는지 꼭 확인하세요!)
    ```bash
-   git clone https://github.com/pogoksci/pogoksci.github.io.git scimanager
+   git clone https://github.com/pogoksci/scimanager.git
    ```
 5. **완료 및 이동**:
    - 설치가 끝나면 왼쪽에 `scimanager` 폴더가 보입니다.
@@ -67,7 +67,7 @@ GitHub에 있는 코드를 내 컴퓨터로 가져오기 위한 도구입니다.
 3. **명령어 입력**:
    - 아래 명령어를 입력하고 엔터를 칩니다.
    ```powershell
-   git clone https://github.com/pogoksci/pogoksci.github.io.git scimanager
+   git clone https://github.com/pogoksci/scimanager.git
    ```
 4. **결과 확인**:
    - `D:\git` 폴더 안에 `scimanager` 라는 폴더가 생겼는지 확인합니다.
