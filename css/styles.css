@@ -6025,6 +6025,7 @@ input[type="text"].date-input-month-day {
 
 #inventory-list-container-page .modal-content-report {
   max-width: 400px;
+  overflow-y: auto;
 }
 
 #inventory-list-container-page .modal-header-report {
