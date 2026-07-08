@@ -678,11 +678,76 @@
             id, current_amount, unit, door_vertical, door_horizontal, internal_shelf_level, storage_column,
             Cabinet ( cabinet_name, door_horizontal_count, area_id:lab_rooms!fk_cabinet_lab_rooms ( room_name ) )
           `)
-          .eq("substance_id", substance.id);
+          .eq("substance_id", substance.id)
+          .gt("current_amount", 0); // 재고가 0보다 큰 것만 가져옴
 
         if (!invErr && invItems && invItems.length > 0) {
-          let locRowsHtml = "";
-          invItems.forEach(item => {
+          let gridContent = "";
+
+          if (invItems.length > 1) {
+            // 여러 개 있는 경우 표 형태로 출력
+            let tableRowsHtml = "";
+            invItems.forEach(item => {
+              const area = item.Cabinet?.area_id?.room_name || "";
+              const cabinetName = item.Cabinet?.cabinet_name || "";
+              const doorVertical = item.door_vertical || "";
+              const doorHorizontal = item.door_horizontal || "";
+              const hCount = Number(item.Cabinet?.door_horizontal_count || 0);
+              const shelfLevel = item.internal_shelf_level;
+              const column = item.storage_column;
+
+              let doorHLabel = "";
+              if (hCount > 1) {
+                if (doorHorizontal === "1") doorHLabel = "왼쪽";
+                else if (doorHorizontal === "2") doorHLabel = "오른쪽";
+                else if (doorHorizontal) doorHLabel = doorHorizontal;
+              }
+
+              const detailParts = [];
+              if (doorVertical && doorHLabel) detailParts.push(`${doorVertical}층 ${doorHLabel}문`);
+              else if (doorVertical) detailParts.push(`${doorVertical}층문`);
+              else if (doorHLabel) detailParts.push(`${doorHLabel}문`);
+
+              let shelfPart = "";
+              if (shelfLevel && column) shelfPart = `${shelfLevel}단 ${column}열`;
+              else {
+                if (shelfLevel) shelfPart += `${shelfLevel}단`;
+                if (column) shelfPart += (shelfPart ? " " : "") + `${column}열`;
+              }
+              if (shelfPart) detailParts.push(shelfPart);
+
+              const detailStr = detailParts.join(", ");
+              const locMain = `${area} 『${cabinetName}』`.trim();
+              const fullLoc = detailStr ? `${locMain} (${detailStr})` : locMain;
+
+              tableRowsHtml += `
+                <tr style="border-bottom: 1px solid #dee2e6; background: white;">
+                  <td style="padding: 6px 4px; font-weight: bold; color: #222; font-size: 11px; text-align: left; word-break: break-all; line-height: 1.3;">📍 ${fullLoc || '미지정'}</td>
+                  <td style="padding: 6px 4px; text-align: right; color: #495057; font-size: 11px; white-space: nowrap;">${item.current_amount || 0}${item.unit || ''}</td>
+                  <td style="padding: 6px 4px; text-align: center;">
+                    <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 6px; font-size: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" onclick="App.Chatbot.goToInventoryDetail(${item.id})">상세</button>
+                  </td>
+                </tr>
+              `;
+            });
+
+            gridContent = `
+              <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; line-height: 1.4; table-layout: auto;">
+                <thead>
+                  <tr style="border-bottom: 2px solid #dee2e6; text-align: left; background: #f1f3f5; font-weight: bold; color: #495057;">
+                    <th style="padding: 6px 4px; text-align: left;">보관 위치</th>
+                    <th style="padding: 6px 4px; text-align: right; width: 60px;">수량</th>
+                    <th style="padding: 6px 4px; text-align: center; width: 45px;">상세</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableRowsHtml}
+                </tbody>
+              </table>
+            `;
+          } else {
+            // 한 개만 있는 경우 카드 형태
+            const item = invItems[0];
             const area = item.Cabinet?.area_id?.room_name || "";
             const cabinetName = item.Cabinet?.cabinet_name || "";
             const doorVertical = item.door_vertical || "";
@@ -715,16 +780,16 @@
             const locMain = `${area} 『${cabinetName}』`.trim();
             const fullLoc = detailStr ? `${locMain} (${detailStr})` : locMain;
 
-            locRowsHtml += `
+            gridContent = `
               <div class="chatbot-matching-item" style="padding: 6px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <span class="chatbot-matching-name" style="font-weight: bold; color: #222;">📍 ${fullLoc || '위치 미지정'}</span>
                   <div style="font-size: 11.5px; color: #666; margin-top: 2px;">📦 보유 수량: ${item.current_amount || 0}${item.unit || '개'} (No.${item.id})</div>
                 </div>
-                <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 8px; font-size:11px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="App.Chatbot.goToDetail(${substance.id})">상세이동</button>
+                <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 8px; font-size:11px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="App.Chatbot.goToInventoryDetail(${item.id})">상세이동</button>
               </div>
             `;
-          });
+          }
 
           return `📍 <b>${chemName}</b>의 과학실 내 보관 위치 정보입니다.
           <div class="chatbot-chemical-card" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-top: 8px;">
@@ -736,7 +801,7 @@
               <span class="chatbot-chem-cas" style="font-size: 11px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${casRn}</span>
             </div>
             <div class="chatbot-matching-grid" style="display: flex; flex-direction: column;">
-              ${locRowsHtml}
+              ${gridContent}
             </div>
           </div>
           <div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
@@ -904,6 +969,16 @@ ${propText}
             alert("해당 물질의 등록된 재고(시약병)가 없습니다.");
           }
         });
+    },
+
+    goToInventoryDetail: function (inventoryId) {
+      this.togglePanel(false); // 챗봇 패널 닫기
+      if (getApp().Router?.go) {
+        getApp().Router.go("inventoryDetail", { id: inventoryId });
+      } else {
+        localStorage.setItem("selected_inventory_id", inventoryId);
+        location.reload();
+      }
     },
 
     // ------------------------------------------------------------
