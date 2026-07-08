@@ -146,21 +146,7 @@
         <div class="chatbot-msg-row msg-bot">
           <div class="chatbot-bubble">
             안녕하세요! 🧪 <b>AI 과학실 챗봇</b>입니다.<br>
-            정보를 조회하고자 하는 시약의 이름을 입력해 주세요.<br><br>
-            <span style="color:#777; font-size:12px;">💡 <b>시약 예시:</b></span>
-            <ul style="margin: 4px 0 8px 16px; padding: 0; font-size:12.5px; color:#555;">
-              <li>"수산화 나트륨"</li>
-              <li>"염산"</li>
-              <li>"에탄올"</li>
-              <li>"아세톤"</li>
-            </ul>
-            밑의 추천 시약을 클릭하거나 직접 이름을 입력해 보세요!
-            <div class="chatbot-chips-container" style="margin-top: 10px;">
-              <button class="chatbot-chip" onclick="App.Chatbot.askPreset('수산화 나트륨')">🧪 수산화 나트륨</button>
-              <button class="chatbot-chip" onclick="App.Chatbot.askPreset('염산')">🧪 염산</button>
-              <button class="chatbot-chip" onclick="App.Chatbot.askPreset('에탄올')">🧪 에탄올</button>
-              <button class="chatbot-chip" onclick="App.Chatbot.askPreset('아세톤')">🧪 아세톤</button>
-            </div>
+            과학실 시약, 교구, 설비의 보관 위치나 MSDS 안전 정보를 언제든 물어보세요. 무엇을 도와드릴까요?
           </div>
         </div>
       `;
@@ -290,13 +276,7 @@
         if (inputEl) {
           inputEl.placeholder = "무엇을 도와드릴까요?";
         }
-        return `🔄 다른 시약을 검색합니다. 시약의 이름을 입력해 주세요.
-        <div class="chatbot-chips-container" style="margin-top: 10px;">
-          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('수산화 나트륨')">🧪 수산화 나트륨</button>
-          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('염산')">🧪 염산</button>
-          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('에탄올')">🧪 에탄올</button>
-          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('아세톤')">🧪 아세톤</button>
-        </div>`;
+        return `🔄 검색 상태가 초기화되었습니다. 궁금하신 약품, 교구, 설비의 이름을 입력해 주세요.`;
       }
 
       // --- 실험 준비물 매칭 (아이디어 2) ---
