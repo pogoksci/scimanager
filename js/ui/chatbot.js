@@ -708,58 +708,1182 @@
         };
 
         const chemDefaults = {
-          "염산": { mw: 36.46, density: 1.18, defaultConc: 37, defaultUnit: "%" },
-          "황산": { mw: 98.08, density: 1.84, defaultConc: 98, defaultUnit: "%" },
-          "질산": { mw: 63.01, density: 1.42, defaultConc: 70, defaultUnit: "%" },
-          "아세톤": { mw: 58.08, density: 0.79, defaultConc: 99.5, defaultUnit: "%" },
-          "에탄올": { mw: 46.07, density: 0.789, defaultConc: 99, defaultUnit: "%" },
-          "수산화나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
-          "수산화 나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
-          "암모니아": { mw: 17.03, density: 0.907, defaultConc: 25, defaultUnit: "%" },
-          "암모니아수": { mw: 17.03, density: 0.907, defaultConc: 25, defaultUnit: "%" },
-          "과산화수소": { mw: 34.01, density: 1.11, defaultConc: 30, defaultUnit: "%" },
-          "과산화 수소": { mw: 34.01, density: 1.11, defaultConc: 30, defaultUnit: "%" },
-          "아세트산": { mw: 60.05, density: 1.05, defaultConc: 99.5, defaultUnit: "%" },
-          "인산": { mw: 97.99, density: 1.685, defaultConc: 85, defaultUnit: "%" },
-          "수산화칼륨": { mw: 56.11, density: 2.04, defaultConc: 85, defaultUnit: "%" },
-          "수산화 칼륨": { mw: 56.11, density: 2.04, defaultConc: 85, defaultUnit: "%" },
-          "염화칼슘": { mw: 110.98, density: 2.15, defaultConc: 100, defaultUnit: "%" },
-          "염화 칼슘": { mw: 110.98, density: 2.15, defaultConc: 100, defaultUnit: "%" },
-          "염화나트륨": { mw: 58.44, density: 2.16, defaultConc: 100, defaultUnit: "%" },
-          "염화 나트륨": { mw: 58.44, density: 2.16, defaultConc: 100, defaultUnit: "%" },
-          "탄산수소나트륨": { mw: 84.01, density: 2.2, defaultConc: 100, defaultUnit: "%" },
-          "탄산 수소 나트륨": { mw: 84.01, density: 2.2, defaultConc: 100, defaultUnit: "%" },
-          "포도당": { mw: 180.16, density: 1.54, defaultConc: 100, defaultUnit: "%" },
-          "질산은": { mw: 169.87, density: 4.35, defaultConc: 100, defaultUnit: "%" },
-          "질산 은": { mw: 169.87, density: 4.35, defaultConc: 100, defaultUnit: "%" },
-          "황산구리": { mw: 249.68, density: 2.28, defaultConc: 100, defaultUnit: "%" },
-          "황산 구리": { mw: 249.68, density: 2.28, defaultConc: 100, defaultUnit: "%" },
-          "아이오딘화칼륨": { mw: 166.0, density: 3.12, defaultConc: 100, defaultUnit: "%" },
-          "아이오딘화 칼륨": { mw: 166.0, density: 3.12, defaultConc: 100, defaultUnit: "%" },
-          "과망간산칼륨": { mw: 158.03, density: 2.7, defaultConc: 100, defaultUnit: "%" },
-          "과망간산 칼륨": { mw: 158.03, density: 2.7, defaultConc: 100, defaultUnit: "%" },
-          "질산칼륨": { mw: 101.1, density: 2.1, defaultConc: 100, defaultUnit: "%" },
-          "질산 칼륨": { mw: 101.1, density: 2.1, defaultConc: 100, defaultUnit: "%" },
-          "황산나트륨": { mw: 142.04, density: 2.68, defaultConc: 100, defaultUnit: "%" },
-          "황산 나트륨": { mw: 142.04, density: 2.68, defaultConc: 100, defaultUnit: "%" },
-          "염화마그네슘": { mw: 203.3, density: 1.57, defaultConc: 100, defaultUnit: "%" },
-          "염화 마그네슘": { mw: 203.3, density: 1.57, defaultConc: 100, defaultUnit: "%" },
-          "염화구리": { mw: 170.48, density: 2.51, defaultConc: 100, defaultUnit: "%" },
-          "염화 구리": { mw: 170.48, density: 2.51, defaultConc: 100, defaultUnit: "%" },
-          "황산아연": { mw: 287.5, density: 1.97, defaultConc: 100, defaultUnit: "%" },
-          "황산 아연": { mw: 287.5, density: 1.97, defaultConc: 100, defaultUnit: "%" },
-          "질산납": { mw: 331.2, density: 4.53, defaultConc: 100, defaultUnit: "%" },
-          "질산 납": { mw: 331.2, density: 4.53, defaultConc: 100, defaultUnit: "%" },
-          "티오황산나트륨": { mw: 248.18, density: 1.69, defaultConc: 100, defaultUnit: "%" },
-          "티오황산 나트륨": { mw: 248.18, density: 1.69, defaultConc: 100, defaultUnit: "%" },
-          "탄산칼슘": { mw: 100.09, density: 2.71, defaultConc: 100, defaultUnit: "%" },
-          "탄산 칼슘": { mw: 100.09, density: 2.71, defaultConc: 100, defaultUnit: "%" },
-          "구연산나트륨": { mw: 294.1, density: 1.7, defaultConc: 100, defaultUnit: "%" },
-          "구연산 나트륨": { mw: 294.1, density: 1.7, defaultConc: 100, defaultUnit: "%" },
-          "질산암모늄": { mw: 80.04, density: 1.72, defaultConc: 100, defaultUnit: "%" },
-          "질산 암모늄": { mw: 80.04, density: 1.72, defaultConc: 100, defaultUnit: "%" },
-          "황산암모늄": { mw: 132.14, density: 1.77, defaultConc: 100, defaultUnit: "%" },
-          "황산 암모늄": { mw: 132.14, density: 1.77, defaultConc: 100, defaultUnit: "%" },
+          "인산": {
+            "mw": 98,
+            "density": 1.685,
+            "defaultConc": 85,
+            "defaultUnit": "%"
+          },
+          "C.I. 염기성 보라색 010": {
+            "mw": 479.01,
+            "density": 1.3,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "황산": {
+            "mw": 98.08,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "암모니아 용액": {
+            "mw": 35.05,
+            "density": 0.907,
+            "defaultConc": 25,
+            "defaultUnit": "%"
+          },
+          "암모니아수": {
+            "mw": 35.05,
+            "density": 0.907,
+            "defaultConc": 25,
+            "defaultUnit": "%"
+          },
+          "감초 추출물": {
+            "mw": 0,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "C.I. pigment red 179": {
+            "mw": 177.16,
+            "density": 1.61,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "루미놀 용액": {
+            "mw": 177.16,
+            "density": 1.61,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "디클로로메탄": {
+            "mw": 84.93,
+            "density": 1.3255,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화수소": {
+            "mw": 36.46,
+            "density": 1.19,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염산": {
+            "mw": 36.46,
+            "density": 1.18,
+            "defaultConc": 37,
+            "defaultUnit": "%"
+          },
+          "D-리모넨(D-LIMONENE)": {
+            "mw": 136.23,
+            "density": 0.8402,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "D-리모넨": {
+            "mw": 136.23,
+            "density": 0.8402,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "P-아미노페놀": {
+            "mw": 109.13,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "헤모글로빈": {
+            "mw": 0,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "황산 마그네슘": {
+            "mw": 122.38,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "메틸 알코올": {
+            "mw": 32.04,
+            "density": 0.81,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "칼륨 페로시안화물 트리수화물(POTASSIUM FERROCYANIDE TRIHYDRATE)": {
+            "mw": 422.39,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "칼륨 페로시안화물 트리수화물": {
+            "mw": 422.39,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "페로시안화 칼륨 3수화물": {
+            "mw": 422.39,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "Magnesium": {
+            "mw": 24.31,
+            "density": 1.738,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "마그네슘": {
+            "mw": 24.31,
+            "density": 1.738,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "질산칼륨": {
+            "mw": 102.11,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 칼륨": {
+            "mw": 102.11,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "과산화수소": {
+            "mw": 34.01,
+            "density": 1.11,
+            "defaultConc": 30,
+            "defaultUnit": "%"
+          },
+          "글리세롤": {
+            "mw": 92.09,
+            "density": 1.2613,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "말론 산": {
+            "mw": 104.06,
+            "density": 1.6,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "스트론튬 염화물, 헥사수화물(STRONTIUM CHLORIDE, HEXAHYDRATE)": {
+            "mw": 266.61,
+            "density": 1.95,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "스트론튬 염화물, 헥사수화물": {
+            "mw": 266.61,
+            "density": 1.95,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 스트론튬 6수화물": {
+            "mw": 266.61,
+            "density": 1.95,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "붕소산 사나트륨염(십수화물)": {
+            "mw": 381.37,
+            "density": 1.73,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "붕소산 사나트륨염": {
+            "mw": 381.37,
+            "density": 1.73,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "붕사": {
+            "mw": 381.37,
+            "density": 1.73,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "규산나트륨(SODIUM SILICATE)": {
+            "mw": 122.06,
+            "density": 1.4,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "규산나트륨": {
+            "mw": 122.06,
+            "density": 1.4,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "규산 나트륨": {
+            "mw": 122.06,
+            "density": 1.4,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화마그네슘": {
+            "mw": 40.3,
+            "density": 3.58,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 마그네슘, 헥사하이드레이트": {
+            "mw": 203.3,
+            "density": 1.56,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 마그네슘 6수화물": {
+            "mw": 203.3,
+            "density": 1.56,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "질산 은": {
+            "mw": 170.88,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "요오드": {
+            "mw": 253.81,
+            "density": 4.9,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아이오딘 용액": {
+            "mw": 253.81,
+            "density": 4.9,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "젖산 칼슘 5수화물": {
+            "mw": 310.31,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "코발트 염화물, 헥사수화물(COBALT CHLORIDE, HEXAHYDRATE)": {
+            "mw": 237.93,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "코발트 염화물, 헥사수화물": {
+            "mw": 237.93,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 코발트 6수화물": {
+            "mw": 237.93,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "수산화나트륨": {
+            "mw": 40,
+            "density": 2.13,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "수산화 나트륨": {
+            "mw": 40,
+            "density": 2.13,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "수산화 칼슘": {
+            "mw": 74.09,
+            "density": 2.24,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "질산 니켈, 헥사히드레이트(NICKEL NITRATE, HEXAHYDRATE)": {
+            "mw": 292.81,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 니켈, 헥사히드레이트": {
+            "mw": 292.81,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 니켈 6수화물": {
+            "mw": 292.81,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산암모늄": {
+            "mw": 80.04,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 암모늄": {
+            "mw": 80.04,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "구연산 나트륨(SODIUM CITRATE)": {
+            "mw": 297.12,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "구연산 나트륨": {
+            "mw": 297.12,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "구연산 나트륨 2수화물": {
+            "mw": 297.12,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "에탄올": {
+            "mw": 46.07,
+            "density": 0.789,
+            "defaultConc": 99,
+            "defaultUnit": "%"
+          },
+          "질산 구리(II) 삼수화물": {
+            "mw": 243.62,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 구리 삼수화물": {
+            "mw": 243.62,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "페놀 레드": {
+            "mw": 354.38,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "요오드화 칼륨": {
+            "mw": 166,
+            "density": 3.13,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아이오딘화 칼륨": {
+            "mw": 166,
+            "density": 3.13,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "시트르산 모노수화물(CITRIC ACID MONOHYDRATE)": {
+            "mw": 210.14,
+            "density": 1.5,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "시트르산 모노수화물": {
+            "mw": 210.14,
+            "density": 1.5,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 나트륨(SODIUM CHLORIDE)": {
+            "mw": 58.44,
+            "density": 2.165,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 나트륨": {
+            "mw": 58.44,
+            "density": 2.165,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "사프라닌 O": {
+            "mw": 350.85,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아이오딘화 나트륨(요오드화 나트륨)(SODIUM IODIDE)": {
+            "mw": 149.89,
+            "density": 3.67,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아이오딘화 나트륨": {
+            "mw": 149.89,
+            "density": 3.67,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "황산암모늄": {
+            "mw": 132.14,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 암모늄": {
+            "mw": 132.14,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "무수초산": {
+            "mw": 102.09,
+            "density": 1.082,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "무수 아세트산": {
+            "mw": 102.09,
+            "density": 1.05,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "이소프로필 알코올": {
+            "mw": 60.1,
+            "density": 0.78505,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "이산화 망간": {
+            "mw": 86.94,
+            "density": 5,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 리튬(LITHIUM CHLORIDE)": {
+            "mw": 42.39,
+            "density": 2.07,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 리튬": {
+            "mw": 42.39,
+            "density": 2.07,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "알루미늄 암모늄 황산염 도데카수화물": {
+            "mw": 456.35,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "백반": {
+            "mw": 456.35,
+            "density": 1.64,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "C.I. 염기성 청색 009": {
+            "mw": 319.85,
+            "density": 1.31,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "메틸렌 블루": {
+            "mw": 319.85,
+            "density": 1.31,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "질산나트륨": {
+            "mw": 86,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 나트륨": {
+            "mw": 86,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "브로모티몰 청색": {
+            "mw": 624.38,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "BTB 용액": {
+            "mw": 624.38,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "톨루이딘 블루 O": {
+            "mw": 305.83,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "탄소": {
+            "mw": 12.01,
+            "density": 1.8,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "바륨 수산화물, 옥타수화물(BARIUM HYDROXIDE, OCTAHYDRATE)": {
+            "mw": 315.46,
+            "density": 2.18,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "바륨 수산화물, 옥타수화물": {
+            "mw": 315.46,
+            "density": 2.18,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "수산화 바륨 8수화물": {
+            "mw": 315.46,
+            "density": 2.18,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "티몰프탈레인": {
+            "mw": 430.54,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "수산화 칼륨": {
+            "mw": 56.11,
+            "density": 2.044,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 제I구리": {
+            "mw": 143.09,
+            "density": 6,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 구리(I)": {
+            "mw": 143.09,
+            "density": 6,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 구리": {
+            "mw": 79.55,
+            "density": 6.315,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "구리": {
+            "mw": 63.55,
+            "density": 8.94,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "페놀프탈레인": {
+            "mw": 318.32,
+            "density": 1.277,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "요오드산 칼륨": {
+            "mw": 215.01,
+            "density": 3.98,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아이오딘산 칼륨": {
+            "mw": 215.01,
+            "density": 3.98,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "한천": {
+            "mw": 0,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "알긴산 나트륨(SODIUM ALGINATE)": {
+            "mw": 0,
+            "density": 1.25,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "알긴산 나트륨": {
+            "mw": 0,
+            "density": 1.25,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "전분": {
+            "mw": 0,
+            "density": 0.119,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "녹말": {
+            "mw": 0,
+            "density": 0.119,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "황산 제1철, 칠수화물(FERROUS SULFATE, HEPTAHYDRATE)": {
+            "mw": 280.03,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 제1철, 칠수화물": {
+            "mw": 280.03,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 제1철 7수화물": {
+            "mw": 280.03,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "Potassium chromate": {
+            "mw": 196.21,
+            "density": 2.73,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "크롬산 칼륨": {
+            "mw": 196.21,
+            "density": 2.73,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "철": {
+            "mw": 55.85,
+            "density": 7.86,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "GENTIAN VIOLET": {
+            "mw": 407.98,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "크리스탈 바이올렛": {
+            "mw": 407.98,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "황산 나트륨": {
+            "mw": 144.06,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 나트륨 무수물": {
+            "mw": 144.06,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "이탄산 나트륨(SODIUM BICARBONATE)": {
+            "mw": 85.01,
+            "density": 2.159,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "이탄산 나트륨": {
+            "mw": 85.01,
+            "density": 2.159,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "탄산 수소 나트륨": {
+            "mw": 85.01,
+            "density": 2.159,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 제II구리, 디히드레이트(CUPRIC CHLORIDE, DIHYDRATE)": {
+            "mw": 170.48,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 제II구리, 디히드레이트": {
+            "mw": 170.48,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 구리(II) 2수화물": {
+            "mw": 170.48,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 구리 2수화물": {
+            "mw": 170.48,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "2-하이드록시-5-((3-나이트로페닐)아조)벤조 산 모노나트륨 염(2-HYDROXY-5-((3-NITROPHEN...": {
+            "mw": 310.22,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "2-하이드록시-5-벤조 산 모노나트륨 염(2-HYDROXY-5-((3-NITROPHEN...": {
+            "mw": 310.22,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "알리자린 옐로우": {
+            "mw": 310.22,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 제2철, 헥사히드레이트": {
+            "mw": 270.3,
+            "density": 1.339,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 철(II) 6수화물": {
+            "mw": 270.3,
+            "density": 1.339,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 철 6수화물": {
+            "mw": 270.3,
+            "density": 1.339,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "탄산 칼슘": {
+            "mw": 102.1,
+            "density": 2.8,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "티몰 블루": {
+            "mw": 466.59,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "Potassium dichromate": {
+            "mw": 296.2,
+            "density": 2.676,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "중크롬산 칼륨": {
+            "mw": 296.2,
+            "density": 2.676,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "Aluminum": {
+            "mw": 26.98,
+            "density": 2.7,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "알루미늄": {
+            "mw": 26.98,
+            "density": 2.7,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화칼슘": {
+            "mw": 56.08,
+            "density": 3.3,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 칼슘": {
+            "mw": 56.08,
+            "density": 3.3,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "나트륨 옥살산염": {
+            "mw": 136.01,
+            "density": 2.34,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "브로민화물 표준용액 브로민화물 표준용액 (1 mg/ml 브로민화물)(BROMIDE STANDARD SOLUTION (1 mg/ml BROMIDE))": {
+            "mw": 119,
+            "density": 2.75,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "브로민화물 표준용액 브로민화물 표준용액": {
+            "mw": 119,
+            "density": 2.75,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "브로민화 칼륨": {
+            "mw": 119,
+            "density": 2.75,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아망가니즈 황산염 모노수화물": {
+            "mw": 171.03,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 망간 모노수화물": {
+            "mw": 171.03,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "티오황산 나트륨 펜타수화물(SODIUM THIOSULFATE PENTAHYDRATE)": {
+            "mw": 250.2,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "티오황산 나트륨 펜타수화물": {
+            "mw": 250.2,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "티오황산 나트륨 5수화물": {
+            "mw": 250.2,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 칼륨": {
+            "mw": 176.28,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "이산화티타늄": {
+            "mw": 79.87,
+            "density": 4.23,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "소디움 비설파이트": {
+            "mw": 105.07,
+            "density": 1.48,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아황산수소 나트륨": {
+            "mw": 105.07,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 아연, 헵타수화물": {
+            "mw": 289.58,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 아연 7수화물": {
+            "mw": 289.58,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "브로민산 칼륨(브롬산 칼륨)(POTASSIUM BROMATE)": {
+            "mw": 168.01,
+            "density": 3.34,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "브로민산 칼륨": {
+            "mw": 168.01,
+            "density": 3.34,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화제1철-제1철(FERRIC-FERROUS OXIDE)": {
+            "mw": 231.54,
+            "density": 5.1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화제1철-제1철": {
+            "mw": 231.54,
+            "density": 5.1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 철(II),(III), Black": {
+            "mw": 231.54,
+            "density": 5.1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 철, Black": {
+            "mw": 231.54,
+            "density": 5.1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "싸이오사이안산 칼륨": {
+            "mw": 98.19,
+            "density": 1.956,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "티오시안산 칼륨": {
+            "mw": 98.19,
+            "density": 1.956,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "인디고 카르민(INDIGO CARMINE)": {
+            "mw": 468.37,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "인디고 카르민": {
+            "mw": 468.37,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "인디고 카민": {
+            "mw": 468.37,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "덱스트로스": {
+            "mw": 180.16,
+            "density": 1.544,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "포도당": {
+            "mw": 180.16,
+            "density": 1.544,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "초산": {
+            "mw": 60.05,
+            "density": 1.0446,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아세트산": {
+            "mw": 60.05,
+            "density": 1.05,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "살리실산": {
+            "mw": 138.12,
+            "density": 1.443,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "과망간산칼륨": {
+            "mw": 159.04,
+            "density": 2.7,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "과망간산 칼륨": {
+            "mw": 159.04,
+            "density": 2.7,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "메틸 적색": {
+            "mw": 269.3,
+            "density": 1.31,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "메틸 레드": {
+            "mw": 269.3,
+            "density": 1.31,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "브이엠 및 피 나프타": {
+            "mw": 0,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "석유 에테르": {
+            "mw": 0,
+            "density": 1,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "메틸 오렌지(METHYL ORANGE)": {
+            "mw": 328.34,
+            "density": 1.473,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "메틸 오렌지": {
+            "mw": 328.34,
+            "density": 1.473,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화철": {
+            "mw": 159.69,
+            "density": 5.24,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 철(III), Red": {
+            "mw": 159.69,
+            "density": 5.24,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 철, Red": {
+            "mw": 159.69,
+            "density": 5.24,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 칼슘(CALCIUM CHLORIDE)": {
+            "mw": 110.98,
+            "density": 2.152,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "염화 칼슘": {
+            "mw": 110.98,
+            "density": 2.152,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "나트륨 아세트산, 트리수화물(SODIUM ACETATE, TRIHYDRATE)": {
+            "mw": 137.09,
+            "density": 1.05,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "나트륨 아세트산, 트리수화물": {
+            "mw": 137.09,
+            "density": 1.05,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "아세트산 나트륨 3수화물": {
+            "mw": 137.09,
+            "density": 1.05,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "아세톤": {
+            "mw": 58.08,
+            "density": 0.79,
+            "defaultConc": 99.5,
+            "defaultUnit": "%"
+          },
+          "질산 납(Ⅱ)": {
+            "mw": 333.24,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 납": {
+            "mw": 333.24,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "질산 납(II)": {
+            "mw": 333.24,
+            "density": 1.42,
+            "defaultConc": 70,
+            "defaultUnit": "%"
+          },
+          "황산 구리(II), 오수화물": {
+            "mw": 251.7,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 구리, 오수화물": {
+            "mw": 251.7,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 구리(II) 5수화물": {
+            "mw": 251.7,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "황산 구리 5수화물": {
+            "mw": 251.7,
+            "density": 1.84,
+            "defaultConc": 98,
+            "defaultUnit": "%"
+          },
+          "산화 제II구리(CUPRIC OXIDE)": {
+            "mw": 79.55,
+            "density": 6.315,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 제II구리": {
+            "mw": 79.55,
+            "density": 6.315,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "산화 구리(II)": {
+            "mw": 79.55,
+            "density": 6.315,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "Zinc": {
+            "mw": 65.4,
+            "density": 7.14,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          },
+          "아연": {
+            "mw": 65.4,
+            "density": 7.14,
+            "defaultConc": 100,
+            "defaultUnit": "%"
+          }
         };
 
         const defaultData = Object.keys(chemDefaults).find(k => chemName.includes(k)) ? chemDefaults[Object.keys(chemDefaults).find(k => chemName.includes(k))] : null;
