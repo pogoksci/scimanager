@@ -727,13 +727,13 @@
             "defaultUnit": "%"
           },
           "암모니아 용액": {
-            "mw": 17.03,
+            "mw": 35.05,
             "density": 0.907,
             "defaultConc": 25,
             "defaultUnit": "%"
           },
           "암모니아수": {
-            "mw": 17.03,
+            "mw": 35.05,
             "density": 0.907,
             "defaultConc": 25,
             "defaultUnit": "%"
@@ -1914,7 +1914,8 @@
               sourceM = currentConcVal;
             } else if (currentUnit === "%") {
               if (mw) {
-                sourceM = (currentConcVal * 10 * density) / mw;
+                const calculationMw = (chemName.includes("암모니아") || chemName.includes("ammonia")) ? 17.03 : mw;
+                sourceM = (currentConcVal * 10 * density) / calculationMw;
               } else {
                 sourceM = 0;
               }
@@ -1932,7 +1933,8 @@
             destM = targetConc / 1000;
           } else if (targetUnit === "%") {
             if (mw) {
-              destM = (targetConc * 10 * 1.0) / mw;
+              const calculationMw = (chemName.includes("암모니아") || chemName.includes("ammonia")) ? 17.03 : mw;
+              destM = (targetConc * 10 * 1.0) / calculationMw;
             }
           }
 
