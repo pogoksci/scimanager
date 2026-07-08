@@ -897,14 +897,17 @@
     itemsToProcess.forEach(item => {
       const itemLogs = logs.filter(l => l.inventory_id === item.id);
 
-      // Split Logs based on usage_date
+      // Split Logs based on usage_date (normalized to YYYY-MM-DD for comparison)
       const beforeLogs = itemLogs.filter(l => {
-        const d = l.usage_date;
-        return d < startDate; // startDate is "YYYY-MM-DD"
+        const d = l.usage_date ? l.usage_date.substring(0, 10) : "";
+        const start = startDate ? startDate.substring(0, 10) : "";
+        return d < start;
       });
       const periodLogs = itemLogs.filter(l => {
-        const d = l.usage_date;
-        return d >= startDate && d <= endDate;
+        const d = l.usage_date ? l.usage_date.substring(0, 10) : "";
+        const start = startDate ? startDate.substring(0, 10) : "";
+        const end = endDate ? endDate.substring(0, 10) : "";
+        return d >= start && d <= end;
       });
 
       // Calculate Brought Forward (기초 재고)
@@ -1010,7 +1013,7 @@
       items.forEach(item => {
         bodyContent += '<div class="page-break">';
         bodyContent += headerHtml;
-        bodyContent += buildSingleItemTable(item);
+        bodyContent += buildSingleItemTable(item, '1_per_page');
         bodyContent += '</div>';
       });
     } else if (layout === '4_per_page') {
@@ -1024,7 +1027,7 @@
         bodyContent += `<div class="report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
         slice.forEach(item => {
           bodyContent += '<div style="overflow: hidden; display: flex; flex-direction: column;">';
-          bodyContent += buildSingleItemTable(item);
+          bodyContent += buildSingleItemTable(item, '4_per_page');
           bodyContent += '</div>';
         });
         bodyContent += '</div>'; // close report-grid
@@ -1036,7 +1039,7 @@
       bodyContent += '<tbody>';
       items.forEach(item => {
         bodyContent += '<tr><td style="padding-bottom: 20px;">';
-        bodyContent += buildSingleItemTable(item);
+        bodyContent += buildSingleItemTable(item, 'continuous');
         bodyContent += '</td></tr>';
       });
       bodyContent += '</tbody>';
@@ -1065,12 +1068,13 @@
     printWindow.document.close();
   }
 
-  function buildSingleItemTable(data) {
+  function buildSingleItemTable(data, layout) {
     const { info, broughtForward, logs } = data;
     const unit = info.unit || "";
     const nameKor = info.name_kor || "이름 없음";
 
     let rows = "";
+    let rowCount = 0;
 
     // 1. Brought Forward Row - Only show if non-zero
     let currentBalance = broughtForward;
@@ -1084,6 +1088,7 @@
                   <td>-</td>
               </tr>
           `;
+      rowCount++;
     }
 
     // 2. Logs
@@ -1096,7 +1101,7 @@
       if (isIncome) currentBalance += amt;
       else currentBalance -= amt;
 
-      const date = log.usage_date || "-";
+      const date = log.usage_date ? log.usage_date.substring(0, 10) : "-";
       // If subject is '최초 등록' or period is '기타', simplify the text
       let subjectStr = log.subject;
       if (log.subject !== "최초 등록" && log.period && log.period !== '-' && log.period !== '기타') {
@@ -1113,7 +1118,32 @@
                   <td></td>
               </tr>
           `;
+      rowCount++;
     });
+
+    // 3. Fill page with empty rows
+    let minRows = 12;
+    if (layout === '4_per_page') {
+      minRows = 5;
+    } else if (layout === '1_per_page') {
+      minRows = 15;
+    } else {
+      minRows = 12;
+    }
+
+    const emptyRowsCount = Math.max(0, minRows - rowCount);
+    for (let i = 0; i < emptyRowsCount; i++) {
+      rows += `
+              <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+              </tr>
+          `;
+    }
 
     const formulaStr = (info.formula && info.formula !== "-") ? `(${info.formula})` : "";
     const isHazardousStr = (info.school_hazardous_chemical === '○' || info.toxic_substance === '○') ? 'O' : 'X';
