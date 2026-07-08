@@ -1019,7 +1019,44 @@
     const reportItems = [];
 
     itemsToProcess.forEach(item => {
-      const itemLogs = logs.filter(l => l.inventory_id === item.id);
+      let itemLogs = logs.filter(l => l.inventory_id === item.id);
+
+      // Check for real 'Initial Registration' log
+      const hasInitialLog = itemLogs.some(l => l.subject === '최초 등록');
+      if (!hasInitialLog) {
+        // Calculate Virtual Initial Amount
+        let totalUsageDiff = 0; // outcomes - incomes (excluding 최초 등록)
+        const additive = ["최초 등록", "구입", "수량 조정(증가)", "이월", "잔량 조정(증가)"];
+        itemLogs.forEach(l => {
+          if (l.subject === '최초 등록') return;
+          const amt = l.amount || 0;
+          if (additive.includes(l.subject)) {
+            totalUsageDiff -= amt;
+          } else {
+            totalUsageDiff += amt;
+          }
+        });
+        const initialAmount = parseFloat((item.current_amount + totalUsageDiff).toFixed(2));
+        const initialDate = item.purchase_date || (item.created_at ? item.created_at.split('T')[0] : (new Date().toISOString().split('T')[0]));
+
+        const virtualInitialLog = {
+          inventory_id: item.id,
+          usage_date: initialDate,
+          subject: '최초 등록',
+          period: '-',
+          amount: initialAmount,
+          created_at: item.created_at || new Date().toISOString()
+        };
+        // Add to itemLogs
+        itemLogs = [...itemLogs, virtualInitialLog];
+        // Sort itemLogs by usage_date and created_at
+        itemLogs.sort((a, b) => {
+          const dateA = a.usage_date ? a.usage_date.substring(0, 10) : "";
+          const dateB = b.usage_date ? b.usage_date.substring(0, 10) : "";
+          if (dateA !== dateB) return dateA.localeCompare(dateB);
+          return (a.created_at || "").localeCompare(b.created_at || "");
+        });
+      }
 
       // Split Logs based on usage_date (normalized to YYYY-MM-DD for comparison)
       const beforeLogs = itemLogs.filter(l => {
