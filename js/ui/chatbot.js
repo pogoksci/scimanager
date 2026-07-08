@@ -14,6 +14,21 @@
     model: "",
     selectedSubstance: null, // Track currently selected substance
 
+    formatToolLocation: function (loc) {
+      if (!loc) return "위치 미지정";
+      if (typeof loc === 'string') return loc;
+
+      const parts = [];
+      if (loc.area_name) parts.push(loc.area_name);
+      if (loc.cabinet_name) parts.push(loc.cabinet_name);
+      if (loc.door_vertical) parts.push(`${loc.door_vertical}층`);
+      if (loc.door_horizontal) parts.push(`${loc.door_horizontal}번`);
+      if (loc.internal_shelf_level) parts.push(`${loc.internal_shelf_level}단`);
+      if (loc.storage_column) parts.push(`${loc.storage_column}열`);
+
+      return parts.join(" > ") || "위치 미지정";
+    },
+
     // ------------------------------------------------------------
     // 1️⃣ 초기화 및 UI 생성
     // ------------------------------------------------------------
@@ -257,7 +272,8 @@
       const matchingKeywords = ["실험", "준비물", "준비", "키트"];
       const emergencyKeywords = ["사고", "화상", "눈에", "피부에", "응급", "대처", "조치", "안전", "흡입", "마셨", "유출", "깨졌"];
       const wasteKeywords = ["폐액", "폐기", "버려", "버리"];
-
+      const locationKeywords = ["위치", "어디", "보관", "어딨", "있어", "있니", "있나요", "찾아", "찾기", "장소", "위치해"];
+ 
       const isMwQuery = tokens.some(t => mwKeywords.some(k => t.includes(k)));
       const isMsdsQuery = tokens.some(t => msdsKeywords.some(k => t.includes(k)));
       const isPropQuery = tokens.some(t => propKeywords.some(k => t.includes(k)));
@@ -265,6 +281,7 @@
       const isMatchingQuery = tokens.some(t => matchingKeywords.some(k => t.includes(k)));
       const isEmergencyQuery = tokens.some(t => emergencyKeywords.some(k => t.includes(k)));
       const isWasteQuery = tokens.some(t => wasteKeywords.some(k => t.includes(k)));
+      const isLocationQuery = tokens.some(t => locationKeywords.some(k => t.includes(k)));
 
       // 다른 시약 검색 요청 시 상태 초기화
       if (isResetQuery) {
@@ -443,8 +460,97 @@
 
       const substance = this.selectedSubstance;
 
+      // 1.5. DB에서 교구/설비 매칭 찾기 (화학물질 매칭 실패 시)
+      let foundTools = null;
+      if (!substance) {
+        for (const token of tokens) {
+          if (token.length < 2) continue;
+          const { data } = await supabase
+            .from("tools")
+            .select("*")
+            .or(`tools_name.ilike.%${token}%,tools_category.ilike.%${token}%`)
+            .limit(5);
+
+          if (data && data.length > 0) {
+            foundTools = data;
+            break;
+          }
+        }
+
+        if (!foundTools) {
+          for (const token of tokens) {
+            if (token.length < 2) continue;
+            const stripped = token.replace(/(의|은|는|이|가|을|를|과|와|도|으로|로|에|에서|이란|이란것|란)$/, "");
+            if (stripped.length < 2 || stripped === token) continue;
+
+            const { data } = await supabase
+              .from("tools")
+              .select("*")
+              .or(`tools_name.ilike.%${stripped}%,tools_category.ilike.%${stripped}%`)
+              .limit(5);
+
+            if (data && data.length > 0) {
+              foundTools = data;
+              break;
+            }
+          }
+        }
+      }
+ 
       // 2. 물질 매칭 실패 시 -> 긴급/폐기 일반 대처 혹은 AI Fallback
       if (!substance) {
+        if (foundTools) {
+          let toolListHtml = "";
+          foundTools.forEach(t => {
+            const locStr = this.formatToolLocation(t.location);
+            const displayNo = t.tools_no ? `No.${t.tools_no}` : '';
+            const categoryText = t.tools_category ? ` - ${t.tools_category}` : '';
+
+            toolListHtml += `
+              <div class="chatbot-matching-item" style="padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <span class="chatbot-matching-name" style="font-weight: bold; color: #111;">🧩 [${t.tools_section || '교구'}${categoryText}] ${t.tools_name}</span>
+                  <div style="font-size: 12px; color: #555; margin-top: 4px; line-height: 1.4;">
+                    📍 <b>위치:</b> ${locStr}<br>
+                    📦 <b>보유 수량:</b> ${t.stock || 0}개
+                  </div>
+                </div>
+                <span style="font-size: 11px; color: #888; white-space: nowrap; margin-left: 8px;">${displayNo}</span>
+              </div>
+            `;
+          });
+
+          return `🔍 <b>교구/설비</b> 검색 결과입니다.
+          <div class="chatbot-matching-card" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-top: 8px;">
+            <div class="chatbot-matching-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
+              <div class="chatbot-matching-title" style="font-weight: bold; color: #495057;">교구/설비 보관 위치</div>
+              <span class="matching-badge badge-instock" style="background: #e9ecef; color: #495057; font-size: 11px; padding: 2px 6px; border-radius: 4px;">${foundTools.length}건 매칭</span>
+            </div>
+            <div class="chatbot-matching-grid" style="display: flex; flex-direction: column;">
+              ${toolListHtml}
+            </div>
+          </div>
+          <div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
+          </div>`;
+        }
+
+        if (isLocationQuery) {
+          return `🔍 <b>보관 위치 조회 가이드</b>
+          <div style="font-size:12.5px; color:#495057; line-height:1.5; padding:8px 0;">
+            찾고자 하는 **약품, 교구, 또는 설비의 이름**을 함께 입력해 주세요.<br>
+            예를 들어 다음과 같이 물어볼 수 있습니다:<br><br>
+            - *"수산화 나트륨 어디 있어?"* (약품 위치)<br>
+            - *"현미경 위치 알려줘"* (교구 위치)<br>
+            - *"흄후드 어딨어?"* (설비 위치)
+          </div>
+          <div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('수산화 나트륨 위치')">🧪 수산화 나트륨 위치</button>
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('현미경')">🧩 현미경</button>
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
+          </div>`;
+        }
+
         if (isEmergencyQuery) {
           return `🚨 <b>과학실 긴급 상황 대처 요령</b>
           <div class="chatbot-emergency-card">
@@ -562,6 +668,93 @@
           <button class="chatbot-chip chip-filled" onclick="App.Chatbot.goToDetail(${substance.id})">상세 이동</button>
           <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 시약 검색</button>
         </div>`;
+      }
+
+      // 3-0. 위치(Location) 의도
+      if (isLocationQuery) {
+        const { data: invItems, error: invErr } = await supabase
+          .from("Inventory")
+          .select(`
+            id, current_amount, unit, door_vertical, door_horizontal, internal_shelf_level, storage_column,
+            Cabinet ( cabinet_name, door_horizontal_count, area_id:lab_rooms!fk_cabinet_lab_rooms ( room_name ) )
+          `)
+          .eq("substance_id", substance.id);
+
+        if (!invErr && invItems && invItems.length > 0) {
+          let locRowsHtml = "";
+          invItems.forEach(item => {
+            const area = item.Cabinet?.area_id?.room_name || "";
+            const cabinetName = item.Cabinet?.cabinet_name || "";
+            const doorVertical = item.door_vertical || "";
+            const doorHorizontal = item.door_horizontal || "";
+            const hCount = Number(item.Cabinet?.door_horizontal_count || 0);
+            const shelfLevel = item.internal_shelf_level;
+            const column = item.storage_column;
+
+            let doorHLabel = "";
+            if (hCount > 1) {
+              if (doorHorizontal === "1") doorHLabel = "왼쪽";
+              else if (doorHorizontal === "2") doorHLabel = "오른쪽";
+              else if (doorHorizontal) doorHLabel = doorHorizontal;
+            }
+
+            const detailParts = [];
+            if (doorVertical && doorHLabel) detailParts.push(`${doorVertical}층 ${doorHLabel}문`);
+            else if (doorVertical) detailParts.push(`${doorVertical}층문`);
+            else if (doorHLabel) detailParts.push(`${doorHLabel}문`);
+
+            let shelfPart = "";
+            if (shelfLevel && column) shelfPart = `${shelfLevel}단 ${column}열`;
+            else {
+              if (shelfLevel) shelfPart += `${shelfLevel}단`;
+              if (column) shelfPart += (shelfPart ? " " : "") + `${column}열`;
+            }
+            if (shelfPart) detailParts.push(shelfPart);
+
+            const detailStr = detailParts.join(", ");
+            const locMain = `${area} 『${cabinetName}』`.trim();
+            const fullLoc = detailStr ? `${locMain} (${detailStr})` : locMain;
+
+            locRowsHtml += `
+              <div class="chatbot-matching-item" style="padding: 6px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span class="chatbot-matching-name" style="font-weight: bold; color: #222;">📍 ${fullLoc || '위치 미지정'}</span>
+                  <div style="font-size: 11.5px; color: #666; margin-top: 2px;">📦 보유 수량: ${item.current_amount || 0}${item.unit || '개'} (No.${item.id})</div>
+                </div>
+                <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 8px; font-size:11px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="App.Chatbot.goToDetail(${substance.id})">상세이동</button>
+              </div>
+            `;
+          });
+
+          return `📍 <b>${chemName}</b>의 과학실 내 보관 위치 정보입니다.
+          <div class="chatbot-chemical-card" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-top: 8px;">
+            <div class="chatbot-chem-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
+              <div>
+                <div class="chatbot-chem-title" style="font-weight: bold; color: #111; font-size: 15px;">${chemName}</div>
+                <div class="chatbot-chem-subtitle" style="font-size: 11px; color: #666;">${substance.substance_name || ""}</div>
+              </div>
+              <span class="chatbot-chem-cas" style="font-size: 11px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${casRn}</span>
+            </div>
+            <div class="chatbot-matching-grid" style="display: flex; flex-direction: column;">
+              ${locRowsHtml}
+            </div>
+          </div>
+          <div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('위험성')">⚠️ 위험성(MSDS)</button>
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('물리적 특성')">🌡️ 물리적 특성</button>
+            <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
+          </div>`;
+        } else {
+          return `🔍 <b>${chemName}</b> (CAS: ${casRn})의 화학물질 정보는 등록되어 있으나, 현재 과학실 내에 **보관된 시약병(재고)이 없습니다.**
+          
+💡 **도움말:**
+이 물질에 대해 다른 정보를 원하시면 아래 버튼을 눌러보세요.
+<div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
+  <button class="chatbot-chip" onclick="App.Chatbot.askPreset('위험성')">⚠️ 위험성(MSDS)</button>
+  <button class="chatbot-chip" onclick="App.Chatbot.askPreset('분자량')">⚖️ 분자량</button>
+  <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
+</div>`;
+        }
       }
 
       // 3-1. 분자량(Molecular Weight) 의도
@@ -773,7 +966,7 @@ ${propText}
       } else {
         // OpenAI 및 Custom OpenAI 호환 API (Claude, OpenRouter, Ollama 등)
         let endpoint = "https://api.openai.com/v1/chat/completions";
-        let modelName = this.model || "gpt-4o-mini";
+        const modelName = this.model || "gpt-4o-mini";
 
         if (provider === "custom") {
           let baseUrl = this.apiUrl ? this.apiUrl.trim() : "";
