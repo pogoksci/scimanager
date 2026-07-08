@@ -263,7 +263,11 @@
             const tr = document.createElement('tr');
 
             const periodLabel = item.period === '99' ? '점심' : (item.period === '88' ? '방과후' : `${item.period}교시`);
-            const safetyClass = item.safety_education === '실시' ? 'complete' : 'pending';
+            
+            const isOtherSubject = item.activity_type === '기타' || (item.subject_id && subjectMap[item.subject_id] === '기타');
+            const displaySafety = isOtherSubject ? '-' : (item.safety_education || '미실시');
+            const safetyClass = displaySafety === '실시' ? 'complete' : (displaySafety === '-' ? '' : 'pending');
+            const badgeStyle = displaySafety === '-' ? 'background-color: #f5f5f5; color: #666;' : '';
 
             // ✅ Logic to display Club Name or Content
             let displayContent = item.content || '';
@@ -284,8 +288,8 @@
                     title="${canEdit ? '클릭하여 내용 수정 (입력 후 포커스를 옮기면 저장됩니다)' : ''}">${displayContent}</td>
                 <td class="usage-view-cell-center">
                     <span class="badge-safety ${safetyClass}" 
-                          style="${canEdit ? 'cursor:pointer;' : ''}"
-                          title="${canEdit ? '클릭하여 상태 변경' : ''}">${item.safety_education}</span>
+                          style="${badgeStyle} ${canEdit && !isOtherSubject ? 'cursor:pointer;' : ''}"
+                          title="${canEdit && !isOtherSubject ? '클릭하여 상태 변경' : ''}">${displaySafety}</span>
                 </td>
             `;
 
@@ -315,6 +319,11 @@
     }
 
     async function toggleSafetyStatus(item, badgeEl) {
+        // If the activity_type or subject is '기타', it is always '-' and clicking shouldn't change it
+        if (item.activity_type === '기타' || (item.subject_id && subjectMap[item.subject_id] === '기타')) {
+            return;
+        }
+
         const supabase = globalThis.App?.supabase;
         if (!supabase) return;
 
@@ -388,6 +397,8 @@
         // 1. Format Data for Excel
         const excelData = lastSearchResult.map(item => {
             const periodLabel = item.period === '99' ? '점심' : (item.period === '88' ? '방과후' : `${item.period}교시`);
+            const isOtherSubject = item.activity_type === '기타' || (item.subject_id && subjectMap[item.subject_id] === '기타');
+            const displaySafety = isOtherSubject ? '-' : (item.safety_education || '미실시');
             return {
                 "날짜": item.usage_date,
                 "교시": periodLabel,
@@ -397,7 +408,7 @@
                 "과목": subjectMap[item.subject_id] || item.activity_type,
                 "담당교사": teacherMap[item.teacher_id] || '-',
                 "활동내용": item.content || '',
-                "안전교육": item.safety_education
+                "안전교육": displaySafety
             };
         });
 
@@ -451,6 +462,9 @@
                 displayContent = clubMap[item.club_id] || displayContent;
             }
 
+            const isOtherSubject = item.activity_type === '기타' || (item.subject_id && subjectMap[item.subject_id] === '기타');
+            const displaySafety = isOtherSubject ? '-' : (item.safety_education || '미실시');
+
             return `
                 <tr>
                     <td class="center">${index + 1}</td>
@@ -460,7 +474,7 @@
                     <td class="center">${item.grade ? `${item.grade}-${item.class_number}` : '-'}</td>
                     <td class="center">${subjectMap[item.subject_id] || item.activity_type}</td>
                     <td class="left">${displayContent}</td>
-                    <td class="center">${item.safety_education}</td>
+                    <td class="center">${displaySafety}</td>
                 </tr>
             `;
         }).join('');
@@ -521,7 +535,7 @@
                             <th>학급</th>
                             <th>과목</th>
                             <th>활동 내용</th>
-                            <th>안전</th>
+                            <th>안전교육</th>
                         </tr>
                     </thead>
                     <tbody>

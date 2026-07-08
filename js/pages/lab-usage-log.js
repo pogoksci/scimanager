@@ -590,8 +590,7 @@
                 const newItem = {
                     activity_type: type,
                     usage_date: date,
-                    period: String(period),
-                    safety_education: '실시'
+                    period: String(period)
                 };
                 if (type === '교과수업') {
                     const grade = form.querySelector('.sel-grade').value;
@@ -612,6 +611,8 @@
                     if (!content) { alert('활동명을 입력해주세요.'); return; }
                     newItem.content = content;
                 }
+                // Set safety_education based on type and subject
+                newItem.safety_education = (type === '기타' || (newItem.subject_id && subjectMap[newItem.subject_id] === '기타')) ? '-' : '실시';
                 const itemEl = createActivityItem({ type: 'LOG', data: newItem, checked: true }, false);
                 container.appendChild(itemEl);
                 form.remove();
@@ -669,7 +670,7 @@
                                 usage_date: d.usage_date,
                                 period: parseInt(d.period),
                                 activity_type: d.activity_type,
-                                safety_education: '실시', // Default
+                                safety_education: d.safety_education || ((d.activity_type === '기타' || (d.subject_id && subjectMap[d.subject_id] === '기타')) ? '-' : '실시'),
                                 remarks: '승인',
                                 semester_id: sem ? sem.id : currentSemesterId,
                                 content: d.content || '',
