@@ -715,6 +715,10 @@
           "에탄올": { mw: 46.07, density: 0.789, defaultConc: 99, defaultUnit: "%" },
           "수산화나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
           "수산화 나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
+          "암모니아": { mw: 17.03, density: 0.907, defaultConc: 25, defaultUnit: "%" },
+          "암모니아수": { mw: 17.03, density: 0.907, defaultConc: 25, defaultUnit: "%" },
+          "과산화수소": { mw: 34.01, density: 1.11, defaultConc: 30, defaultUnit: "%" },
+          "과산화 수소": { mw: 34.01, density: 1.11, defaultConc: 30, defaultUnit: "%" },
         };
 
         const defaultData = Object.keys(chemDefaults).find(k => chemName.includes(k)) ? chemDefaults[Object.keys(chemDefaults).find(k => chemName.includes(k))] : null;
