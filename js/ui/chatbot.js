@@ -708,7 +708,7 @@
                     <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 6px; font-size: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;" onclick="App.Chatbot.goToInventoryDetail(${item.id})">상세</button>
                   </td>
                 </tr>
-              `;
+              `.replace(/\n\s*/g, "");
             });
 
             gridContent = `
@@ -724,7 +724,7 @@
                   ${tableRowsHtml}
                 </tbody>
               </table>
-            `;
+            `.replace(/\n\s*/g, "");
           } else {
             // 한 개만 있는 경우 카드 형태
             const item = invItems[0];
@@ -768,19 +768,20 @@
                 </div>
                 <button class="chatbot-chip chip-filled" style="margin: 0; padding: 2px 8px; font-size:11px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="App.Chatbot.goToInventoryDetail(${item.id})">상세이동</button>
               </div>
-            `;
+            `.replace(/\n\s*/g, "");
           }
 
           return `📍 <b>${chemName}</b>의 과학실 내 보관 위치 정보입니다.
+` + `
           <div class="chatbot-chemical-card" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin-top: 8px;">
-            <div class="chatbot-chem-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
-              <div>
-                <div class="chatbot-chem-title" style="font-weight: bold; color: #111; font-size: 15px;">${chemName}</div>
-                <div class="chatbot-chem-subtitle" style="font-size: 11px; color: #666;">${substance.substance_name || ""}</div>
+            <div class="chatbot-chem-header" style="display: flex; flex-direction: column; align-items: flex-start; border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px; gap: 4px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="chatbot-chem-title" style="font-weight: bold; color: #111; font-size: 15px; margin: 0; padding: 0; line-height: 1.2;">${chemName}</span>
+                <span class="chatbot-chem-cas" style="font-size: 11px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace; line-height: 1.2;">${casRn}</span>
               </div>
-              <span class="chatbot-chem-cas" style="font-size: 11px; background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${casRn}</span>
+              <div class="chatbot-chem-subtitle" style="font-size: 11px; color: #666; margin: 0; padding: 0; line-height: 1.2; text-align: left;">${substance.substance_name || ""}</div>
             </div>
-            <div class="chatbot-matching-grid" style="display: flex; flex-direction: column;">
+            <div style="display: flex; flex-direction: column; width: 100%;">
               ${gridContent}
             </div>
           </div>
@@ -788,7 +789,7 @@
             <button class="chatbot-chip" onclick="App.Chatbot.askPreset('위험성')">⚠️ 위험성(MSDS)</button>
             <button class="chatbot-chip" onclick="App.Chatbot.askPreset('물리적 특성')">🌡️ 물리적 특성</button>
             <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
-          </div>`;
+          </div>`.replace(/\n\s*/g, "");
         } else {
           return `🔍 <b>${chemName}</b> (CAS: ${casRn})의 화학물질 정보는 등록되어 있으나, 현재 과학실 내에 **보관된 시약병(재고)이 없습니다.**
           
@@ -896,33 +897,33 @@ ${propText}
       }
 
       // AI가 비활성화된 상태이거나 시약 이름만 입력한 경우 요약 카드 출력
-      const summaryCardHtml = `
-        🧪 <b>${chemName}</b> 시약이 선택되었습니다. 이 시약에 대해 무엇이 궁금하신가요?
-        <div class="chatbot-chemical-card">
-          <div class="chatbot-chem-header">
-            <div>
-              <div class="chatbot-chem-title">${chemName}</div>
-              <div class="chatbot-chem-subtitle">${substance.substance_name || ""}</div>
+      const summaryCardHtml = `🧪 <b>${chemName}</b> 시약이 선택되었습니다. 이 시약에 대해 무엇이 궁금하신가요?
+` + `
+        <div class="chatbot-chemical-card" style="background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 12px; padding: 12px 14px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+          <div class="chatbot-chem-header" style="display: flex; flex-direction: column; align-items: flex-start; border-bottom: 1px dashed rgba(0, 0, 0, 0.08); padding-bottom: 6px; gap: 4px; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="chatbot-chem-title" style="font-weight: bold; font-size: 14px; color: #111; margin: 0; padding: 0; line-height: 1.2;">${chemName}</span>
+              <span class="chatbot-chem-cas" style="font-size: 11px; background-color: #f1f3f5; color: #495057; padding: 2px 6px; border-radius: 4px; font-family: monospace; line-height: 1.2;">${casRn}</span>
             </div>
-            <span class="chatbot-chem-cas">${casRn}</span>
+            <div class="chatbot-chem-subtitle" style="font-size: 11px; color: #666; margin: 0; padding: 0; line-height: 1.2; text-align: left;">${substance.substance_name || ""}</div>
           </div>
-          <div class="chatbot-chem-grid">
-            <div class="chatbot-chem-label">분자식</div>
-            <div class="chatbot-chem-val">${formula}</div>
-            <div class="chatbot-chem-label">분자량</div>
-            <div class="chatbot-chem-val">${molMass}</div>
+          <div class="chatbot-chem-grid" style="display: grid; grid-template-columns: 80px 1fr; row-gap: 4px; font-size: 12.5px;">
+            <div class="chatbot-chem-label" style="color: #777; font-weight: 500;">분자식</div>
+            <div class="chatbot-chem-val" style="color: #333;">${formula}</div>
+            <div class="chatbot-chem-label" style="color: #777; font-weight: 500;">분자량</div>
+            <div class="chatbot-chem-val" style="color: #333;">${molMass}</div>
           </div>
-          <div class="chatbot-chem-footer-btns">
-            <button class="chatbot-chem-btn" onclick="App.Chatbot.askPreset('분자량')">분자량</button>
-            <button class="chatbot-chem-btn" onclick="App.Chatbot.askPreset('위험성')">위험성</button>
-            <button class="chatbot-chem-btn" onclick="App.Chatbot.askPreset('특성')">물리<br>특성</button>
-            <button class="chatbot-chem-btn btn-filled" onclick="App.Chatbot.goToDetail(${substance.id})">상세<br>이동</button>
+          <div class="chatbot-chem-footer-btns" style="display: flex; gap: 6px; margin-top: 6px;">
+            <button class="chatbot-chem-btn" style="flex: 1; padding: 6px 0; font-size: 11px; font-weight: bold; border-radius: 6px; border: 1px solid #00a0b2; background: transparent; color: #00a0b2; cursor: pointer; text-align: center;" onclick="App.Chatbot.askPreset('분자량')">분자량</button>
+            <button class="chatbot-chem-btn" style="flex: 1; padding: 6px 0; font-size: 11px; font-weight: bold; border-radius: 6px; border: 1px solid #00a0b2; background: transparent; color: #00a0b2; cursor: pointer; text-align: center;" onclick="App.Chatbot.askPreset('위험성')">위험성</button>
+            <button class="chatbot-chem-btn" style="flex: 1; padding: 6px 0; font-size: 11px; font-weight: bold; border-radius: 6px; border: 1px solid #00a0b2; background: transparent; color: #00a0b2; cursor: pointer; text-align: center;" onclick="App.Chatbot.askPreset('특성')">물리<br>특성</button>
+            <button class="chatbot-chem-btn btn-filled" style="flex: 1; padding: 6px 0; font-size: 11px; font-weight: bold; border-radius: 6px; border: 1px solid #00a0b2; background: #00a0b2; color: #ffffff; cursor: pointer; text-align: center;" onclick="App.Chatbot.goToDetail(${substance.id})">상세<br>이동</button>
           </div>
         </div>
-        <div class="chatbot-chips-container" style="margin-top: 10px;">
-          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 시약 검색</button>
+        <div class="chatbot-chips-container" style="margin-top: 10px; display: flex; gap: 5px;">
+          <button class="chatbot-chip" onclick="App.Chatbot.askPreset('다른 시약 검색')">🔄 다른 검색</button>
         </div>
-      `;
+      `.replace(/\n\s*/g, "");
       return summaryCardHtml;
     },
 

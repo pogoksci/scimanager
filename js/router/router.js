@@ -45,6 +45,15 @@
 
     console.log(`🧭 Router → ${pageKey}`, params);
 
+    // Toggle body classes based on route to hide/show splash screen
+    if (pageKey === "main") {
+      document.body.classList.add("home-active");
+      document.body.classList.remove("loaded");
+    } else {
+      document.body.classList.remove("home-active");
+      document.body.classList.add("loaded");
+    }
+
     // 1. History Push
     if (!options.skipPush) {
       // Clean URL Mode: Don't change the address bar URL, but push state for back-button support
@@ -169,10 +178,10 @@
       App.Navbar.setActive(navId);
     }
 
-    window.scrollTo(0, 0);
+    globalThis.scrollTo(0, 0);
   }
 
-  window.addEventListener("popstate", (event) => {
+  globalThis.addEventListener("popstate", (event) => {
     const state = event.state;
     if (state && state.pageKey) {
       go(state.pageKey, state.params, { skipPush: true });
