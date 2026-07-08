@@ -935,11 +935,12 @@
       const endDate = document.getElementById("report-end-date").value;
       const target = form.elements["report-target"].value;
       const layout = form.elements["report-layout"].value;
+      const sort = form.elements["report-sort"].value;
 
       if (!startDate || !endDate) return alert("기간을 입력해주세요.");
 
       cleanup(); // Close and restore
-      await generateStockReport({ startDate, endDate, target, layout });
+      await generateStockReport({ startDate, endDate, target, layout, sort });
     };
 
     // Close Button
@@ -981,7 +982,7 @@
     endDateEl.value = end;
   }
 
-  async function generateStockReport({ startDate, endDate, target, layout }) {
+  async function generateStockReport({ startDate, endDate, target, layout, sort }) {
     // 1. Fetch Data
     let itemsToProcess = [];
 
@@ -1093,12 +1094,47 @@
 
     if (reportItems.length === 0) return alert("해당 조건에 맞는 데이터가 없습니다.");
 
+    // Sort reportItems based on 'sort' option
+    if (sort === "name_kor") {
+      reportItems.sort((a, b) => {
+        const nameA = a.info.name_kor || "";
+        const nameB = b.info.name_kor || "";
+        return nameA.localeCompare(nameB, 'ko');
+      });
+    } else if (sort === "id_asc") {
+      reportItems.sort((a, b) => (a.info.id || 0) - (b.info.id || 0));
+    } else if (sort === "cas_rn") {
+      reportItems.sort((a, b) => {
+        const casA = a.info.cas_rn || "";
+        const casB = b.info.cas_rn || "";
+        if (casA === "-" || !casA) return 1;
+        if (casB === "-" || !casB) return -1;
+        return casA.localeCompare(casB);
+      });
+    } else if (sort === "classification_group") {
+      // Sort alphabetically by classification, then by name_kor inside
+      reportItems.sort((a, b) => {
+        const clsA = a.info.classification || "미지정";
+        const clsB = b.info.classification || "미지정";
+        const compCls = clsA.localeCompare(clsB, 'ko');
+        if (compCls !== 0) return compCls;
+
+        const nameA = a.info.name_kor || "";
+        const nameB = b.info.name_kor || "";
+        return nameA.localeCompare(nameB, 'ko');
+      });
+    }
+
     // 4. Generate HTML
-    renderStockReportHtml(reportItems, { startDate, endDate, layout });
+    renderStockReportHtml(reportItems, { startDate, endDate, layout, sort });
   }
 
-  function renderStockReportHtml(items, { startDate, endDate, layout }) {
+  function renderStockReportHtml(items, { startDate, endDate, layout, sort }) {
     const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert("팝업 차단을 해제해주세요.");
+      return;
+    }
 
     const styles = `
           @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
@@ -1132,41 +1168,110 @@
 
     let bodyContent = "";
 
-    if (layout === '1_per_page') {
+    if (sort === 'classification_group') {
+      // Group items by classification
+      const groups = {};
       items.forEach(item => {
-        bodyContent += '<div class="page-break">';
-        bodyContent += headerHtml;
-        bodyContent += buildSingleItemTable(item, '1_per_page');
-        bodyContent += '</div>';
+        const cls = item.info.classification || "미지정";
+        if (!groups[cls]) groups[cls] = [];
+        groups[cls].push(item);
       });
-    } else if (layout === '4_per_page') {
-      // Chunk into 4
-      for (let i = 0; i < items.length; i += 4) {
-        const slice = items.slice(i, i + 4);
-        const gridHeight = "80vh";
 
-        bodyContent += '<div class="page-break">';
-        bodyContent += headerHtml;
-        bodyContent += `<div class="report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
-        slice.forEach(item => {
-          bodyContent += '<div style="overflow: hidden; display: flex; flex-direction: column;">';
-          bodyContent += buildSingleItemTable(item, '4_per_page');
+      // Keys are already sorted alphabetically since items was sorted beforehand
+      const sortedKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b, 'ko'));
+
+      if (layout === '1_per_page') {
+        sortedKeys.forEach(cls => {
+          groups[cls].forEach(item => {
+            bodyContent += '<div class="page-break">';
+            bodyContent += `
+              <div class="print-header">
+                  <div class="title">약품 수불대장 [분류: ${cls}]</div>
+                  <div class="date">${startDate} ~ ${endDate}</div>
+              </div>
+            `;
+            bodyContent += buildSingleItemTable(item, '1_per_page');
+            bodyContent += '</div>';
+          });
+        });
+      } else if (layout === '4_per_page') {
+        sortedKeys.forEach(cls => {
+          const clsItems = groups[cls];
+          for (let i = 0; i < clsItems.length; i += 4) {
+            const slice = clsItems.slice(i, i + 4);
+            const gridHeight = "80vh";
+
+            bodyContent += '<div class="page-break">';
+            bodyContent += `
+              <div class="print-header">
+                  <div class="title">약품 수불대장 [분류: ${cls}]</div>
+                  <div class="date">${startDate} ~ ${endDate}</div>
+              </div>
+            `;
+            bodyContent += `<div class="report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
+            slice.forEach(item => {
+              bodyContent += '<div style="overflow: hidden; display: flex; flex-direction: column;">';
+              bodyContent += buildSingleItemTable(item, '4_per_page');
+              bodyContent += '</div>';
+            });
+            bodyContent += '</div>'; // close report-grid
+            bodyContent += '</div>'; // close page-break
+          }
+        });
+      } else { // continuous (feed)
+        bodyContent += '<table class="print-layout-table">';
+        bodyContent += `<thead><tr><td>${headerHtml}</td></tr></thead>`;
+        bodyContent += '<tbody>';
+        sortedKeys.forEach((cls, clsIdx) => {
+          const trStyle = clsIdx > 0 ? 'page-break-before: always;' : '';
+          bodyContent += `<tr style="${trStyle}"><td style="padding-top: 15px; padding-bottom: 10px;"><h2 style="font-size: 16px; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 15px; font-weight: bold;">분류: ${cls}</h2></td></tr>`;
+          groups[cls].forEach(item => {
+            bodyContent += '<tr><td style="padding-bottom: 20px;">';
+            bodyContent += buildSingleItemTable(item, 'continuous');
+            bodyContent += '</td></tr>';
+          });
+        });
+        bodyContent += '</tbody>';
+        bodyContent += '</table>';
+      }
+    } else {
+      // Standard layout rendering
+      if (layout === '1_per_page') {
+        items.forEach(item => {
+          bodyContent += '<div class="page-break">';
+          bodyContent += headerHtml;
+          bodyContent += buildSingleItemTable(item, '1_per_page');
           bodyContent += '</div>';
         });
-        bodyContent += '</div>'; // close report-grid
-        bodyContent += '</div>'; // close page-break
+      } else if (layout === '4_per_page') {
+        // Chunk into 4
+        for (let i = 0; i < items.length; i += 4) {
+          const slice = items.slice(i, i + 4);
+          const gridHeight = "80vh";
+
+          bodyContent += '<div class="page-break">';
+          bodyContent += headerHtml;
+          bodyContent += `<div class="report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
+          slice.forEach(item => {
+            bodyContent += '<div style="overflow: hidden; display: flex; flex-direction: column;">';
+            bodyContent += buildSingleItemTable(item, '4_per_page');
+            bodyContent += '</div>';
+          });
+          bodyContent += '</div>'; // close report-grid
+          bodyContent += '</div>'; // close page-break
+        }
+      } else { // continuous (feed)
+        bodyContent += '<table class="print-layout-table">';
+        bodyContent += `<thead><tr><td>${headerHtml}</td></tr></thead>`;
+        bodyContent += '<tbody>';
+        items.forEach(item => {
+          bodyContent += '<tr><td style="padding-bottom: 20px;">';
+          bodyContent += buildSingleItemTable(item, 'continuous');
+          bodyContent += '</td></tr>';
+        });
+        bodyContent += '</tbody>';
+        bodyContent += '</table>';
       }
-    } else { // continuous (feed)
-      bodyContent += '<table class="print-layout-table">';
-      bodyContent += `<thead><tr><td>${headerHtml}</td></tr></thead>`;
-      bodyContent += '<tbody>';
-      items.forEach(item => {
-        bodyContent += '<tr><td style="padding-bottom: 20px;">';
-        bodyContent += buildSingleItemTable(item, 'continuous');
-        bodyContent += '</td></tr>';
-      });
-      bodyContent += '</tbody>';
-      bodyContent += '</table>';
     }
 
     const html = `
