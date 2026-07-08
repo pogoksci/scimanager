@@ -983,7 +983,7 @@
           .page-break { page-break-after: always; display: block; clear: both; }
           .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #000; }
           .item-table th, .item-table td { border: 1px solid #000; padding: 4px; text-align: center; }
-          .item-table th { background: #f0f0f0; }
+          .item-table th { background: #f5f5f5; }
           .item-header { background: #e0e0e0; padding: 5px; font-weight: bold; border: 1px solid #000; border-bottom: none; display: flex; justify-content: space-between; }
           .print-header { text-align: center; margin-bottom: 15px; width: 100%; }
           .print-header .title { font-size: 22px; font-weight: bold; text-align: center; }
@@ -1156,8 +1156,8 @@
               </div>
               
               <!-- Chemical Info Table -->
-              <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 1px solid #000; font-size: 11px; font-family: 'Noto Sans KR', sans-serif;">
-                  <tr>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #000; font-size: 11px; font-family: 'Noto Sans KR', sans-serif;">
+                  <tr style="background: #fafafa;">
                       <td style="width: 20%; background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">약품명</td>
                       <td style="width: 30%; border: 1px solid #000; padding: 6px; text-align: center; color: #0020d0; font-style: italic; font-weight: bold;">${nameKor}${formulaStr}</td>
                       <td style="width: 20%; background: #f5f5f5; font-weight: bold; border: 1px solid #000; padding: 6px; text-align: center; color: #333;">유효기간</td>
