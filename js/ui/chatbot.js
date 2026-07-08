@@ -727,13 +727,13 @@
             "defaultUnit": "%"
           },
           "암모니아 용액": {
-            "mw": 35.05,
+            "mw": 17.03,
             "density": 0.907,
             "defaultConc": 25,
             "defaultUnit": "%"
           },
           "암모니아수": {
-            "mw": 35.05,
+            "mw": 17.03,
             "density": 0.907,
             "defaultConc": 25,
             "defaultUnit": "%"
@@ -1887,7 +1887,7 @@
         };
 
         const defaultData = Object.keys(chemDefaults).find(k => chemName.includes(k)) ? chemDefaults[Object.keys(chemDefaults).find(k => chemName.includes(k))] : null;
-        const mw = parseFloat(substance.molecular_mass) || (defaultData ? defaultData.mw : 0);
+        const mw = (defaultData && defaultData.mw) ? defaultData.mw : (parseFloat(substance.molecular_mass) || 0);
 
         let bestCandidate = null;
         let candidateType = null;
