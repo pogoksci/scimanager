@@ -591,13 +591,13 @@
         }
 
         // Fallback: If no matching kit found
-        return `🔍 입력하신 실험 키트("${cleanSubject || query}")에 대한 준비물 정보를 찾을 수 없습니다.
+        return `🔍 입력하신 실험 키트 <${cleanSubject || query}> 에 대한 준비물 정보를 찾을 수 없습니다.
         
 💡 <b>실험명 예시:</b>
-- "화학정원 만들기" (또는 "화학정원")
-- "앙금 생성 반응" (또는 "앙금")
-- "기체 발생 장치"
-- "달고나 만들기"
+- <화학정원 만들기> (또는 <화학정원>)
+- <앙금 생성 반응> (또는 <앙금>)
+- <기체 발생 장치>
+- <달고나 만들기>
 <div class="chatbot-chips-container" style="margin-top: 10px;">
   <button class="chatbot-chip" onclick="App.Chatbot.askPreset('화학정원 실험')">🧪 화학정원 실험</button>
   <button class="chatbot-chip" onclick="App.Chatbot.askPreset('앙금 생성 실험')">🧪 앙금 생성 실험</button>
@@ -783,8 +783,18 @@
         }
 
         if (!bestCandidate) {
+          const stockList = invItems.map(i => {
+            const val = i.concentration_value;
+            const unit = i.concentration_unit;
+            const state = i.state || "";
+            if (val === null || val === undefined || val === "null" || val === "" || !unit || unit === "null") {
+              return `농도 미표시 시약 (${state})`;
+            }
+            return `${val}${unit} ${state}`;
+          }).join(', ');
+
           return `❌ **조제 불가능 (농도 부족 / 재고 없음)**
-현재 과학실 내에 보유한 **${chemName}** 재고(${invItems.map(i => `${i.concentration_value || ''}${i.concentration_unit || ''} ${i.state}`).join(', ')}) 중 목표 농도(${targetConc}${targetUnit})보다 농도가 높은 액체 시약이나 고체 시약이 없어 조제 레시피를 계산할 수 없습니다.`;
+현재 과학실 내에 보유한 **${chemName}** 재고(${stockList}) 중 목표 농도(${targetConc}${targetUnit})보다 농도가 높은 액체 시약이나 고체 시약이 없어 조제 레시피를 계산할 수 없습니다.`;
         }
 
         let requiredAmount = 0;
