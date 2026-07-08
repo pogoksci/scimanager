@@ -6023,61 +6023,61 @@ input[type="text"].date-input-month-day {
   height: 100%;
 }
 
-#inventory-list-container-page .modal-content-report {
+#modal-stock-report .modal-content-report {
   max-width: 400px;
   overflow-y: auto;
 }
 
-#inventory-list-container-page .modal-header-report {
+#modal-stock-report .modal-header-report {
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
   margin-bottom: 15px;
 }
 
-#inventory-list-container-page .form-group-report {
+#modal-stock-report .form-group-report {
   margin-bottom: 20px;
 }
 
-#inventory-list-container-page .label-report {
+#modal-stock-report .label-report {
   font-weight: bold;
   display: block;
   margin-bottom: 8px;
 }
 
-#inventory-list-container-page .date-range-group {
+#modal-stock-report .date-range-group {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-#inventory-list-container-page .quick-btn-group {
+#modal-stock-report .quick-btn-group {
   margin-top: 8px;
   display: flex;
   gap: 5px;
 }
 
-#inventory-list-container-page .radio-label {
+#modal-stock-report .radio-label {
   display: flex;
   align-items: center;
   margin-bottom: 6px;
 }
 
-#inventory-list-container-page .radio-label-last {
+#modal-stock-report .radio-label-last {
   display: flex;
   align-items: center;
 }
 
-#inventory-list-container-page .radio-label-mt {
+#modal-stock-report .radio-label-mt {
   display: flex;
   align-items: center;
   margin-top: 6px;
 }
 
-#inventory-list-container-page .radio-text {
+#modal-stock-report .radio-text {
   margin-left: 8px;
 }
 
-#inventory-list-container-page .modal-footer-report {
+#modal-stock-report .modal-footer-report {
   padding-top: 10px;
   border-top: 1px solid #eee;
   display: grid;
@@ -6085,14 +6085,14 @@ input[type="text"].date-input-month-day {
   gap: 10px;
 }
 
-#inventory-list-container-page .btn-report-cancel {
+#modal-stock-report .btn-report-cancel {
   width: 100%;
   font-size: 14px;
   height: 45px;
   border-radius: 6px;
 }
 
-#inventory-list-container-page .btn-report-submit {
+#modal-stock-report .btn-report-submit {
   width: 100%;
   font-size: 14px;
   padding: 0;
@@ -6100,7 +6100,7 @@ input[type="text"].date-input-month-day {
   border-radius: 6px;
 }
 
-#inventory-list-container-page .icon-print-sm {
+#modal-stock-report .icon-print-sm {
   font-size: 14px;
   margin-right: 4px;
   vertical-align: bottom;
