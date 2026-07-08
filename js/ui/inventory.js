@@ -640,20 +640,90 @@
       return;
     }
 
-    // 1. 새 창 열기
+    const modalHtml = `
+      <div id="print-report-modal" class="modal-overlay" style="z-index: 9999; display: flex;">
+        <div class="modal-content" style="max-width: 400px; width: 90%;">
+          <h3>약품 목록 출력 설정</h3>
+          <p style="margin-bottom: 12px; font-size: 14px; color: #666;">
+            출력할 약품 목록의 정렬 및 형태를 선택하세요.
+          </p>
+          <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                <input type="radio" name="print-sort-option" value="name_kor" checked> 1. 전체 가나다순
+             </label>
+             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                <input type="radio" name="print-sort-option" value="classification_group"> 2. 분류별 가나다순 (분류 변경 시 페이지 나눔)
+             </label>
+             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                <input type="radio" name="print-sort-option" value="id_asc"> 3. 등록번호(No)순
+             </label>
+             <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                <input type="radio" name="print-sort-option" value="cas_rn"> 4. 전체 CAS순
+             </label>
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+             <button id="btn-cancel-print-report" class="btn-cancel">취소</button>
+             <button id="btn-confirm-print-report" class="btn-primary">출력하기</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const existing = document.getElementById("print-report-modal");
+    if (existing) existing.remove();
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const modal = document.getElementById("print-report-modal");
+    document.getElementById("btn-cancel-print-report").onclick = () => modal.remove();
+    document.getElementById("btn-confirm-print-report").onclick = () => {
+      const selectedOption = document.querySelector('input[name="print-sort-option"]:checked').value;
+      modal.remove();
+      printReportWithOptions(selectedOption);
+    };
+  }
+
+  function printReportWithOptions(sortOption) {
+    if (!currentFilteredData || currentFilteredData.length === 0) {
+      alert("출력할 데이터가 없습니다.");
+      return;
+    }
+
+    // Clone the array to avoid modifying currentFilteredData sorting in place
+    const items = [...currentFilteredData];
+
+    // 1. Sort the items
+    if (sortOption === "name_kor") {
+      items.sort((a, b) => {
+        const nameA = a.name_kor || "";
+        const nameB = b.name_kor || "";
+        return nameA.localeCompare(nameB, 'ko');
+      });
+    } else if (sortOption === "id_asc") {
+      items.sort((a, b) => (a.id || 0) - (b.id || 0));
+    } else if (sortOption === "cas_rn") {
+      items.sort((a, b) => {
+        const casA = a.cas_rn || "";
+        const casB = b.cas_rn || "";
+        if (casA === "-" || !casA) return 1;
+        if (casB === "-" || !casB) return -1;
+        return casA.localeCompare(casB);
+      });
+    }
+
+    // 2. Open print window
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
       alert("팝업 차단을 해제해주세요.");
       return;
     }
 
-    // 2. HTML 작성
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
-    let rowsHtml = "";
-    currentFilteredData.forEach((item, index) => {
-      // null 체크 및 안전한 문자열 변환
+    let bodyHtml = "";
+
+    const renderRowHtml = (item) => {
       const nameKor = item.name_kor || "-";
       const nameEng = item.name_eng || "";
       const casRn = item.cas_rn || "-";
@@ -664,7 +734,7 @@
       const classification = item.classification || "-";
       const concentration = item.concentration_text || "-";
 
-      rowsHtml += `
+      return `
         <tr>
             <td style="text-align: center;">${item.id}</td>
             <td>
@@ -681,8 +751,76 @@
             <td style="text-align: center;">${amount}</td>
             <td style="text-align: center;">${classification}</td>
         </tr>
+      `;
+    };
+
+    if (sortOption === "classification_group") {
+      // Group items by classification
+      const groups = {};
+      items.forEach(item => {
+        const cls = item.classification || "미지정";
+        if (!groups[cls]) groups[cls] = [];
+        groups[cls].push(item);
+      });
+
+      // Sort group keys alphabetically
+      const sortedKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b, 'ko'));
+
+      sortedKeys.forEach((cls, idx) => {
+        // Sort items inside this group alphabetically by name
+        groups[cls].sort((a, b) => {
+          const nameA = a.name_kor || "";
+          const nameB = b.name_kor || "";
+          return nameA.localeCompare(nameB, 'ko');
+        });
+
+        const pageBreakClass = idx > 0 ? 'page-break' : '';
+        bodyHtml += `
+          <div class="${pageBreakClass}" style="margin-bottom: 30px;">
+              <h2 class="class-title" style="margin-top: 15px; margin-bottom: 10px; font-size: 16px; border-bottom: 2px solid #333; padding-bottom: 4px; font-weight: bold;">분류: ${cls}</h2>
+              <table>
+                  <thead>
+                      <tr>
+                          <th width="5%">No.</th>
+                          <th width="18%">약품명</th>
+                          <th width="10%">농도</th>
+                          <th width="15%">CAS No.</th>
+                          <th width="13%">화학식</th>
+                          <th width="19%" class="col-location">위치</th>
+                          <th width="10%">보유량</th>
+                          <th width="10%">분류</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      ${groups[cls].map(item => renderRowHtml(item)).join('')}
+                  </tbody>
+              </table>
+          </div>
         `;
-    });
+      });
+    } else {
+      // Single table for non-grouped sorting options
+      const rowsHtml = items.map(item => renderRowHtml(item)).join('');
+      bodyHtml = `
+          <table>
+              <thead>
+                  <tr>
+                      <th width="5%">No.</th>
+                      <th width="18%">약품명</th>
+                      <th width="10%">농도</th>
+                      <th width="15%">CAS No.</th>
+                      <th width="13%">화학식</th>
+                      <th width="19%" class="col-location">위치</th>
+                      <th width="10%">보유량</th>
+                      <th width="10%">분류</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  ${rowsHtml}
+              </tbody>
+          </table>
+      `;
+    }
 
     const htmlContent = `
     <!DOCTYPE html>
@@ -694,15 +832,17 @@
             body { font-family: "Noto Sans KR", sans-serif; padding: 20px; }
             h1 { text-align: center; margin-bottom: 10px; font-size: 24px; }
             .meta { text-align: right; margin-bottom: 20px; font-size: 14px; color: #555; }
-            table { width: 100%; border-collapse: collapse; font-size: 11px; }
+            table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }
             th, td { border: 1px solid #ddd; padding: 8px; vertical-align: middle; }
             th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
             .name-kor { font-weight: bold; font-size: 12px; }
             .name-eng { font-size: 10px; color: #666; margin-top: 2px; }
+            .page-break { page-break-before: always; }
             @media print {
                 @page { margin: 15mm; }
                 body { padding: 0; }
                 th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+                .page-break { page-break-before: always; }
             }
             /* Portrait Optimization */
             @media print and (orientation: portrait) {
@@ -716,23 +856,7 @@
         <div class="meta">
             출력일: ${dateStr} | 총 ${currentFilteredData.length}건
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th width="5%">No.</th>
-                    <th width="18%">약품명</th>
-                    <th width="10%">농도</th>
-                    <th width="15%">CAS No.</th>
-                    <th width="13%">화학식</th>
-                    <th width="19%" class="col-location">위치</th>
-                    <th width="10%">보유량</th>
-                    <th width="10%">분류</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${rowsHtml}
-            </tbody>
-        </table>
+        ${bodyHtml}
         <script>
             window.onload = function() {
                 window.print();
@@ -742,7 +866,6 @@
     </html>
     `;
 
-    // 3. 쓰기 및 출력
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
