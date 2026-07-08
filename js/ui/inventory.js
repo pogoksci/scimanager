@@ -1037,7 +1037,25 @@
           }
         });
         const initialAmount = parseFloat((item.current_amount + totalUsageDiff).toFixed(2));
-        const initialDate = item.purchase_date || (item.created_at ? item.created_at.split('T')[0] : (new Date().toISOString().split('T')[0]));
+
+        // Find the earliest transaction date to prevent virtual initial date from being after transactions
+        let earliestLogDate = null;
+        itemLogs.forEach(l => {
+          if (l.usage_date) {
+            const dStr = l.usage_date.substring(0, 10);
+            if (!earliestLogDate || dStr < earliestLogDate) {
+              earliestLogDate = dStr;
+            }
+          }
+        });
+
+        const createdDate = item.created_at ? item.created_at.split('T')[0] : null;
+        const purchaseDate = item.purchase_date;
+
+        let initialDate = purchaseDate || createdDate || earliestLogDate || (new Date().toISOString().split('T')[0]);
+        if (earliestLogDate && initialDate > earliestLogDate) {
+          initialDate = earliestLogDate;
+        }
 
         const virtualInitialLog = {
           inventory_id: item.id,
@@ -1054,6 +1072,11 @@
           const dateA = a.usage_date ? a.usage_date.substring(0, 10) : "";
           const dateB = b.usage_date ? b.usage_date.substring(0, 10) : "";
           if (dateA !== dateB) return dateA.localeCompare(dateB);
+
+          // If dates are equal, '최초 등록' should always come first
+          if (a.subject === '최초 등록') return -1;
+          if (b.subject === '최초 등록') return 1;
+
           return (a.created_at || "").localeCompare(b.created_at || "");
         });
       }
