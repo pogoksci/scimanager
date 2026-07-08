@@ -981,22 +981,35 @@
           .item-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #000; }
           .item-table th, .item-table td { border: 1px solid #000; padding: 4px; text-align: center; }
           .item-table th { background: #f0f0f0; }
-          .header { text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 10px; margin-top: 0; }
           .item-header { background: #e0e0e0; padding: 5px; font-weight: bold; border: 1px solid #000; border-bottom: none; display: flex; justify-content: space-between; }
+          .print-header { text-align: center; margin-bottom: 15px; width: 100%; }
+          .print-header .title { font-size: 22px; font-weight: bold; text-align: center; }
+          .print-header .date { text-align: right; font-size: 11px; margin-top: 5px; font-weight: normal; }
+          .print-layout-table { width: 100%; border-collapse: collapse; border: none; }
+          .print-layout-table td { border: none; padding: 0; }
+          .print-layout-table tr { page-break-inside: avoid; }
           
           @media print {
               body { padding: 5mm; }
               .page-break { page-break-after: always; }
               /* Ensure the grid fits on one page */
-              .report-grid { height: 92vh !important; }
+              .report-grid { height: 80vh !important; }
           }
       `;
+
+    const headerHtml = `
+      <div class="print-header">
+          <div class="title">약품 수불대장</div>
+          <div class="date">${startDate} ~ ${endDate}</div>
+      </div>
+    `;
 
     let bodyContent = "";
 
     if (layout === '1_per_page') {
       items.forEach(item => {
         bodyContent += '<div class="page-break">';
+        bodyContent += headerHtml;
         bodyContent += buildSingleItemTable(item);
         bodyContent += '</div>';
       });
@@ -1004,38 +1017,40 @@
       // Chunk into 4
       for (let i = 0; i < items.length; i += 4) {
         const slice = items.slice(i, i + 4);
-        const isFirstPage = (i === 0);
-        const gridHeight = "88vh";
+        const gridHeight = "80vh";
 
-        // If not first page, add a spacer to match the header height
-        if (!isFirstPage) {
-          bodyContent += `<div class="header" style="visibility: hidden; margin-bottom: 10px;">수불대장</div>`;
-        }
-
-        bodyContent += `<div class="page-break report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
+        bodyContent += '<div class="page-break">';
+        bodyContent += headerHtml;
+        bodyContent += `<div class="report-grid" style="display:grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: ${gridHeight}; gap: 10px; padding: 5px; box-sizing: border-box;">`;
         slice.forEach(item => {
           bodyContent += '<div style="overflow: hidden; display: flex; flex-direction: column;">';
           bodyContent += buildSingleItemTable(item);
           bodyContent += '</div>';
         });
-        bodyContent += '</div>';
+        bodyContent += '</div>'; // close report-grid
+        bodyContent += '</div>'; // close page-break
       }
     } else { // continuous (feed)
+      bodyContent += '<table class="print-layout-table">';
+      bodyContent += `<thead><tr><td>${headerHtml}</td></tr></thead>`;
+      bodyContent += '<tbody>';
       items.forEach(item => {
+        bodyContent += '<tr><td style="padding-bottom: 20px;">';
         bodyContent += buildSingleItemTable(item);
-        bodyContent += '<br>';
+        bodyContent += '</td></tr>';
       });
+      bodyContent += '</tbody>';
+      bodyContent += '</table>';
     }
 
     const html = `
           <!DOCTYPE html>
           <html>
           <head>
-              <title>수불대장</title>
+              <title>약품 수불대장</title>
               <style>${styles}</style>
           </head>
           <body>
-              <h1 class="header">수불대장 (${startDate} ~ ${endDate})</h1>
               ${bodyContent}
               <script>
                   window.onload = function(){ 
@@ -1104,7 +1119,7 @@
     const isHazardousStr = (info.school_hazardous_chemical === '○' || info.toxic_substance === '○') ? 'O' : 'X';
 
     return `
-          <div style="border: 2px solid #000; padding: 5px; height: 100%; box-sizing: border-box; overflow: hidden;">
+          <div style="padding: 5px; height: 100%; box-sizing: border-box; overflow: hidden;">
               <div class="item-header" style="border:none; background:none; border-bottom:1px solid #000; margin-bottom:5px;">
                   <span style="font-size: 1.1em;">(No.${info.id}) ${nameKor}</span>
                   <span style="white-space: nowrap; margin-left: 10px;">CAS: ${info.cas_rn || '-'} / 단위: ${unit}</span>
