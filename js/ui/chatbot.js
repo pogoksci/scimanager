@@ -13,6 +13,7 @@
     apiUrl: "",
     model: "",
     selectedSubstance: null, // Track currently selected substance
+    lastDateRange: null, // 저장된 마지막 폐수 조회 기간
 
     formatToolLocation: function (loc) {
       if (!loc) return "위치 미지정";
@@ -269,6 +270,35 @@
       const isWasteQuery = tokens.some(t => wasteKeywords.some(k => t.includes(k)));
       const isLocationQuery = tokens.some(t => locationKeywords.some(k => t.includes(k)));
 
+      // 구입요청/소모임박 키워드
+      const lowStockKeywords = ["구입", "구매", "소모", "부족", "주문", "살 거", "구입요청"];
+      const isLowStockQuery = tokens.some(t => lowStockKeywords.some(k => t.includes(k)));
+
+      // 폐수 통계용 날짜 패턴 매칭
+      const dateMatches = [];
+      const regex1 = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일?/g;
+      const regex2 = /(\d{4})[\.\-\/](\d{1,2})[\.\-\/](\d{1,2})/g;
+      
+      let match;
+      regex1.lastIndex = 0;
+      regex2.lastIndex = 0;
+      while ((match = regex1.exec(query)) !== null) {
+        const y = match[1];
+        const m = String(match[2]).padStart(2, "0");
+        const d = String(match[3]).padStart(2, "0");
+        dateMatches.push(`${y}-${m}-${d}`);
+      }
+      while ((match = regex2.exec(query)) !== null) {
+        const y = match[1];
+        const m = String(match[2]).padStart(2, "0");
+        const d = String(match[3]).padStart(2, "0");
+        dateMatches.push(`${y}-${m}-${d}`);
+      }
+
+      // 폐수 통계 의도 판별
+      const isWasteStatsQuery = (query.includes("폐수") || query.includes("폐액") || query.includes("버린")) && 
+                                (query.includes("발생") || query.includes("통계") || query.includes("얼마나") || query.includes("양") || dateMatches.length > 0 || query.includes("기간"));
+
       // 다른 시약 검색 요청 시 상태 초기화
       if (isResetQuery) {
         this.selectedSubstance = null;
@@ -277,6 +307,188 @@
           inputEl.placeholder = "무엇을 도와드릴까요?";
         }
         return `🔄 검색 상태가 초기화되었습니다. 궁금하신 약품, 교구, 설비의 이름을 입력해 주세요.`;
+      }
+
+      // --- 폐수 통계 질의 처리 ---
+      if (isWasteStatsQuery) {
+        let startDate = null;
+        let endDate = null;
+
+        if (dateMatches.length >= 2) {
+          startDate = dateMatches[0];
+          endDate = dateMatches[1];
+          this.lastDateRange = { startDate, endDate };
+        } else if (dateMatches.length === 1) {
+          startDate = dateMatches[0];
+          endDate = new Date().toISOString().split('T')[0];
+          this.lastDateRange = { startDate, endDate };
+        } else if (query.includes("같은 기간") || query.includes("동일 기간")) {
+          if (this.lastDateRange) {
+            startDate = this.lastDateRange.startDate;
+            endDate = this.lastDateRange.endDate;
+          }
+        }
+
+        if (!startDate || !endDate) {
+          const now = new Date();
+          const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+          startDate = oneYearAgo.toISOString().split('T')[0];
+          endDate = now.toISOString().split('T')[0];
+          this.lastDateRange = { startDate, endDate };
+        }
+
+        const { data: wasteLogs, error: logErr } = await supabase
+          .from("WasteLog")
+          .select("*")
+          .gte("date", startDate)
+          .lte("date", endDate);
+
+        if (logErr) {
+          console.error("WasteLog fetch error:", logErr);
+          return "❌ 폐수 정보를 불러오는 중 오류가 발생했습니다.";
+        }
+
+        if (!wasteLogs || wasteLogs.length === 0) {
+          return `📊 **폐수 발생량 통계 결과**
+- **조회 기간:** ${startDate} ~ ${endDate}
+
+해당 기간 내에 등록된 폐수 배출 기록이 존재하지 않습니다.`;
+        }
+
+        let targetClass = null;
+        if (query.includes("산") || query.includes("산성")) targetClass = "산";
+        else if (query.includes("알칼리") || query.includes("알칼리성") || query.includes("염기") || query.includes("염기성")) targetClass = "알칼리";
+        else if (query.includes("유기물") || query.includes("유기용제") || query.includes("유기")) targetClass = "유기물";
+        else if (query.includes("무기물") || query.includes("무기산") || query.includes("무기")) targetClass = "무기물";
+        else if (query.includes("기타")) targetClass = "기타";
+
+        if (targetClass) {
+          const filtered = wasteLogs.filter(log => log.classification === targetClass);
+          const sum = filtered.reduce((acc, log) => acc + Number(log.amount || 0), 0);
+
+          return `📊 **폐수 발생량 통계 결과**
+- **조회 기간:** ${startDate} ~ ${endDate}
+- **폐수 종류:** ${targetClass}
+- **총 발생량:** <b>${sum.toLocaleString()} g</b> (${(sum / 1000).toFixed(2)} kg)`.replace(/\n\s*/g, "");
+        } else {
+          const sums = { "산": 0, "알칼리": 0, "유기물": 0, "무기물": 0, "기타": 0 };
+          let totalSum = 0;
+
+          wasteLogs.forEach(log => {
+            const cls = log.classification || "기타";
+            const amt = Number(log.amount || 0);
+            if (sums[cls] !== undefined) {
+              sums[cls] += amt;
+            } else {
+              sums["기타"] += amt;
+            }
+            totalSum += amt;
+          });
+
+          let tableRows = "";
+          Object.keys(sums).forEach(cls => {
+            const amt = sums[cls];
+            tableRows += `
+              <tr style="border-bottom: 1px solid #dee2e6; background: white;">
+                <td style="padding: 6px 8px; font-weight: bold; color: #333; text-align: left;">${cls}</td>
+                <td style="padding: 6px 8px; text-align: right; color: #495057;">${amt.toLocaleString()} g</td>
+                <td style="padding: 6px 8px; text-align: right; color: #495057;">${(amt / 1000).toFixed(2)} kg</td>
+              </tr>
+            `.replace(/\n\s*/g, "");
+          });
+
+          tableRows += `
+            <tr style="border-bottom: 1px solid #dee2e6; background: #f8f9fa; font-weight: bold;">
+              <td style="padding: 6px 8px; color: #111; text-align: left;">합계</td>
+              <td style="padding: 6px 8px; text-align: right; color: #007bff;">${totalSum.toLocaleString()} g</td>
+              <td style="padding: 6px 8px; text-align: right; color: #007bff;">${(totalSum / 1000).toFixed(2)} kg</td>
+            </tr>
+          `.replace(/\n\s*/g, "");
+
+          return `📊 **기간 내 종류별 폐수 발생량 결과**
+- **조회 기간:** ${startDate} ~ ${endDate}
+` + `
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; border: 1px solid #dee2e6; table-layout: auto;">
+  <thead>
+    <tr style="border-bottom: 2px solid #dee2e6; text-align: left; background: #f1f3f5; font-weight: bold; color: #495057;">
+      <th style="padding: 6px 8px; text-align: left;">폐수 종류</th>
+      <th style="padding: 6px 8px; text-align: right;">발생량 (g)</th>
+      <th style="padding: 6px 8px; text-align: right;">발생량 (kg)</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${tableRows}
+  </tbody>
+</table>`.replace(/\n\s*/g, "");
+        }
+      }
+
+      // --- 소모 임박 / 구입 필요 시약 질의 처리 ---
+      if (isLowStockQuery) {
+        const { data: activeItems, error: activeErr } = await supabase
+          .from("Inventory")
+          .select(`
+            id, current_amount, initial_amount, unit, edited_name_kor,
+            Substance ( chem_name_kor, chem_name_kor_mod, substance_name, substance_name_mod ),
+            Cabinet ( cabinet_name, area_id:lab_rooms!fk_cabinet_lab_rooms ( room_name ) )
+          `)
+          .gt("current_amount", 0);
+
+        if (activeErr) {
+          console.error("Inventory active fetch error:", activeErr);
+          return "❌ 재고 정보를 불러오는 중 오류가 발생했습니다.";
+        }
+
+        const lowStockItems = (activeItems || []).filter(item => {
+          const initial = Number(item.initial_amount || 0);
+          const current = Number(item.current_amount || 0);
+          return initial > 0 && current <= (initial * 0.2);
+        });
+
+        if (lowStockItems.length === 0) {
+          return `🎉 **구입 필요 시약 분석 결과**
+현재 과학실 내에 잔여량이 20% 이하로 떨어진 소모 임박 시약이 없습니다. 재고 상태가 안전합니다!`;
+        }
+
+        let tableRows = "";
+        lowStockItems.forEach(item => {
+          const chemName = item.edited_name_kor || item.Substance?.chem_name_kor_mod || item.Substance?.chem_name_kor || item.Substance?.substance_name_mod || item.Substance?.substance_name || "이름 없음";
+          const area = item.Cabinet?.area_id?.room_name || "";
+          const cabinetName = item.Cabinet?.cabinet_name || "";
+          const locMain = `${area} 『${cabinetName}』`.trim() || "미지정";
+          const initial = Number(item.initial_amount || 0);
+          const current = Number(item.current_amount || 0);
+          const percent = Math.round((current / initial) * 100);
+
+          tableRows += `
+            <tr style="border-bottom: 1px solid #dee2e6; background: white;">
+              <td style="padding: 6px 4px; text-align: left; font-weight: bold; font-size: 11px;">
+                <a href="#" style="color: #007bff; text-decoration: none;" onclick="App.Chatbot.goToInventoryDetail(${item.id}); return false;">${chemName}</a>
+              </td>
+              <td style="padding: 6px 4px; text-align: right; font-size: 11px; color: #d6336c; font-weight: bold;">
+                ${current}${item.unit || ''} (${percent}%)
+              </td>
+              <td style="padding: 6px 4px; text-align: left; font-size: 10.5px; color: #666; max-width: 90px; word-break: break-all;">
+                ${locMain}
+              </td>
+            </tr>
+          `.replace(/\n\s*/g, "");
+        });
+
+        return `⚠️ **구입 권장 시약 리스트 (잔여량 20% 이하)**
+` + `
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; border: 1px solid #dee2e6; table-layout: auto;">
+  <thead>
+    <tr style="border-bottom: 2px solid #dee2e6; text-align: left; background: #fff0f6; font-weight: bold; color: #d6336c;">
+      <th style="padding: 6px 4px; text-align: left;">시약명</th>
+      <th style="padding: 6px 4px; text-align: right; width: 85px;">남은 양 (%)</th>
+      <th style="padding: 6px 4px; text-align: left; width: 90px;">보관 위치</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${tableRows}
+  </tbody>
+</table>`.replace(/\n\s*/g, "");
       }
 
       // --- 실험 준비물 매칭 (아이디어 2) ---
@@ -440,6 +652,266 @@
 
       const substance = this.selectedSubstance;
 
+      // --- 농도 변환 레시피 질의 처리 ---
+      const concMatch = query.match(/([0-9.]+)\s*(M|mM|%|N)/i);
+      const volMatch = query.match(/([0-9.]+)\s*(mL|L|l)/i);
+      const makeKeywords = ["만들", "필요", "조제", "희석", "제조", "배합", "레시피"];
+      const isMakeQuery = tokens.some(t => makeKeywords.some(k => t.includes(k))) || (concMatch && volMatch);
+
+      if (substance && isMakeQuery && (concMatch || volMatch)) {
+        const chemName = substance.chem_name_kor_mod || substance.chem_name_kor || substance.substance_name_mod || substance.substance_name;
+        
+        let targetVol = 500; // default 500mL
+        if (volMatch) {
+          const val = parseFloat(volMatch[1]);
+          const unit = volMatch[2].toLowerCase();
+          if (unit === 'l') {
+            targetVol = val * 1000;
+          } else {
+            targetVol = val;
+          }
+        }
+        
+        let targetConc = 0.1; // default 0.1
+        let targetUnit = "M";
+        if (concMatch) {
+          targetConc = parseFloat(concMatch[1]);
+          targetUnit = concMatch[2].toUpperCase();
+        }
+
+        // 1. Fetch active inventory items for this substance
+        const { data: invItems, error: invErr } = await supabase
+          .from("Inventory")
+          .select(`
+            id, current_amount, initial_amount, unit, concentration_value, concentration_unit, state,
+            Cabinet ( cabinet_name, area_id:lab_rooms!fk_cabinet_lab_rooms ( room_name ) ),
+            Substance ( id, chem_name_kor, chem_name_kor_mod, substance_name, substance_name_mod, molecular_mass, Properties ( name, property ) )
+          `)
+          .eq("substance_id", substance.id)
+          .gt("current_amount", 0);
+
+        if (invErr) {
+          console.error("Inventory fetch error for recipe:", invErr);
+          return "❌ 재고 정보를 확인하는 도중 오류가 발생했습니다.";
+        }
+
+        if (!invItems || invItems.length === 0) {
+          return `❌ 현재 과학실 내에 **${chemName}**의 재고가 한 병도 존재하지 않아 조제 레시피를 계산할 수 없습니다.`;
+        }
+
+        const extractDensity = (item) => {
+          const props = item.Substance?.Properties || [];
+          const densityProp = props.find(p => p.name && p.name.toLowerCase().includes("density"));
+          if (!densityProp) return null;
+          const m = densityProp.property.match(/([0-9.]+)\s*g\/cm3|([0-9.]+)\s*g\/mL|([0-9.]+)/i);
+          return m ? parseFloat(m[1] || m[2] || m[3]) : null;
+        };
+
+        const chemDefaults = {
+          "염산": { mw: 36.46, density: 1.18, defaultConc: 37, defaultUnit: "%" },
+          "황산": { mw: 98.08, density: 1.84, defaultConc: 98, defaultUnit: "%" },
+          "질산": { mw: 63.01, density: 1.42, defaultConc: 70, defaultUnit: "%" },
+          "아세톤": { mw: 58.08, density: 0.79, defaultConc: 99.5, defaultUnit: "%" },
+          "에탄올": { mw: 46.07, density: 0.789, defaultConc: 99, defaultUnit: "%" },
+          "수산화나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
+          "수산화 나트륨": { mw: 40.00, density: 2.13, defaultConc: 98, defaultUnit: "%" },
+        };
+
+        const defaultData = Object.keys(chemDefaults).find(k => chemName.includes(k)) ? chemDefaults[Object.keys(chemDefaults).find(k => chemName.includes(k))] : null;
+        const mw = parseFloat(substance.molecular_mass) || (defaultData ? defaultData.mw : 0);
+
+        let bestCandidate = null;
+        let candidateType = null;
+        let candidateConcM = 0;
+
+        const solids = invItems.filter(item => {
+          const state = (item.state || "").trim();
+          return ["고체", "파우더", "가루", "Solid", "Powder"].some(s => state.includes(s));
+        });
+
+        if (solids.length > 0) {
+          solids.sort((a, b) => Number(b.current_amount || 0) - Number(a.current_amount || 0));
+          bestCandidate = solids[0];
+          candidateType = 'solid';
+        } else {
+          const liquids = [];
+          for (const item of invItems) {
+            const currentConcVal = parseFloat(item.concentration_value) || 0;
+            const currentUnit = item.concentration_unit || "%";
+            const density = extractDensity(item) || (defaultData ? defaultData.density : 1.0);
+
+            let sourceM = 0;
+            if (currentUnit === "M") {
+              sourceM = currentConcVal;
+            } else if (currentUnit === "%") {
+              if (mw) {
+                sourceM = (currentConcVal * 10 * density) / mw;
+              } else {
+                sourceM = 0;
+              }
+            } else if (currentUnit === "N") {
+              sourceM = currentConcVal;
+            }
+
+            liquids.push({ item, sourceM, currentConcVal, currentUnit, density });
+          }
+
+          let destM = 0;
+          if (targetUnit === "M") {
+            destM = targetConc;
+          } else if (targetUnit === "mM") {
+            destM = targetConc / 1000;
+          } else if (targetUnit === "%") {
+            if (mw) {
+              destM = (targetConc * 10 * 1.0) / mw;
+            }
+          }
+
+          const validLiquids = liquids.filter(liq => {
+            if (targetUnit === "%" && liq.currentUnit === "%") {
+              return liq.currentConcVal >= targetConc;
+            }
+            return liq.sourceM >= destM;
+          });
+
+          if (validLiquids.length > 0) {
+            validLiquids.sort((a, b) => b.sourceM - a.sourceM);
+            bestCandidate = validLiquids[0].item;
+            candidateType = 'liquid';
+            candidateConcM = validLiquids[0].sourceM;
+          }
+        }
+
+        if (!bestCandidate) {
+          return `❌ **조제 불가능 (농도 부족 / 재고 없음)**
+현재 과학실 내에 보유한 **${chemName}** 재고(${invItems.map(i => `${i.concentration_value || ''}${i.concentration_unit || ''} ${i.state}`).join(', ')}) 중 목표 농도(${targetConc}${targetUnit})보다 농도가 높은 액체 시약이나 고체 시약이 없어 조제 레시피를 계산할 수 없습니다.`;
+        }
+
+        let requiredAmount = 0;
+        let stepsHtml = "";
+        let prepHtml = "";
+        const isAcid = (chemName || "").includes("산");
+        const candidateName = bestCandidate.edited_name_kor || bestCandidate.Substance?.chem_name_kor_mod || chemName;
+        const currentConcStr = `${bestCandidate.concentration_value || ''}${bestCandidate.concentration_unit || ''}`;
+        const area = bestCandidate.Cabinet?.area_id?.room_name || "";
+        const cabinetName = bestCandidate.Cabinet?.cabinet_name || "";
+        const locationStr = `${area} 『${cabinetName}』`.trim() || "위치 미지정";
+
+        if (candidateType === 'solid') {
+          let purity = 1.0;
+          if (bestCandidate.concentration_unit === "%" && bestCandidate.concentration_value) {
+            purity = parseFloat(bestCandidate.concentration_value) / 100;
+          }
+
+          if (targetUnit === "M" || targetUnit === "mM") {
+            if (!mw) {
+              return `❌ 분자량(MW) 정보가 존재하지 않아 몰농도 레시피를 계산할 수 없습니다.`;
+            }
+            let targetM = targetConc;
+            if (targetUnit === "mM") targetM = targetConc / 1000;
+            const volL = targetVol / 1000;
+            requiredAmount = (targetM * volL * mw) / purity;
+          } else if (targetUnit === "%") {
+            requiredAmount = (targetVol * (targetConc / 100)) / purity;
+          }
+
+          prepHtml = `
+            <li><strong>사용할 시약:</strong> ${candidateName} (고체, No.${bestCandidate.id})</li>
+            <li><strong>보관 위치:</strong> ${locationStr}</li>
+            <li><strong>필요 시약 질량:</strong> <b style="color: #007bff;">${requiredAmount.toFixed(2)} g</b></li>
+            <li><strong>필요 준비물:</strong> 전자저울, 약포지, 약숟가락, ${targetVol}mL 부피 플라스크, 씻기병(증류수), 비커</li>
+          `;
+
+          stepsHtml = `
+            <ol style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 12px; color: #495057;">
+              <li>전자저울에 약포지를 올리고 영점을 맞춥니다.</li>
+              <li><strong>${candidateName} ${requiredAmount.toFixed(2)}g</strong>을 정확히 계량하여 비커에 넣습니다.</li>
+              <li>증류수를 적당량(약 ${Math.floor(targetVol / 2)}mL) 부어 유리 막대로 저어 완전히 녹입니다. ${isAcid ? "<br><span style='color: #d6336c; font-weight: bold;'>※ 주의: 용해 시 발열 반응이 발생할 수 있으니 안전에 주의하십시오.</span>" : ""}</li>
+              <li>녹인 용액을 <strong>${targetVol}mL 부피 플라스크</strong>에 조심스럽게 옮겨 담습니다.</li>
+              <li>비커를 증류수로 2~3회 깨끗이 헹구어 플라스크에 같이 부어줍니다.</li>
+              <li>표시선까지 증류수를 정확히 채우고 마개를 닫은 후, 위아래로 흔들어 균일하게 섞어 줍니다.</li>
+            </ol>
+          `;
+        } else {
+          const currentUnit = bestCandidate.concentration_unit || "%";
+          const currentConcVal = parseFloat(bestCandidate.concentration_value) || 0;
+
+          if (targetUnit === "%" && currentUnit === "%") {
+            requiredAmount = (targetVol * targetConc) / currentConcVal;
+          } else {
+            let destM = 0;
+            if (targetUnit === "M") {
+              destM = targetConc;
+            } else if (targetUnit === "mM") {
+              destM = targetConc / 1000;
+            } else if (targetUnit === "%") {
+              if (mw) {
+                destM = (targetConc * 10 * 1.0) / mw;
+              }
+            }
+            requiredAmount = (destM * targetVol) / candidateConcM;
+          }
+
+          const waterVol = (targetVol - requiredAmount).toFixed(1);
+
+          prepHtml = `
+            <li><strong>사용할 시약:</strong> ${candidateName} (액체 ${currentConcStr}, No.${bestCandidate.id})</li>
+            <li><strong>보관 위치:</strong> ${locationStr}</li>
+            <li><strong>필요 원액 부피:</strong> <b style="color: #d6336c;">${requiredAmount.toFixed(2)} mL</b></li>
+            <li><strong>필요 준비물:</strong> 피펫, 피펫 펌프, ${targetVol}mL 부피 플라스크, 증류수</li>
+          `;
+
+          if (isAcid) {
+            stepsHtml = `
+              <ol style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 12px; color: #495057;">
+                <li><strong>${targetVol}mL 부피 플라스크</strong>에 증류수를 미리 약 ${(targetVol / 3).toFixed(0)}mL 정도 채워 둡니다. <br><span style="color: #d6336c; font-weight: bold;">(※ 중요: 발열 반응 방지를 위해 항상 물에 산을 첨가해야 합니다!)</span></li>
+                <li>피펫을 사용하여 <strong>${candidateName} 원액 ${requiredAmount.toFixed(2)}mL</strong>를 정밀하게 취합니다.</li>
+                <li>플라스크 벽면을 따라 원액을 아주 천천히 흘려 넣어 줍니다.</li>
+                <li>부피 플라스크의 표시선까지 나머지 증류수를 조심스럽게 마저 채웁니다.</li>
+                <li>마개를 꼭 닫고 플라스크를 천천히 뒤집어 가며 완전히 섞어 줍니다.</li>
+              </ol>
+            `;
+          } else {
+            stepsHtml = `
+              <ol style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 12px; color: #495057;">
+                <li><strong>${targetVol}mL 부피 플라스크</strong>에 피펫을 이용하여 <strong>${candidateName} 원액 ${requiredAmount.toFixed(2)}mL</strong>를 넣습니다.</li>
+                <li>표시선까지 증류수를 채워 줍니다. (약 ${waterVol}mL 소요)</li>
+                <li>마개를 닫고 가볍게 흔들어 균일하게 섞어 줍니다.</li>
+              </ol>
+            `;
+          }
+        }
+
+        let stockWarning = "";
+        const currentStock = parseFloat(bestCandidate.current_amount) || 0;
+        const needed = requiredAmount;
+        if (needed > currentStock) {
+          stockWarning = `
+            <div style="background: #fff5f5; border: 1px solid #ffa8a8; padding: 10px; border-radius: 6px; color: #e03131; font-weight: bold; font-size: 12px; margin-top: 10px;">
+              ⚠️ [재고 부족 경고] 현재 보유 중인 재고량(${currentStock}${bestCandidate.unit || 'mL'})이 제조에 필요한 양(${needed.toFixed(2)}${bestCandidate.unit || 'mL'})보다 적습니다.
+            </div>
+          `;
+        }
+
+        return `🧪 **${chemName} ${targetConc}${targetUnit} ${volMatch ? volMatch[1] + volMatch[2] : '500mL'} 조제 레시피**
+` + `
+<div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-top: 10px;">
+  <strong style="color: #495057; font-size: 13px;">📋 준비 단계</strong>
+  <ul style="margin: 6px 0 0; padding-left: 20px; line-height: 1.5; font-size: 12px; color: #495057;">
+    ${prepHtml}
+  </ul>
+  ${stockWarning}
+</div>
+
+<div style="background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; margin-top: 10px;">
+  <strong style="color: #0984e3; font-size: 13px;">⚙️ 조제 순서 (레시피)</strong>
+  <div style="margin-top: 8px;">
+    ${stepsHtml}
+  </div>
+</div>
+`.replace(/\n\s*/g, "");
+      }
+
       // 1.5. DB에서 교구/설비 매칭 찾기 (화학물질 매칭 실패 시)
       let foundTools = null;
       if (!substance) {
@@ -574,11 +1046,16 @@
         if (this.apiKey) {
           return await this.callAI(query);
         } else {
-          return `🔍 데이터베이스에서 입력하신 키워드와 관련된 화학물질을 찾지 못했습니다.
-          
-💡 <b>도움말:</b>
-오타가 없는지 확인하거나 정확한 명칭(예: '수산화 나트륨', '에탄올', '염산')으로 질문해 보세요.
-일반적인 질문이나 오타 자동 보정 기능을 원하시면 **[설정 > 과학실 설정 > 사용자 기초설정]** 탭에서 API Key를 입력해 주시면 똑똑한 AI 모드를 사용할 수 있습니다!`;
+          // DB에 미답변 질문 저장
+          const supabase = getSupabase();
+          if (supabase) {
+            supabase.from("chatbot_unanswered")
+              .insert([{ query: query }])
+              .then(({ error }) => {
+                if (error) console.error("Failed to save unanswered query:", error);
+              });
+          }
+          return `죄송합니다. 현재는 답변드릴 수 없습니다. 질문하신 내용을 검토하여 추후 답변 가능하도록 기능개선을 위해 노력하겠습니다.`;
         }
       }
 
