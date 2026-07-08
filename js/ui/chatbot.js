@@ -67,7 +67,7 @@
           </div>
           <div class="chatbot-messages" id="chatbot-messages-container"></div>
           <div class="chatbot-input-area">
-            <input type="text" id="chatbot-input" placeholder="시약의 이름을 입력하세요..." autocomplete="off">
+            <input type="text" id="chatbot-input" placeholder="무엇을 도와드릴까요?" autocomplete="off">
             <button id="chatbot-send-btn" title="보내기">
               <span class="material-symbols-outlined">send</span>
             </button>
@@ -288,7 +288,7 @@
         this.selectedSubstance = null;
         const inputEl = document.getElementById("chatbot-input");
         if (inputEl) {
-          inputEl.placeholder = "시약의 이름을 입력하세요...";
+          inputEl.placeholder = "무엇을 도와드릴까요?";
         }
         return `🔄 다른 시약을 검색합니다. 시약의 이름을 입력해 주세요.
         <div class="chatbot-chips-container" style="margin-top: 10px;">
@@ -611,7 +611,7 @@
       // 입력창 placeholder 업데이트
       const inputEl = document.getElementById("chatbot-input");
       if (inputEl) {
-        inputEl.placeholder = `"${chemName}"에 대해 질문하세요 (예: 분자량, 위험성)...`;
+        inputEl.placeholder = "무엇을 도와드릴까요?";
       }
 
       // --- 긴급 SOS 및 폐액 가이드 분기 처리 (아이디어 4) ---
