@@ -382,10 +382,16 @@
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
 
-        // Hide video element visually immediately to prevent side-by-side flickering
-        videoStream.style.opacity = '0';
-        videoStream.style.position = 'absolute';
+        // 1. Show original preview immediately and hide videoStream to prevent side-by-side flicker
+        previewImg.src = base64;
+        previewImg.style.display = 'block';
+        if (photoContainer) {
+            const ph = photoContainer.querySelector('.placeholder-text');
+            if (ph) ph.style.display = 'none';
+        }
+        videoStream.style.display = 'none';
 
+        // 2. Process resizing in background
         try {
             const resized = await App.Camera.processImage(base64);
             const blob = App.Utils.base64ToBlob(resized.base64_320);
@@ -394,20 +400,20 @@
             photoFiles.file = null;
 
             previewImg.src = resized.base64_320;
-            previewImg.style.display = 'block';
-            if (photoContainer) {
-                const ph = photoContainer.querySelector('.placeholder-text');
-                if (ph) ph.style.display = 'none';
-            }
         } catch (err) {
             console.error("Failed to process captured photo:", err);
-            alert("사진 처리 중 오류가 발생했습니다.");
+            // Fallback to original
+            try {
+                const blob = App.Utils.base64ToBlob(base64);
+                photoFiles.blob = blob;
+                photoFiles.file = null;
+            } catch (blobErr) {
+                console.error(blobErr);
+            }
         }
 
         setTimeout(() => {
             stopCamera();
-            videoStream.style.opacity = '';
-            videoStream.style.position = '';
         }, 150);
     }
 

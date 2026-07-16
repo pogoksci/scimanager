@@ -628,44 +628,46 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      // Hide video element visually immediately to prevent side-by-side flickering
-      videoStream.style.opacity = '0';
-      videoStream.style.position = 'absolute';
+      // 1. Show original preview immediately and hide videoStream to prevent side-by-side flicker
+      if (previewImg) {
+        previewImg.src = base64;
+        previewImg.style.display = 'block';
+      } else {
+        // Fallback
+        const img = document.createElement('img');
+        img.id = 'preview-img';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.src = base64;
+        previewBox.insertBefore(img, previewBox.firstChild);
+      }
 
+      const placeholder = previewBox.querySelector('.placeholder-text');
+      if (placeholder) placeholder.style.display = 'none';
+
+      videoStream.style.display = 'none';
+
+      // 2. Process resizing in background
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
-          if (!resized) return;
+          if (resized) {
+            set("photo_320_base64", resized.base64_320);
+            set("photo_160_base64", resized.base64_160);
 
-          set("photo_320_base64", resized.base64_320);
-          set("photo_160_base64", resized.base64_160);
-
-          if (previewImg) {
-            previewImg.src = resized.base64_320;
-            previewImg.style.display = 'block';
-          } else {
-            // Fallback
-            const img = document.createElement('img');
-            img.id = 'preview-img';
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            img.src = resized.base64_320;
-            previewBox.insertBefore(img, previewBox.firstChild);
+            const targetImg = previewImg || previewBox.querySelector('#preview-img');
+            if (targetImg) targetImg.src = resized.base64_320;
           }
-
-          const placeholder = previewBox.querySelector('.placeholder-text');
-          if (placeholder) placeholder.style.display = 'none';
-
         } catch (err) {
           console.error("Image processing failed:", err);
-          alert("사진 처리 중 오류가 발생했습니다.");
+          // Fallback to original
+          set("photo_320_base64", base64);
+          set("photo_160_base64", base64);
         }
       }
       setTimeout(() => {
         stopCamera();
-        videoStream.style.opacity = '';
-        videoStream.style.position = '';
       }, 150);
     };
 
@@ -1485,10 +1487,25 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      // Hide video element visually immediately to prevent side-by-side flickering
-      videoStream.style.opacity = '0';
-      videoStream.style.position = 'absolute';
+      // 1. Show original preview immediately and hide videoStream to prevent side-by-side flicker
+      const placeholder = previewBox.querySelector('.placeholder-text');
+      if (placeholder) placeholder.style.display = 'none';
 
+      let img = previewBox.querySelector('img');
+      if (!img) {
+        img = document.createElement('img');
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        previewBox.insertBefore(img, previewBox.firstChild);
+      }
+      img.src = base64;
+      img.style.display = 'block';
+      img.style.objectFit = 'cover';
+
+      videoStream.style.display = 'none';
+
+      // 2. Process resizing in background
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1496,27 +1513,18 @@
             set("photo_320_base64", resized.base64_320);
             set("photo_160_base64", resized.base64_160);
 
-            const placeholder = previewBox.querySelector('.placeholder-text');
-            if (placeholder) placeholder.style.display = 'none';
-
-            let img = previewBox.querySelector('img');
-            if (!img) {
-              img = document.createElement('img');
-              img.style.width = "100%";
-              img.style.height = "100%";
-              img.style.objectFit = "cover";
-              previewBox.insertBefore(img, previewBox.firstChild);
-            }
-            img.src = resized.base64_320;
-            img.style.display = 'block';
-            img.style.objectFit = 'cover';
+            const targetImg = previewBox.querySelector('img');
+            if (targetImg) targetImg.src = resized.base64_320;
           }
-        } catch (e) { console.error(e); }
+        } catch (e) {
+          console.error(e);
+          // Fallback to original
+          set("photo_320_base64", base64);
+          set("photo_160_base64", base64);
+        }
       }
       setTimeout(() => {
         stopCabinetCamera();
-        videoStream.style.opacity = '';
-        videoStream.style.position = '';
       }, 150);
     };
 
@@ -1902,10 +1910,25 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      // Hide video element visually immediately to prevent side-by-side flickering
-      videoStream.style.opacity = '0';
-      videoStream.style.position = 'absolute';
+      // 1. Show original preview immediately and hide videoStream to prevent side-by-side flicker
+      let img = previewBox.querySelector('img');
+      if (!img) {
+        img = document.createElement("img");
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        previewBox.insertBefore(img, previewBox.firstChild);
+      }
+      img.src = base64;
+      img.style.display = 'block';
+      img.style.objectFit = 'cover';
 
+      const placeholder = previewBox.querySelector('.placeholder-text');
+      if (placeholder) placeholder.style.display = 'none';
+
+      videoStream.style.display = 'none';
+
+      // 2. Process resizing in background
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1913,27 +1936,18 @@
             set("photo_320_base64", resized.base64_320);
             set("photo_160_base64", resized.base64_160);
 
-            let img = previewBox.querySelector('img');
-            if (!img) {
-              img = document.createElement("img");
-              img.style.width = "100%";
-              img.style.height = "100%";
-              img.style.objectFit = "cover";
-              previewBox.insertBefore(img, previewBox.firstChild);
-            }
-            img.src = resized.base64_320;
-            img.style.display = 'block';
-            img.style.objectFit = 'cover';
-
-            const placeholder = previewBox.querySelector('.placeholder-text');
-            if (placeholder) placeholder.style.display = 'none';
+            const targetImg = previewBox.querySelector('img');
+            if (targetImg) targetImg.src = resized.base64_320;
           }
-        } catch (e) { console.error(e); }
+        } catch (e) {
+          console.error(e);
+          // Fallback to original
+          set("photo_320_base64", base64);
+          set("photo_160_base64", base64);
+        }
       }
       setTimeout(() => {
         stopCamera();
-        videoStream.style.opacity = '';
-        videoStream.style.position = '';
       }, 150);
     };
 

@@ -634,10 +634,11 @@
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
 
-        // Hide video element visually immediately to prevent side-by-side flickering
-        videoStream.style.opacity = '0';
-        videoStream.style.position = 'absolute';
+        // 1. Show original preview immediately and hide videoStream to prevent side-by-side flicker
+        showPreview(base64);
+        videoStream.style.display = 'none';
 
+        // 2. Process resizing in background
         try {
             const resized = await App.Camera.processImage(base64);
             if (resized) {
@@ -646,7 +647,6 @@
             }
         } catch (err) {
             console.error(err);
-            showPreview(base64);
             currentPhotoBase64 = base64;
         }
 
@@ -658,8 +658,6 @@
 
         setTimeout(() => {
             stopCamera();
-            videoStream.style.opacity = '';
-            videoStream.style.position = '';
         }, 150);
     }
 
