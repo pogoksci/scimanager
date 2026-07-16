@@ -94,9 +94,10 @@
 
   function captureFrame(video, canvas, maxDim = 1024) {
     if (!video || !canvas) return null;
-    let w = video.videoWidth || video.width;
-    let h = video.videoHeight || video.height;
-    if (!w || !h) return null;
+    const track = video.srcObject && video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
+    const settings = track && track.getSettings ? track.getSettings() : null;
+    let w = video.videoWidth || (settings && settings.width) || video.width || 640;
+    let h = video.videoHeight || (settings && settings.height) || video.height || 480;
 
     if (w > maxDim || h > maxDim) {
       const scale = maxDim / Math.max(w, h);
