@@ -7,9 +7,9 @@
   position: fixed;
   bottom: 80px; /* Avoid overlapping with bottom navigation bar (60px) */
   right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
   background: linear-gradient(135deg, #00bfd4, #00a0b2);
   color: #ffffff;
   border: none;
