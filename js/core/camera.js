@@ -83,6 +83,24 @@
     });
   }
 
+  function captureFrame(video, canvas, maxDim = 1024) {
+    if (!video || !canvas) return null;
+    let w = video.videoWidth || video.width;
+    let h = video.videoHeight || video.height;
+    if (!w || !h) return null;
+
+    if (w > maxDim || h > maxDim) {
+      const scale = maxDim / Math.max(w, h);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+    }
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, w, h);
+    return canvas.toDataURL("image/jpeg", 0.85);
+  }
+
   // ------------------------------------------------------------
   // 🧩 5️⃣ 이미지 리사이즈 및 Base64 저장
   // ------------------------------------------------------------
@@ -113,12 +131,8 @@
     if (!modal || !video || !canvas || !captureBtn || !cancelBtn) return;
 
     captureBtn.onclick = async () => {
-      const ctx = canvas.getContext("2d");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const base64 = canvas.toDataURL("image/jpeg");
+      const base64 = captureFrame(video, canvas);
+      if (!base64) return;
       stopCameraStream();
       modal.style.display = "none";
 
@@ -175,6 +189,7 @@
     processImage: processAndStorePhoto,
     resizeBase64: resizeBase64,
     getNextStream: getNextStream,
-    hasMultipleCameras: hasMultipleCameras
+    hasMultipleCameras: hasMultipleCameras,
+    captureFrame: captureFrame
   };
 })();

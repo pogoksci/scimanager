@@ -620,13 +620,8 @@
 
     async function takeKitPhoto() {
         if (!videoStream || !canvas) return;
-
-        canvas.width = videoStream.videoWidth;
-        canvas.height = videoStream.videoHeight;
-        canvas.getContext('2d').drawImage(videoStream, 0, 0);
-
-        const base64 = canvas.toDataURL("image/jpeg");
-
+        const base64 = App.Camera.captureFrame(videoStream, canvas);
+        if (!base64) return;
         stopCamera();
 
         if (App.Camera && App.Camera.processImage) {
