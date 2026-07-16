@@ -246,6 +246,20 @@
         document.getElementById('btn-cancel-camera').addEventListener('click', stopCamera);
         cameraInput.addEventListener('change', handleFileSelect);
 
+        const kitSwitchBtn = document.getElementById('btn-kit-switch');
+        if (kitSwitchBtn) {
+            kitSwitchBtn.addEventListener('click', async () => {
+                if (!isCameraActive) return;
+                try {
+                    const res = await App.Camera.getNextStream(videoStream.srcObject);
+                    videoStream.srcObject = res.stream;
+                    videoStream.play();
+                } catch (err) {
+                    console.error("Kit camera switch failed:", err);
+                }
+            });
+        }
+
         // Submit
         form.addEventListener('submit', handleSubmit);
 
@@ -553,8 +567,8 @@
 
     async function startCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            videoStream.srcObject = stream;
+            const res = await App.Camera.getNextStream(videoStream.srcObject);
+            videoStream.srcObject = res.stream;
             videoStream.style.display = 'block';
             videoStream.play();
 
@@ -576,6 +590,11 @@
             if (btnConfirm) {
                 btnConfirm.style.display = 'inline-flex';
                 btnConfirm.innerHTML = '<span class="material-symbols-outlined">camera</span> 촬영';
+            }
+
+            const btnSwitch = document.getElementById('btn-kit-switch');
+            if (btnSwitch) {
+                btnSwitch.style.display = App.Camera.hasMultipleCameras() ? 'inline-flex' : 'none';
             }
 
             document.getElementById('btn-cancel-camera').style.display = 'inline-flex';
@@ -602,6 +621,7 @@
 
         document.getElementById('btn-kit-file').style.display = 'inline-flex';
         document.getElementById('btn-kit-confirm').style.display = 'none';
+        document.getElementById('btn-kit-switch').style.display = 'none';
         document.getElementById('btn-cancel-camera').style.display = 'none';
 
         if (previewImg.src && previewImg.src !== window.location.href) {

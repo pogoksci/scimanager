@@ -152,6 +152,21 @@
         document.getElementById('tools-camera-cancel-btn').addEventListener('click', stopCamera);
         document.getElementById('tools-camera-input').addEventListener('change', handleFileSelect);
 
+        const switchBtn = document.getElementById('tools-camera-switch-btn');
+        if (switchBtn) {
+            switchBtn.addEventListener('click', async () => {
+                if (!streamObj) return;
+                try {
+                    const res = await App.Camera.getNextStream(streamObj);
+                    streamObj = res.stream;
+                    videoStream.srcObject = streamObj;
+                    videoStream.play();
+                } catch (err) {
+                    console.error("Tools camera switch failed:", err);
+                }
+            });
+        }
+
         // Submit
         form.addEventListener('submit', handleSubmit);
 
@@ -308,17 +323,8 @@
         }
 
         try {
-            // Priority 1: Try Environment Camera (Mobile Rear)
-            try {
-                streamObj = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-            } catch (mobileErr) {
-                // Priority 2: Fallback to any available video device (Desktop/Laptop)
-                streamObj = await navigator.mediaDevices.getUserMedia({
-                    video: true
-                });
-            }
+            const res = await App.Camera.getNextStream(streamObj);
+            streamObj = res.stream;
         } catch (err) {
             console.warn("Camera init failed:", err);
 
@@ -394,6 +400,11 @@
         document.getElementById('tools-camera-btn').style.display = isCameraOn ? 'none' : 'inline-flex';
         document.getElementById('tools-camera-confirm-btn').style.display = isCameraOn ? 'inline-flex' : 'none';
         document.getElementById('tools-camera-cancel-btn').style.display = isCameraOn ? 'inline-flex' : 'none';
+
+        const switchBtn = document.getElementById('tools-camera-switch-btn');
+        if (switchBtn) {
+            switchBtn.style.display = (isCameraOn && App.Camera.hasMultipleCameras()) ? 'inline-flex' : 'none';
+        }
     }
 
     function resetPhotoUI() {

@@ -5,6 +5,8 @@
   globalThis.App = globalThis.App || {};
 
   let stream = null;
+  let videoDevices = [];
+  let currentDeviceIndex = -1;
 
   // ------------------------------------------------------------
   // 📸 1️⃣ startCamera — 카메라 실행 (forms.js나 cabinet.js에서 호출 가능)
@@ -131,6 +133,87 @@
     };
   }
 
+  async function initDevices() {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      videoDevices = devices.filter(d => d.kind === 'videoinput');
+      // Sort: place rear/back/후면/environment cameras first
+      videoDevices.sort((a, b) => {
+        const labelA = (a.label || "").toLowerCase();
+        const labelB = (b.label || "").toLowerCase();
+        const isRearA = labelA.includes("back") || labelA.includes("rear") || labelA.includes("후면") || labelA.includes("environment");
+        const isRearB = labelB.includes("back") || labelB.includes("rear") || labelB.includes("후면") || labelB.includes("environment");
+        if (isRearA && !isRearB) return -1;
+        if (!isRearA && isRearB) return 1;
+        return 0;
+      });
+      console.log("📸 카메라 목록 초기화 완료:", videoDevices);
+    } catch (e) {
+      console.error("📸 enumerateDevices 실패:", e);
+    }
+  }
+
+  function hasMultipleCameras() {
+    return videoDevices.length > 1;
+  }
+
+  async function getNextStream(currentStream, onDeviceChanged) {
+    // 1. Stop current stream if any
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+    }
+
+    // 2. Initial setup if not loaded
+    if (videoDevices.length === 0) {
+      const initialStream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      });
+      
+      await initDevices();
+
+      const activeTrack = initialStream.getVideoTracks()[0];
+      const activeSettings = activeTrack ? activeTrack.getSettings() : null;
+      const activeDeviceId = activeSettings ? activeSettings.deviceId : null;
+
+      if (activeDeviceId) {
+        currentDeviceIndex = videoDevices.findIndex(d => d.deviceId === activeDeviceId);
+      }
+      if (currentDeviceIndex === -1) {
+        currentDeviceIndex = 0;
+      }
+
+      if (onDeviceChanged && videoDevices[currentDeviceIndex]) {
+        onDeviceChanged(videoDevices[currentDeviceIndex]);
+      }
+
+      return { stream: initialStream, deviceId: activeDeviceId };
+    }
+
+    // 3. Cycle to next device
+    currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+    const selectedDevice = videoDevices[currentDeviceIndex];
+    console.log("📸 전환된 카메라:", selectedDevice.label || selectedDevice.deviceId);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          deviceId: { exact: selectedDevice.deviceId },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
+      });
+      if (onDeviceChanged) onDeviceChanged(selectedDevice);
+      return { stream, deviceId: selectedDevice.deviceId };
+    } catch (err) {
+      console.warn("📸 카메라 접근 실패, 다음 카메라 시도:", selectedDevice.label, err);
+      return getNextStream(null, onDeviceChanged);
+    }
+  }
+
   // ------------------------------------------------------------
   // 🌍 7️⃣ 전역 등록 (forms.js/cabinet.js 모두에서 사용 가능)
   // ------------------------------------------------------------
@@ -139,6 +222,8 @@
     setupModalListeners: setupModalListeners,
     updatePreview: updatePreview,
     processImage: processAndStorePhoto,
-    resizeBase64: resizeBase64
+    resizeBase64: resizeBase64,
+    getNextStream: getNextStream,
+    hasMultipleCameras: hasMultipleCameras
   };
 })();

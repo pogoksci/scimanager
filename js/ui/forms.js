@@ -1,4 +1,4 @@
-﻿// ================================================================
+// ================================================================
 // /js/ui/forms.js — 폼 상태/UI 관리 (App.Forms)
 // ================================================================
 (function () {
@@ -585,8 +585,6 @@
 
     const togglePhotoButtons = (isCameraOn) => {
       if (photoBtn) photoBtn.style.display = isCameraOn ? 'none' : 'inline-flex';
-      // Logic: active -> camera btn hidden (or changed?), confirm/cancel shown.
-      // tools-form: camera btn hidden.
       if (cameraBtn) cameraBtn.style.display = isCameraOn ? 'none' : 'inline-flex';
 
       if (cameraConfirmBtn) {
@@ -594,14 +592,19 @@
         cameraConfirmBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
       }
       if (cameraCancelBtn) cameraCancelBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
+      
+      const switchBtn = document.getElementById("camera-switch-btn");
+      if (switchBtn) {
+        switchBtn.style.display = (isCameraOn && App.Camera.hasMultipleCameras()) ? 'inline-flex' : 'none';
+      }
     };
 
 
     // Helper: Start Camera
     const startCameraFunc = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        inventoryStream = stream;
+        const res = await App.Camera.getNextStream(inventoryStream);
+        inventoryStream = res.stream;
         videoStream.srcObject = inventoryStream;
         videoStream.style.display = 'block';
         videoStream.play();
@@ -717,6 +720,21 @@
     if (cameraCancelBtn) {
       cameraCancelBtn.onclick = () => {
         stopCamera();
+      };
+    }
+
+    const cameraSwitchBtn = document.getElementById("camera-switch-btn");
+    if (cameraSwitchBtn) {
+      cameraSwitchBtn.onclick = async () => {
+        if (!isCameraActive) return;
+        try {
+          const res = await App.Camera.getNextStream(inventoryStream);
+          inventoryStream = res.stream;
+          videoStream.srcObject = inventoryStream;
+          videoStream.play();
+        } catch (err) {
+          console.error("Camera switch failed:", err);
+        }
       };
     }
 
@@ -1443,12 +1461,17 @@
         cameraConfirmBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
       }
       if (cameraCancelBtn) cameraCancelBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
+
+      const switchBtn = document.getElementById("cabinet-camera-switch-btn");
+      if (switchBtn) {
+        switchBtn.style.display = (isCameraOn && App.Camera.hasMultipleCameras()) ? 'inline-flex' : 'none';
+      }
     };
 
     const startCabinetCamera = async () => {
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        cabinetStream = newStream;
+        const res = await App.Camera.getNextStream(cabinetStream);
+        cabinetStream = res.stream;
         videoStream.srcObject = cabinetStream;
         videoStream.style.display = 'block';
         videoStream.play();
@@ -1533,6 +1556,21 @@
     }
     if (cameraCancelBtn) {
       cameraCancelBtn.onclick = stopCabinetCamera;
+    }
+
+    const cabinetSwitchBtn = document.getElementById("cabinet-camera-switch-btn");
+    if (cabinetSwitchBtn) {
+      cabinetSwitchBtn.onclick = async () => {
+        if (!isCameraActive) return;
+        try {
+          const res = await App.Camera.getNextStream(cabinetStream);
+          cabinetStream = res.stream;
+          videoStream.srcObject = cabinetStream;
+          videoStream.play();
+        } catch (err) {
+          console.error("Cabinet camera switch failed:", err);
+        }
+      };
     }
 
     const handleFile = (file) => {
@@ -1851,13 +1889,18 @@
         cameraConfirmBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
       }
       if (cameraCancelBtn) cameraCancelBtn.style.display = isCameraOn ? 'inline-flex' : 'none';
+
+      const switchBtn = document.getElementById("equipment-camera-switch-btn");
+      if (switchBtn) {
+        switchBtn.style.display = (isCameraOn && App.Camera.hasMultipleCameras()) ? 'inline-flex' : 'none';
+      }
     };
 
     const startCameraFunc = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        equipmentStream = stream;
-        videoStream.srcObject = stream;
+        const res = await App.Camera.getNextStream(equipmentStream);
+        equipmentStream = res.stream;
+        videoStream.srcObject = equipmentStream;
         videoStream.style.display = "block";
         videoStream.play();
 
@@ -1919,6 +1962,21 @@
 
     if (cameraConfirmBtn) cameraConfirmBtn.onclick = takePhoto;
     if (cameraCancelBtn) cameraCancelBtn.onclick = stopCamera;
+
+    const equipmentSwitchBtn = document.getElementById("equipment-camera-switch-btn");
+    if (equipmentSwitchBtn) {
+      equipmentSwitchBtn.onclick = async () => {
+        if (!isCameraActive) return;
+        try {
+          const res = await App.Camera.getNextStream(equipmentStream);
+          equipmentStream = res.stream;
+          videoStream.srcObject = equipmentStream;
+          videoStream.play();
+        } catch (err) {
+          console.error("Equipment camera switch failed:", err);
+        }
+      };
+    }
 
     if (photoBtn) photoBtn.onclick = () => { if (isCameraActive) stopCamera(); photoInput.click(); };
 
