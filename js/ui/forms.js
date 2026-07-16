@@ -628,9 +628,6 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      // Stop camera immediately to show preview
-      stopCamera();
-
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -661,6 +658,9 @@
           alert("사진 처리 중 오류가 발생했습니다.");
         }
       }
+      setTimeout(() => {
+        stopCamera();
+      }, 150);
     };
 
     // Event Listeners
@@ -1479,8 +1479,6 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      stopCabinetCamera();
-
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1505,6 +1503,9 @@
           }
         } catch (e) { console.error(e); }
       }
+      setTimeout(() => {
+        stopCabinetCamera();
+      }, 150);
     };
 
     // Listeners
@@ -1889,8 +1890,6 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
-      stopCamera();
-
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1915,6 +1914,9 @@
           }
         } catch (e) { console.error(e); }
       }
+      setTimeout(() => {
+        stopCamera();
+      }, 150);
     };
 
     if (cameraBtn) {

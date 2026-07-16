@@ -633,7 +633,6 @@
         if (!videoStream || !canvas) return;
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
-        stopCamera();
 
         currentPhotoBase64 = base64;
         showPreview(base64);
@@ -643,6 +642,10 @@
         if (btnCamera) {
             btnCamera.innerHTML = '<span class="material-symbols-outlined">replay</span> 다시 촬영';
         }
+
+        setTimeout(() => {
+            stopCamera();
+        }, 150);
     }
 
     // --- Submit Logic ---

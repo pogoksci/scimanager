@@ -377,12 +377,10 @@
             previewImg.style.display = 'block';
         }
     }
-
     async function takePhoto() {
         if (!streamObj) return;
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
-        stopCamera();
 
         try {
             const blob = dataURLtoBlob(base64);
@@ -401,6 +399,10 @@
             console.error("Failed to process captured photo:", err);
             alert("사진 처리 중 오류가 발생했습니다.");
         }
+
+        setTimeout(() => {
+            stopCamera();
+        }, 150);
     }
 
     function togglePhotoButtons(isCameraOn) {
