@@ -382,6 +382,10 @@
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
 
+        // Hide video element visually immediately to prevent side-by-side flickering
+        videoStream.style.opacity = '0';
+        videoStream.style.position = 'absolute';
+
         try {
             const resized = await App.Camera.processImage(base64);
             const blob = App.Utils.base64ToBlob(resized.base64_320);
@@ -402,6 +406,8 @@
 
         setTimeout(() => {
             stopCamera();
+            videoStream.style.opacity = '';
+            videoStream.style.position = '';
         }, 150);
     }
 

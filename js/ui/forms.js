@@ -628,6 +628,10 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
+      // Hide video element visually immediately to prevent side-by-side flickering
+      videoStream.style.opacity = '0';
+      videoStream.style.position = 'absolute';
+
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -660,6 +664,8 @@
       }
       setTimeout(() => {
         stopCamera();
+        videoStream.style.opacity = '';
+        videoStream.style.position = '';
       }, 150);
     };
 
@@ -1479,6 +1485,10 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
+      // Hide video element visually immediately to prevent side-by-side flickering
+      videoStream.style.opacity = '0';
+      videoStream.style.position = 'absolute';
+
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1505,6 +1515,8 @@
       }
       setTimeout(() => {
         stopCabinetCamera();
+        videoStream.style.opacity = '';
+        videoStream.style.position = '';
       }, 150);
     };
 
@@ -1890,6 +1902,10 @@
       const base64 = App.Camera.captureFrame(videoStream, canvas);
       if (!base64) return;
 
+      // Hide video element visually immediately to prevent side-by-side flickering
+      videoStream.style.opacity = '0';
+      videoStream.style.position = 'absolute';
+
       if (App.Camera && App.Camera.processImage) {
         try {
           const resized = await App.Camera.processImage(base64);
@@ -1916,6 +1932,8 @@
       }
       setTimeout(() => {
         stopCamera();
+        videoStream.style.opacity = '';
+        videoStream.style.position = '';
       }, 150);
     };
 
