@@ -78,7 +78,7 @@
         previewImg = document.getElementById('tools-preview-img');
         videoStream = document.getElementById('tools-camera-stream');
         canvas = document.getElementById('tools-camera-canvas');
-        photoContainer = document.querySelector('.photo-container');
+        photoContainer = document.querySelector('#tools-form-page .photo-container');
     }
 
     function resetForm() {

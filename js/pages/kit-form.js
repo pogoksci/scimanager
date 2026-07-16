@@ -102,7 +102,7 @@
         previewImg = document.getElementById('kit-preview-img');
         videoStream = document.getElementById('kit-camera-stream');
         canvas = document.getElementById('kit-camera-canvas');
-        photoContainer = document.querySelector('.photo-container');
+        photoContainer = document.querySelector('#kit-form-page .photo-container');
 
         fileInput = document.getElementById('kit-file-input');
         cameraInput = document.getElementById('kit-camera-input');
@@ -432,9 +432,14 @@
 
             // 4. Photo
             if (kit.image_url) {
-                previewImg.src = kit.image_url;
-                previewImg.style.display = 'block';
-                photoContainer.querySelector('.placeholder-text').style.display = 'none';
+                if (previewImg) {
+                    previewImg.src = kit.image_url;
+                    previewImg.style.display = 'block';
+                }
+                if (photoContainer) {
+                    const placeholder = photoContainer.querySelector('.placeholder-text');
+                    if (placeholder) placeholder.style.display = 'none';
+                }
                 currentPhotoBase64 = null;
             }
 
@@ -547,9 +552,14 @@
     }
 
     function showPreview(src) {
-        previewImg.src = src;
-        previewImg.style.display = 'block';
-        photoContainer.querySelector('.placeholder-text').style.display = 'none';
+        if (previewImg) {
+            previewImg.src = src;
+            previewImg.style.display = 'block';
+        }
+        if (photoContainer) {
+            const placeholder = photoContainer.querySelector('.placeholder-text');
+            if (placeholder) placeholder.style.display = 'none';
+        }
     }
 
     async function startCamera() {
