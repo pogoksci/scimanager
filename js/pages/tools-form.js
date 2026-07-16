@@ -282,21 +282,39 @@
     }
 
     // --- Photo Logic ---
+    function dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {type:mime});
+    }
+
     function handleFileSelect(e) {
         const file = e.target.files[0];
         if (!file) return;
-        photoFiles.file = file;
-        photoFiles.blob = null;
 
         const reader = new FileReader();
-        reader.onload = (ev) => {
-            previewImg.src = ev.target.result;
-            previewImg.style.display = 'block';
-            if (photoContainer) {
-                const ph = photoContainer.querySelector('.placeholder-text');
-                if (ph) ph.style.display = 'none';
+        reader.onload = async (ev) => {
+            try {
+                const resizedBase64 = await App.Camera.resizeBase64(ev.target.result, 1024);
+                const blob = dataURLtoBlob(resizedBase64);
+                
+                photoFiles.blob = blob;
+                photoFiles.file = null;
+
+                previewImg.src = resizedBase64;
+                previewImg.style.display = 'block';
+                if (photoContainer) {
+                    const ph = photoContainer.querySelector('.placeholder-text');
+                    if (ph) ph.style.display = 'none';
+                }
+            } catch (err) {
+                console.error("Failed to process selected file:", err);
+                alert("이미지 처리 중 오류가 발생했습니다.");
             }
-        }
+        };
         reader.readAsDataURL(file);
     }
 
@@ -360,13 +378,19 @@
         }
     }
 
-    function takePhoto() {
+    async function takePhoto() {
         if (!streamObj) return;
         canvas.width = videoStream.videoWidth;
         canvas.height = videoStream.videoHeight;
         canvas.getContext('2d').drawImage(videoStream, 0, 0);
 
-        canvas.toBlob(blob => {
+        const base64 = canvas.toDataURL("image/jpeg");
+        stopCamera();
+
+        try {
+            const resizedBase64 = await App.Camera.resizeBase64(base64, 1024);
+            const blob = dataURLtoBlob(resizedBase64);
+            
             photoFiles.blob = blob;
             photoFiles.file = null;
 
@@ -377,8 +401,10 @@
                 const ph = photoContainer.querySelector('.placeholder-text');
                 if (ph) ph.style.display = 'none';
             }
-            stopCamera();
-        }, 'image/jpeg');
+        } catch (err) {
+            console.error("Failed to process captured photo:", err);
+            alert("사진 처리 중 오류가 발생했습니다.");
+        }
     }
 
     function togglePhotoButtons(isCameraOn) {
