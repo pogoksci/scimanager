@@ -623,8 +623,9 @@
 
         if (previewImg.src && previewImg.src !== window.location.href) {
             previewImg.style.display = 'block';
-        } else {
-            photoContainer.querySelector('.placeholder-text').style.display = 'block';
+        } else if (photoContainer) {
+            const placeholder = photoContainer.querySelector('.placeholder-text');
+            if (placeholder) placeholder.style.display = 'block';
         }
     }
 
@@ -634,20 +635,8 @@
         if (!base64) return;
         stopCamera();
 
-        if (App.Camera && App.Camera.processImage) {
-            try {
-                const resized = await App.Camera.processImage(base64);
-                if (resized) {
-                    currentPhotoBase64 = resized.base64_320;
-                    showPreview(resized.base64_320);
-                }
-            } catch (err) {
-                console.error(err);
-                // Fallback
-                showPreview(base64);
-                currentPhotoBase64 = base64;
-            }
-        }
+        currentPhotoBase64 = base64;
+        showPreview(base64);
 
         // Review Mode UI Update
         const btnCamera = document.getElementById('btn-kit-camera');

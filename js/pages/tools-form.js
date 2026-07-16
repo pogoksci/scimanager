@@ -385,8 +385,7 @@
         stopCamera();
 
         try {
-            const resizedBase64 = await App.Camera.resizeBase64(base64, 1024);
-            const blob = dataURLtoBlob(resizedBase64);
+            const blob = dataURLtoBlob(base64);
             
             photoFiles.blob = blob;
             photoFiles.file = null;

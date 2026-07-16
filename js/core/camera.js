@@ -69,7 +69,13 @@
   function resizeBase64(base64, size) {
     return new Promise((resolve, reject) => {
       const img = new Image();
+      const timeout = setTimeout(() => {
+        console.warn("⚠️ resizeBase64 timed out, returning original image");
+        resolve(base64);
+      }, 1000);
+
       img.onload = () => {
+        clearTimeout(timeout);
         const canvas = document.createElement("canvas");
         const scale = size / Math.max(img.width, img.height);
         canvas.width = img.width * scale;
@@ -78,7 +84,10 @@
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         resolve(canvas.toDataURL("image/jpeg", 0.8));
       };
-      img.onerror = reject;
+      img.onerror = (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      };
       img.src = base64;
     });
   }

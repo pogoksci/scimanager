@@ -18,7 +18,7 @@
     "./js/core/utils.js",
     "./js/core/state.js",
     "./js/core/api.js",    // 🔄 복구
-    "./js/core/camera.js?v=2", // 🔄 복구
+    "./js/core/camera.js?v=3", // 🔄 복구
     "./js/core/fab.js",
     "./js/ui/auth.js",     // ✅ 인증 모듈 추가
   ];
@@ -26,7 +26,7 @@
     "./js/ui/cabinet.js",
     "./js/ui/equipment-cabinet.js",
     "./js/ui/storage-selector.js",
-    "./js/ui/forms.js?v=2",
+    "./js/ui/forms.js?v=3",
     "./js/ui/inventory.js",
     "./js/ui/inventory-detail.js",
     "./js/ui/navbar.js",
@@ -35,8 +35,8 @@
     "./js/ui/waste.js",
     "./js/pages/kits.js",
     "./js/pages/teaching-tools.js",
-    "./js/pages/tools-form.js?v=2",
-    "./js/pages/kit-form.js?v=2",
+    "./js/pages/tools-form.js?v=3",
+    "./js/pages/kit-form.js?v=3",
     "./js/ui/export-page.js",
     "./js/pages/lab-settings.js",
     "./data/subject-config.js", // ✅ 과목 설정 데이터
