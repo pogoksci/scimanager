@@ -246,19 +246,6 @@
         document.getElementById('btn-cancel-camera').addEventListener('click', stopCamera);
         cameraInput.addEventListener('change', handleFileSelect);
 
-        const kitSwitchBtn = document.getElementById('btn-kit-switch');
-        if (kitSwitchBtn) {
-            kitSwitchBtn.addEventListener('click', async () => {
-                if (!isCameraActive) return;
-                try {
-                    const res = await App.Camera.getNextStream(videoStream.srcObject);
-                    videoStream.srcObject = res.stream;
-                    videoStream.play();
-                } catch (err) {
-                    console.error("Kit camera switch failed:", err);
-                }
-            });
-        }
 
         // Submit
         form.addEventListener('submit', handleSubmit);

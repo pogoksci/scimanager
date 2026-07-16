@@ -88,12 +88,12 @@
   // ------------------------------------------------------------
   async function processAndStorePhoto(base64Data) {
     try {
+      const resized1024 = await resizeBase64(base64Data, 1024);
       const resized320 = await resizeBase64(base64Data, 320);
-      const resized160 = await resizeBase64(base64Data, 160);
-      App.State.set("photo_320_base64", resized320);
-      App.State.set("photo_160_base64", resized160);
-      console.log("📷 Base64 저장 완료:");
-      return { base64_320: resized320, base64_160: resized160 };
+      App.State.set("photo_320_base64", resized1024); // Store 1024px in the 320 slot for higher quality
+      App.State.set("photo_160_base64", resized320);  // Store 320px in the 160 slot
+      console.log("📷 High Quality Base64 저장 완료 (1024px & 320px):");
+      return { base64_320: resized1024, base64_160: resized320 };
     } catch (err) {
       console.error("📸 사진 처리 중 오류:", err);
       throw err;
@@ -134,83 +134,34 @@
   }
 
   async function initDevices() {
-    try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      videoDevices = devices.filter(d => d.kind === 'videoinput');
-      // Sort: place rear/back/후면/environment cameras first
-      videoDevices.sort((a, b) => {
-        const labelA = (a.label || "").toLowerCase();
-        const labelB = (b.label || "").toLowerCase();
-        const isRearA = labelA.includes("back") || labelA.includes("rear") || labelA.includes("후면") || labelA.includes("environment");
-        const isRearB = labelB.includes("back") || labelB.includes("rear") || labelB.includes("후면") || labelB.includes("environment");
-        if (isRearA && !isRearB) return -1;
-        if (!isRearA && isRearB) return 1;
-        return 0;
-      });
-      console.log("📸 카메라 목록 초기화 완료:", videoDevices);
-    } catch (e) {
-      console.error("📸 enumerateDevices 실패:", e);
-    }
+    // No-op to disable unused list
   }
 
   function hasMultipleCameras() {
-    return videoDevices.length > 1;
+    return false; // Force false to hide switch buttons since user wants direct high-res
   }
 
   async function getNextStream(currentStream, onDeviceChanged) {
-    // 1. Stop current stream if any
     if (currentStream) {
       currentStream.getTracks().forEach(track => track.stop());
     }
 
-    // 2. Initial setup if not loaded
-    if (videoDevices.length === 0) {
-      const initialStream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: "environment",
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        }
-      });
-      
-      await initDevices();
-
-      const activeTrack = initialStream.getVideoTracks()[0];
-      const activeSettings = activeTrack ? activeTrack.getSettings() : null;
-      const activeDeviceId = activeSettings ? activeSettings.deviceId : null;
-
-      if (activeDeviceId) {
-        currentDeviceIndex = videoDevices.findIndex(d => d.deviceId === activeDeviceId);
-      }
-      if (currentDeviceIndex === -1) {
-        currentDeviceIndex = 0;
-      }
-
-      if (onDeviceChanged && videoDevices[currentDeviceIndex]) {
-        onDeviceChanged(videoDevices[currentDeviceIndex]);
-      }
-
-      return { stream: initialStream, deviceId: activeDeviceId };
-    }
-
-    // 3. Cycle to next device
-    currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
-    const selectedDevice = videoDevices[currentDeviceIndex];
-    console.log("📸 전환된 카메라:", selectedDevice.label || selectedDevice.deviceId);
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          deviceId: { exact: selectedDevice.deviceId },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          facingMode: { ideal: "environment" },
+          // Request high resolution constraints to trigger the high quality rear camera
+          width: { ideal: 3840 },
+          height: { ideal: 2160 }
         }
       });
-      if (onDeviceChanged) onDeviceChanged(selectedDevice);
-      return { stream, deviceId: selectedDevice.deviceId };
+      return { stream, deviceId: null };
     } catch (err) {
-      console.warn("📸 카메라 접근 실패, 다음 카메라 시도:", selectedDevice.label, err);
-      return getNextStream(null, onDeviceChanged);
+      console.warn("📸 고해상도 카메라 접근 실패, 기본 후면 카메라 시도:", err);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      });
+      return { stream, deviceId: null };
     }
   }
 

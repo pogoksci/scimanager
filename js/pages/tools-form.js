@@ -152,20 +152,6 @@
         document.getElementById('tools-camera-cancel-btn').addEventListener('click', stopCamera);
         document.getElementById('tools-camera-input').addEventListener('change', handleFileSelect);
 
-        const switchBtn = document.getElementById('tools-camera-switch-btn');
-        if (switchBtn) {
-            switchBtn.addEventListener('click', async () => {
-                if (!streamObj) return;
-                try {
-                    const res = await App.Camera.getNextStream(streamObj);
-                    streamObj = res.stream;
-                    videoStream.srcObject = streamObj;
-                    videoStream.play();
-                } catch (err) {
-                    console.error("Tools camera switch failed:", err);
-                }
-            });
-        }
 
         // Submit
         form.addEventListener('submit', handleSubmit);

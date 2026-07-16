@@ -723,20 +723,6 @@
       };
     }
 
-    const cameraSwitchBtn = document.getElementById("camera-switch-btn");
-    if (cameraSwitchBtn) {
-      cameraSwitchBtn.onclick = async () => {
-        if (!isCameraActive) return;
-        try {
-          const res = await App.Camera.getNextStream(inventoryStream);
-          inventoryStream = res.stream;
-          videoStream.srcObject = inventoryStream;
-          videoStream.play();
-        } catch (err) {
-          console.error("Camera switch failed:", err);
-        }
-      };
-    }
 
     // ------------------------------------------------------------
     // 🗺 보관 위치 로직 (App.StorageSelector)
@@ -1558,20 +1544,6 @@
       cameraCancelBtn.onclick = stopCabinetCamera;
     }
 
-    const cabinetSwitchBtn = document.getElementById("cabinet-camera-switch-btn");
-    if (cabinetSwitchBtn) {
-      cabinetSwitchBtn.onclick = async () => {
-        if (!isCameraActive) return;
-        try {
-          const res = await App.Camera.getNextStream(cabinetStream);
-          cabinetStream = res.stream;
-          videoStream.srcObject = cabinetStream;
-          videoStream.play();
-        } catch (err) {
-          console.error("Cabinet camera switch failed:", err);
-        }
-      };
-    }
 
     const handleFile = (file) => {
       if (!file) return;
@@ -1963,20 +1935,6 @@
     if (cameraConfirmBtn) cameraConfirmBtn.onclick = takePhoto;
     if (cameraCancelBtn) cameraCancelBtn.onclick = stopCamera;
 
-    const equipmentSwitchBtn = document.getElementById("equipment-camera-switch-btn");
-    if (equipmentSwitchBtn) {
-      equipmentSwitchBtn.onclick = async () => {
-        if (!isCameraActive) return;
-        try {
-          const res = await App.Camera.getNextStream(equipmentStream);
-          equipmentStream = res.stream;
-          videoStream.srcObject = equipmentStream;
-          videoStream.play();
-        } catch (err) {
-          console.error("Equipment camera switch failed:", err);
-        }
-      };
-    }
 
     if (photoBtn) photoBtn.onclick = () => { if (isCameraActive) stopCamera(); photoInput.click(); };
 
