@@ -634,8 +634,17 @@
         const base64 = App.Camera.captureFrame(videoStream, canvas);
         if (!base64) return;
 
-        currentPhotoBase64 = base64;
-        showPreview(base64);
+        try {
+            const resized = await App.Camera.processImage(base64);
+            if (resized) {
+                currentPhotoBase64 = resized.base64_320;
+                showPreview(resized.base64_320);
+            }
+        } catch (err) {
+            console.error(err);
+            showPreview(base64);
+            currentPhotoBase64 = base64;
+        }
 
         // Review Mode UI Update
         const btnCamera = document.getElementById('btn-kit-camera');

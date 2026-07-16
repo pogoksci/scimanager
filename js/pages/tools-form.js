@@ -298,13 +298,13 @@
         const reader = new FileReader();
         reader.onload = async (ev) => {
             try {
-                const resizedBase64 = await App.Camera.resizeBase64(ev.target.result, 1024);
-                const blob = dataURLtoBlob(resizedBase64);
+                const resized = await App.Camera.processImage(ev.target.result);
+                const blob = App.Utils.base64ToBlob(resized.base64_320);
                 
                 photoFiles.blob = blob;
                 photoFiles.file = null;
 
-                previewImg.src = resizedBase64;
+                previewImg.src = resized.base64_320;
                 previewImg.style.display = 'block';
                 if (photoContainer) {
                     const ph = photoContainer.querySelector('.placeholder-text');
@@ -383,13 +383,13 @@
         if (!base64) return;
 
         try {
-            const blob = dataURLtoBlob(base64);
+            const resized = await App.Camera.processImage(base64);
+            const blob = App.Utils.base64ToBlob(resized.base64_320);
             
             photoFiles.blob = blob;
             photoFiles.file = null;
 
-            const url = URL.createObjectURL(blob);
-            previewImg.src = url;
+            previewImg.src = resized.base64_320;
             previewImg.style.display = 'block';
             if (photoContainer) {
                 const ph = photoContainer.querySelector('.placeholder-text');
@@ -535,7 +535,7 @@
                 const fileName = `tool_${Date.now()}.${fileExt}`;
                 const { error: uploadError } = await supabase.storage
                     .from('tools-photo')
-                    .upload(fileName, fileToUpload);
+                    .upload(fileName, fileToUpload, { contentType: 'image/jpeg', upsert: true });
 
                 if (uploadError) throw uploadError;
 
