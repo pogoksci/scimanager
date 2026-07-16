@@ -320,8 +320,7 @@ button:disabled {
 
 .photo-preview-box::before {
   content: "";
-  display: block;
-  padding-top: 100%;
+  display: none;
 }
 
 .photo-preview-box span {
