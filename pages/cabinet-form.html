@@ -1,0 +1,166 @@
+<!-- /pages/cabinet-form.html -->
+<div id="cabinet-form-page" class="layout-container">
+  <div class="layout-header no-actions">
+    <h2 class="page-title">시약장 등록</h2>
+  </div>
+
+  <div class="layout-content scroll-padding-nav">
+    <form id="cabinet-creation-form">
+      <!-- ========================================================= -->
+      <!-- 1️⃣ 시약장이 위치한 장소 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>1. 시약장이 위치한 장소 *</label>
+        <div id="area-button-group" class="button-group grid-4-col">
+          <!-- Buttons will be loaded dynamically from lab_rooms -->
+        </div>
+      </div>
+
+      <!-- 📍 기타 입력란 (위치 입력용) -->
+      <div class="form-group other-input-group" id="area-other-group" style="display: none;">
+        <input type="text" id="area-other-input" placeholder="보관장소명을 직접 입력하세요">
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 2️⃣ 시약장 이름 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>2. 시약장 이름 *</label>
+        <div id="cabinet_name_buttons" class="button-group">
+          <button type="button" data-value="시약장1">시약장1</button>
+          <button type="button" data-value="시약장2">시약장2</button>
+          <button type="button" data-value="식품보관장">식품보관장</button>
+          <button type="button" data-value="냉장고">냉장고</button>
+          <button type="button" data-value="인화성물질1">인화성물질1</button>
+          <button type="button" data-value="기타">기타</button>
+        </div>
+      </div>
+
+      <!-- 📍 기타 입력란 (시약장 이름 입력용) -->
+      <div class="form-group other-input-group" id="cabinet_other-group" style="display: none;">
+        <input type="text" id="cabinet_other_input" placeholder="시약장 이름을 직접 입력하세요">
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 3️⃣ 사진 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>3. 사진</label>
+        <div class="kit-photo-container">
+          <div id="cabinet-photo-preview" class="kit-photo-preview-box">
+            <img id="cabinet-preview-img" class="media-cover">
+            <div class="placeholder-text">사진 없음</div>
+            <video id="cabinet-camera-stream" autoplay playsinline class="media-cover"></video>
+            <canvas id="cabinet-camera-canvas" style="display: none;"></canvas>
+          </div>
+
+          <div class="kit-photo-actions">
+            <button type="button" id="cabinet-photo-btn" class="btn-secondary-action">
+              <span class="material-symbols-outlined">image</span> 파일에서 선택
+            </button>
+            <button type="button" id="cabinet-camera-btn" class="btn-secondary-action">
+              <span class="material-symbols-outlined">photo_camera</span> 카메라로 촬영
+            </button>
+            <button type="button" id="cabinet-camera-confirm-btn" class="btn-secondary-action" style="display: none;">
+              <span class="material-symbols-outlined">check</span> 확인
+            </button>
+            <button type="button" id="cabinet-camera-cancel-btn" class="btn-secondary-action" style="display: none;">
+              <span class="material-symbols-outlined">close</span> 취소
+            </button>
+
+            <input type="file" id="cabinet-photo-input" accept="image/*" style="display: none;">
+            <input type="file" id="cabinet-camera-input" accept="image/*" capture="environment" style="display: none;">
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>4. 외부 도어의 상하분리 형태 *</label>
+        <div id="door_vertical_split_buttons" class="button-group">
+          <button type="button" data-value="상중하도어">상중하도어</button>
+          <button type="button" data-value="상하도어">상하도어</button>
+          <button type="button" data-value="단일도어">단일도어(상하분리없음)</button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 5️⃣ 외부 도어의 좌우분리 형태 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>5. 외부 도어의 좌우분리 형태</label>
+        <div id="door_horizontal_split_buttons" class="button-group">
+          <button type="button" data-value="좌우분리도어">좌우분리도어</button>
+          <button type="button" data-value="단일도어">단일도어</button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 6️⃣ 외부 도어 1개를 열었을 때 보이는 내부 수납 단 형태 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>6. 외부 도어 1개를 열었을 때 보이는 내부 수납 단 형태</label>
+        <div id="shelf_height_buttons" class="button-group">
+          <button type="button" data-value="1">1단</button>
+          <button type="button" data-value="2">2단</button>
+          <button type="button" data-value="3">3단</button>
+          <button type="button" data-value="4">4단</button>
+          <button type="button" data-value="5">5단</button>
+          <button type="button" data-value="6">6단</button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 7️⃣ 외부 도어 1개를 열었을 때 보이는 내부 수납 열 형태 -->
+      <!-- ========================================================= -->
+      <div class="form-group">
+        <label>7. 외부 도어 1개를 열었을 때 보이는 내부 수납 열 형태</label>
+        <div id="storage_columns_buttons" class="button-group">
+          <button type="button" data-value="1">1열</button>
+          <button type="button" data-value="2">2열</button>
+          <button type="button" data-value="3">3열</button>
+          <button type="button" data-value="4">4열</button>
+          <button type="button" data-value="5">5열</button>
+          <button type="button" data-value="6">6열</button>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 8️⃣ 버튼 영역 -->
+      <!-- ========================================================= -->
+      <div class="form-bottom-buttons">
+        <button type="button" id="cancel-form-btn">
+          취소
+        </button>
+
+        <button type="submit" id="cabinet-submit-button">
+          시약장 등록
+        </button>
+
+        <button type="button" id="cabinet-save-btn" style="display: none;">
+          시약장 정보 수정
+        </button>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- 9️⃣ 카메라 모달 (Note: Modals usually go outside, but kept here for structure) -->
+      <!-- ========================================================= -->
+      <div id="camera-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content camera-modal">
+          <h3 class="modal-header">사진 촬영</h3>
+          <div class="modal-body modal-body-flex">
+            <video id="camera-view" autoplay playsinline class="media-contain"></video>
+            <canvas id="photo-canvas" style="display: none;"></canvas>
+          </div>
+          <div class="modal-footer modal-footer-center">
+            <button type="button" id="capture-btn" class="btn-primary">
+              <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 5px;">camera</span>
+              촬영
+            </button>
+            <button type="button" id="cancel-camera-btn" class="btn-cancel">취소</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

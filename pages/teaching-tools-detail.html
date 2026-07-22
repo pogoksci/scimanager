@@ -1,0 +1,79 @@
+<!-- /pages/teaching-tools-detail.html -->
+<div id="teaching-tools-detail-page" class="layout-container">
+    <!-- Header -->
+    <div class="layout-header no-actions">
+        <div class="detail-name-group">
+            <h2 id="detail-aid-name" class="detail-title">
+            </h2>
+            <span id="detail-aid-class" class="kit-tag class-tag"></span>
+        </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="layout-content scroll-padding-nav">
+        <!-- 2-Column Grid -->
+        <div class="detail-grid">
+            <!-- Left: Photo -->
+            <div class="detail-left">
+                <div class="photo-preview-box photo-box" id="detail-aid-photo">
+                    <!-- Photo will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="detail-right">
+                <div class="kit-info">
+                    <div class="kit-info-row">
+                        <span class="label" id="detail-row-1-label">교구코드</span>
+                        <span class="value" id="detail-row-1-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">소요기준</span>
+                        <span class="value" id="detail-row-2-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">기준량</span>
+                        <span class="value" id="detail-row-3-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">보유량</span>
+                        <span class="value" id="detail-row-4-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">보유율</span>
+                        <span class="value" id="detail-row-5-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">필수/기준</span>
+                        <span class="value" id="detail-row-6-value"></span>
+                    </div>
+                    <div class="kit-info-row">
+                        <span class="label">보관 위치</span>
+                        <span class="value" id="detail-row-7-value"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Logs -->
+        <div class="aid-logs-section logs-section">
+            <h3>사용 기록</h3>
+            <div class="kit-log-table-container">
+                <table class="kit-log-table">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>유형</th>
+                            <th>변동</th>
+                            <th>수량</th>
+                            <th class="th-edit-width">수정/삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aid-usage-logs-body">
+                        <!-- Logs will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

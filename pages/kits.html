@@ -1,0 +1,128 @@
+<!-- /pages/kits.html -->
+<div id="kits-page" class="layout-container">
+    <!-- 1. Fixed Header -->
+    <div class="layout-header">
+        <div class="header-top-row">
+            <h2>실험 키트</h2>
+        </div>
+
+        <div class="header-actions">
+            <!-- Search -->
+            <div class="search-container">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" id="kit-search-input" placeholder="키트 검색...">
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="custom-dropdown" id="kit-sort-dropdown">
+                <button class="dropdown-toggle header-btn" id="kit-sort-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-symbols-outlined">sort</span>
+                    <span id="kit-sort-label" data-value="name_class">키트이름(분류)</span>
+                    <span class="material-symbols-outlined arrow">expand_more</span>
+                </button>
+
+                <div class="dropdown-menu" id="kit-sort-menu" role="menu">
+                    <div class="dropdown-item" data-value="name_class">
+                        <span class="material-symbols-outlined">category</span>
+                        키트이름(분류)
+                    </div>
+                    <div class="dropdown-item" data-value="name_all">
+                        <span class="material-symbols-outlined">sort_by_alpha</span>
+                        키트이름(전체)
+                    </div>
+                    <div class="dropdown-item" data-value="location">
+                        <span class="material-symbols-outlined">location_on</span>
+                        보관장소
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Button -->
+            <button id="kit-print-btn" title="보고서 출력" aria-label="출력" class="header-btn">
+                <span class="material-symbols-outlined">print</span>
+            </button>
+
+            <!-- Refresh Button -->
+            <button id="kit-refresh-btn" title="목록 새로고침" aria-label="새로고침" class="header-btn">
+                <span class="material-symbols-outlined">refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sync Status -->
+    <div id="sync-status" class="sync-status-msg sync-status-padding"></div>
+
+    <!-- 2. Scrollable Content -->
+    <div id="kit-list" class="layout-content inventory-list scroll-padding-fab">
+        <!-- Items will be injected here -->
+        <div class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            <p>목록을 불러오는 중...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Register Kit Modal (Refactored) -->
+<div id="modal-register-kit" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3 class="modal-header" id="kit-form-title">키트 등록</h3>
+
+        <form id="form-register-kit" class="modal-form-flex">
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label>분류 (복수 선택 가능)</label>
+                        <div class="button-group" id="kit-class-buttons">
+                            <button type="button" class="class-toggle-btn" data-value="all">전체</button>
+                            <button type="button" class="class-toggle-btn" data-value="물리학">물리학</button>
+                            <button type="button" class="class-toggle-btn" data-value="화학">화학</button>
+                            <button type="button" class="class-toggle-btn" data-value="생명과학">생명과학</button>
+                            <button type="button" class="class-toggle-btn" data-value="지구과학">지구과학</button>
+                            <button type="button" class="class-toggle-btn" data-value="융합과학">융합과학</button>
+                            <button type="button" class="class-toggle-btn" data-value="기타">기타</button>
+                        </div>
+                        <!-- Hidden input to store selected value for form submission -->
+                        <input type="hidden" id="kit-class-value" value="all">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="kit-name-select">키트명</label>
+                    <select id="kit-name-select" class="form-input" disabled required>
+                        <option value="" disabled selected>분류를 먼저 선택하세요</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="kit-quantity">수량</label>
+                    <input type="number" id="kit-quantity" class="form-input" value="1" min="1" required>
+                </div>
+
+                <!-- Location Selector (Added) -->
+                <div class="form-group">
+                    <label>보관 장소</label>
+                    <div id="kit-storage-selector"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="kit-date">등록일(구입일)</label>
+                    <input type="date" id="kit-date" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kit-photo">키트 사진</label>
+                    <input type="file" id="kit-photo" class="form-input" accept="image/*">
+                    <div id="kit-photo-preview" class="photo-preview-center">
+                        <img id="preview-img" src="" alt="Preview"
+                            class="photo-preview-img">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btn-cancel-kit" class="btn-cancel">취소</button>
+                <button type="submit" id="btn-save-kit" class="btn-primary">등록</button>
+            </div>
+        </form>
+    </div>
+</div>

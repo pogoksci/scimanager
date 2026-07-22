@@ -1,0 +1,246 @@
+<!-- /pages/usage-register.html -->
+<div id="usage-register-page" class="layout-container layout-full-height">
+
+    <!-- 1. List Section (Visible by default) -->
+    <div id="usage-list-section" class="section-flex-col">
+        <!-- Fixed Header -->
+        <div class="layout-header">
+            <div class="header-top-row">
+                <h2>약품 사용량 등록</h2>
+            </div>
+
+            <div class="header-actions">
+                <!-- 검색창 -->
+                <div class="search-container">
+                    <span class="material-symbols-outlined" style="color: #888;">search</span>
+                    <input type="text" id="usage-search-input" placeholder="약품 검색...">
+                </div>
+
+                <!-- 정렬 드롭다운 -->
+                <div class="custom-dropdown" id="sort-dropdown">
+                    <button class="dropdown-toggle" id="sort-toggle" aria-haspopup="true" aria-expanded="false"
+                        style="height: 100%;">
+                        <span class="material-symbols-outlined">sort</span>
+                        <span id="sort-label" data-value="category_name_kor">한글명(분류)</span>
+                        <span class="material-symbols-outlined arrow">expand_more</span>
+                    </button>
+
+                    <div class="dropdown-menu" id="sort-menu" role="menu">
+                        <div class="dropdown-item" data-value="category_name_kor">
+                            <span class="material-symbols-outlined">category</span>
+                            한글명(분류)
+                        </div>
+                        <div class="dropdown-item" data-value="category_name_eng">
+                            <span class="material-symbols-outlined">category</span>
+                            영문명(분류)
+                        </div>
+                        <div class="dropdown-item" data-value="name_kor">
+                            <span class="material-symbols-outlined">sort_by_alpha</span>
+                            한글명(전체)
+                        </div>
+                        <div class="dropdown-item" data-value="name_eng">
+                            <span class="material-symbols-outlined">sort_by_alpha</span>
+                            영문명(전체)
+                        </div>
+                        <div class="dropdown-item" data-value="id_asc">
+                            <span class="material-symbols-outlined">format_list_numbered</span>
+                            전체(번호순)
+                        </div>
+                        <div class="dropdown-item" data-value="id_asc_all">
+                            <span class="material-symbols-outlined">format_list_numbered</span>
+                            전체(전량소진포함)
+                        </div>
+                        <div class="dropdown-item" data-value="formula">
+                            <span class="material-symbols-outlined">science</span>
+                            화학식
+                        </div>
+                        <div class="dropdown-item" data-value="storage_location">
+                            <span class="material-symbols-outlined">location_on</span>
+                            위치
+                        </div>
+                        <div class="dropdown-item" data-value="created_at_desc">
+                            <span class="material-symbols-outlined">schedule</span>
+                            등록순서
+                        </div>
+                        <div class="dropdown-item" data-value="exhausted">
+                            <span class="material-symbols-outlined">block</span>
+                            소모완료약품
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 새로고침 버튼 -->
+                <button id="refresh-btn" title="목록 새로고침" aria-label="새로고침" style="height: 100%;">
+                    <span class="material-symbols-outlined">refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable List -->
+        <div id="usage-inventory-list" class="layout-content inventory-list inventory-list-scroll">
+            <div class="empty-state">
+                <span class="material-symbols-outlined">hourglass_empty</span>
+                <p>목록을 불러오는 중...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Detail Section (Hidden by default, overlays list) -->
+    <!-- Detail section also uses standard class but handles its own internal scrolling -->
+    <div id="usage-detail-section" class="inventory-detail-page detail-section-hidden">
+
+        <div class="usage-fixed-header usage-fixed-header-content">
+            <div class="detail-top-bar">
+                <button type="button" id="btn-back-to-list" class="btn-text" style="padding: 0; font-size: 16px;">
+                    <span class="material-symbols-outlined" style="vertical-align: bottom;">arrow_back</span>
+                    다른 약품 선택
+                </button>
+            </div>
+
+            <!-- Selected Item Info (Will be injected) -->
+            <div id="selected-item-display"></div>
+        </div>
+
+        <div class="detail-scroll-container scroll-padding-nav detail-scroll-content">
+            <div class="form-container-card">
+                <h3>사용량 등록</h3>
+
+                <form id="usage-form">
+                    <div class="form-row">
+                        <div class="form-group form-group-date">
+                            <label>날짜</label>
+                            <div class="date-input-group">
+                                <div class="date-input-box">
+                                    <input type="text" id="usage-date-year" placeholder="YYYY" maxlength="4"
+                                        inputmode="numeric" class="date-input-year">
+                                    <span class="date-separator">-</span>
+                                    <input type="text" id="usage-date-month" placeholder="MM" maxlength="2"
+                                        inputmode="numeric" class="date-input-month-day">
+                                    <span class="date-separator">-</span>
+                                    <input type="text" id="usage-date-day" placeholder="DD" maxlength="2"
+                                        inputmode="numeric" class="date-input-month-day">
+                                </div>
+                                <!-- Hidden Date Input for Picker -->
+                                <input type="date" id="usage-date" required class="hidden-date-picker">
+                                <!-- Calendar Button -->
+                                <button type="button" id="btn-open-calendar" class="btn-calendar">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size: 20px;">calendar_month</span>
+                                </button>
+                                <!-- Schedule Search Button -->
+                                <button type="button" id="btn-search-schedule" class="btn-secondary-action btn-search-schedule-custom">
+                                    일정 조회
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>과목</label>
+                            <select id="usage-subject" required>
+                                <option value="통합과학">통합과학</option>
+                                <option value="과학탐구실험">과학탐구실험</option>
+                                <option value="물리학">물리학</option>
+                                <option value="화학">화학</option>
+                                <option value="생명과학">생명과학</option>
+                                <option value="지구과학">지구과학</option>
+                                <option value="동아리">동아리</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>교시</label>
+                            <select id="usage-period" required>
+                                <option value="1교시">1교시</option>
+                                <option value="2교시">2교시</option>
+                                <option value="3교시">3교시</option>
+                                <option value="4교시">4교시</option>
+                                <option value="5교시">5교시</option>
+                                <option value="6교시">6교시</option>
+                                <option value="7교시">7교시</option>
+                                <option value="점심시간">점심시간</option>
+                                <option value="방과후">방과후</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Results Container -->
+                    <div id="schedule-result-container" class="schedule-result-box">
+                        <label class="schedule-label">📅 해당 날짜의
+                            수업/활동 (클릭 시 자동 입력)</label>
+                        <div id="schedule-list" class="schedule-list-flex">
+                            <!-- Schedule items will be injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Unified Usage/Mass Input Section -->
+                    <div class="form-group usage-input-section">
+                        <label class="usage-label-primary">사용량 입력 (택
+                            1) *</label>
+
+                        <div class="usage-row-flex">
+                            <!-- Left: Usage Amount -->
+                            <div class="usage-col-flex">
+                                <label for="usage-amount" class="usage-sub-label">1. 사용량
+                                    (<span id="usage-unit-display"></span>)</label>
+                                <input type="number" id="usage-amount" placeholder="예: 50" step="0.01" min="0"
+                                    style="width: 100%;">
+                                <p class="usage-note usage-note-text">
+                                    ※금번 '사용량'을 모를 경우, 오른쪽에 있는 '사용 후 시약병 질량'에 입력하세요.
+                                </p>
+                            </div>
+
+                            <!-- Center: OR -->
+                            <div class="usage-or-divider">
+                                또는
+                            </div>
+
+                            <!-- Right: Remaining Mass -->
+                            <div class="usage-col-flex">
+                                <label for="usage-remaining-mass" class="usage-sub-label">2. 사용 후
+                                    시약병 질량 (g)</label>
+                                <input type="number" id="usage-remaining-mass" placeholder="예: 350" step="0.01" min="0"
+                                    style="width: 100%;">
+
+                                <p class="usage-note usage-note-text" id="estimated-bottle-mass">
+                                    ※시약병의 공병 예상 질량: 정보없음
+                                </p>
+
+                                <!-- Exhausted Checkbox -->
+                                <div class="exhausted-check-wrapper exhausted-check-container">
+                                    <input type="checkbox" id="check-exhausted" class="exhausted-checkbox">
+                                    <label for="check-exhausted" class="exhausted-label">전량
+                                        소진시 체크하세요.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <span class="material-symbols-outlined">save</span>
+                        등록하기
+                    </button>
+                </form>
+            </div>
+
+            <div class="history-container-card">
+                <h3>사용 기록</h3>
+                <div class="table-responsive">
+                    <table class="usage-table">
+                        <thead>
+                            <tr>
+                                <th>날짜</th>
+                                <th>과목</th>
+                                <th>교시</th>
+                                <th>사용량</th>
+                                <th>재고량</th>
+                                <th>수정/삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usage-history-body">
+                            <!-- History rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

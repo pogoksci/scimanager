@@ -1,0 +1,65 @@
+<!-- /pages/lab-usage-log.html -->
+<div id="lab-usage-log-page" class="layout-container">
+    <script src="data/subject-config.js"></script>
+    <div class="layout-header header-col-stretch">
+        <div class="top-row-between">
+            <div class="page-title-wrapper title-baseline-gap">
+                <h2 class="title-main">과학실 사용기록·예약</h2>
+                <span id="current-semester-display" class="semester-sub"></span>
+            </div>
+            <div class="room-select-group">
+                <select id="usage-room-select" class="form-select room-select"></select>
+            </div>
+        </div>
+
+        <!-- Weekly Navigation -->
+        <div class="weekly-nav-container">
+            <div class="month-select-wrapper">
+                <label class="month-label">월 선택:</label>
+                <select id="usage-month-select" class="form-select month-select"></select>
+            </div>
+
+            <div class="date-nav-wrapper">
+                <button id="btn-prev-week" class="btn-icon-only">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div id="current-week-label" class="current-week-label">
+                    2025년 12월 22일(월) ~ 12월 28일(일)
+                </div>
+                <button id="btn-next-week" class="btn-icon-only">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+
+            <button id="btn-today" class="btn-secondary btn-today-style">오늘</button>
+        </div>
+    </div>
+
+    <div class="layout-content scroll-padding-fab content-relative">
+        <!-- Weekend Toggle -->
+        <div class="weekend-toggle-wrapper">
+            <input type="checkbox" id="show-weekend-toggle" class="weekend-toggle-input">
+            <label for="show-weekend-toggle" class="weekend-toggle-label">토요일/일요일 표시</label>
+        </div>
+        <div id="usage-log-grid-container" class="grid-container">
+            <table id="usage-log-table" class="usage-grid-table">
+                <thead>
+                    <tr id="usage-grid-header">
+                        <th class="th-period">교시</th>
+                        <!-- Dates will be injected here -->
+                    </tr>
+                </thead>
+                <tbody id="usage-grid-body">
+                    <!-- Periods and cells will be injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Float Save Button Area -->
+        <!-- Float Save Button (Fixed FAB) -->
+        <button id="btn-save-usage-log" class="fab">
+            <span class="material-symbols-outlined">save</span>
+            주간 기록 저장
+        </button>
+    </div>
+</div>

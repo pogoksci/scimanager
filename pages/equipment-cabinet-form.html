@@ -1,0 +1,136 @@
+<!-- /pages/equipment-cabinet-form.html -->
+<div id="equipment-cabinet-form-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h2 class="page-title">교구·물품장 등록</h2>
+    </div>
+
+    <div class="layout-content scroll-padding-nav">
+        <form id="equipment-cabinet-creation-form">
+            <!-- ========================================================= -->
+            <!-- 1️⃣ 위치한 장소 -->
+            <!-- ========================================================= -->
+            <div class="form-group">
+                <label>1. 교구·물품장이 위치한 장소 *</label>
+                <div id="equipment-area-button-group" class="button-group grid-4-col">
+                    <!-- Buttons will be loaded dynamically from lab_rooms -->
+                </div>
+            </div>
+
+            <!-- 📍 기타 입력란 (위치) -->
+            <div class="form-group other-input-group" id="equipment-area-other-group" style="display: none;">
+                <input type="text" id="equipment-area-other-input" placeholder="보관장소명을 직접 입력하세요">
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 2️⃣ 교구·물품장 이름 (12개 버튼) -->
+            <!-- ========================================================= -->
+            <div class="form-group">
+                <label>2. 교구·물품장 이름 *</label>
+                <div id="equipment_name_buttons" class="button-group grid-4-col-gap6">
+                    <button type="button" data-value="교구장1">교구장1</button>
+                    <button type="button" data-value="교구장2">교구장2</button>
+                    <button type="button" data-value="교구장3">교구장3</button>
+                    <button type="button" data-value="교구장4">교구장4</button>
+                    <button type="button" data-value="교구장5">교구장5</button>
+                    <button type="button" data-value="교구장6">교구장6</button>
+                    <button type="button" data-value="교구장7">교구장7</button>
+                    <button type="button" data-value="교구장8">교구장8</button>
+                    <button type="button" data-value="교구장9">교구장9</button>
+                    <button type="button" data-value="교구장10">교구장10</button>
+                    <button type="button" data-value="교구장외부">교구장외부</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <!-- 📍 기타 입력란 (이름) -->
+            <div class="form-group other-input-group" id="equipment_name_other-group" style="display: none;">
+                <input type="text" id="equipment_name_other_input" placeholder="교구·물품장 이름을 직접 입력하세요">
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 3️⃣ 사진 -->
+            <!-- ========================================================= -->
+            <div class="form-group">
+                <label>3. 사진</label>
+                <div class="kit-photo-container">
+                    <div id="equipment-photo-preview" class="kit-photo-preview-box">
+                        <img id="equipment-cabinet-preview-img" class="media-cover">
+                        <div class="placeholder-text">사진 없음</div>
+                        <video id="equipment-camera-stream" autoplay playsinline class="media-cover"></video>
+                        <canvas id="equipment-camera-canvas" style="display: none;"></canvas>
+                    </div>
+
+                    <div class="kit-photo-actions">
+                        <button type="button" id="equipment-photo-btn" class="btn-secondary-action">
+                            <span class="material-symbols-outlined">image</span> 파일에서 선택
+                        </button>
+                        <button type="button" id="equipment-camera-btn" class="btn-secondary-action">
+                            <span class="material-symbols-outlined">photo_camera</span> 카메라로 촬영
+                        </button>
+                        <button type="button" id="equipment-camera-confirm-btn" class="btn-secondary-action"
+                            style="display: none;">
+                            <span class="material-symbols-outlined">check</span> 확인
+                        </button>
+                        <button type="button" id="equipment-camera-cancel-btn" class="btn-secondary-action"
+                            style="display: none;">
+                            <span class="material-symbols-outlined">close</span> 취소
+                        </button>
+
+
+                        <input type="file" id="equipment-photo-input" accept="image/*" style="display: none;">
+                        <input type="file" id="equipment-camera-input" accept="image/*" capture="environment"
+                            style="display: none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 4️⃣ 외부 도어의 상하분리 형태 (교구장외부 선택 시 숨김) -->
+            <!-- ========================================================= -->
+            <div class="form-group" id="equipment-door-step" style="display: block;">
+                <label>4. 외부 도어의 상하분리 형태 *</label>
+                <div id="equipment_door_vertical_buttons" class="button-group">
+                    <button type="button" data-value="상중하도어">상중하도어</button>
+                    <button type="button" data-value="상하도어">상하도어</button>
+                    <button type="button" data-value="단일도어">단일도어(상하분리없음)</button>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- Camera Modal -->
+            <div id="equipment-camera-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content camera-modal">
+                    <h3 class="modal-header">사진 촬영</h3>
+                    <div class="modal-body modal-body-flex">
+                        <video id="equipment-camera-view" autoplay playsinline class="media-contain"></video>
+                        <canvas id="equipment-photo-canvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="modal-footer modal-footer-center">
+                        <button type="button" id="equipment-capture-btn" class="btn-primary">
+                            <span class="material-symbols-outlined"
+                                style="vertical-align: middle; margin-right: 5px;">camera</span> 촬영
+                        </button>
+                        <button type="button" id="equipment-cancel-camera-btn" class="btn-cancel">취소</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 버튼 영역 -->
+            <!-- ========================================================= -->
+            <div class="form-bottom-buttons">
+                <button type="button" id="equipment-cancel-btn">
+                    취소
+                </button>
+
+                <button type="submit" id="equipment-submit-btn">
+                    교구장 등록
+                </button>
+
+                <button type="button" id="equipment-save-btn" style="display: none;">
+                    정보 수정
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

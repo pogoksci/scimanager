@@ -1,0 +1,133 @@
+<!-- /pages/kit-form.html -->
+<div id="kit-form-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h2 id="kit-form-title" class="page-title">키트 등록
+        </h2>
+    </div>
+
+    <div class="layout-content scroll-padding-nav">
+        <form id="kit-form" autocomplete="off">
+            <!-- SECTION 1: Classification & Name -->
+            <h3 class="section-title">
+                기본 정보
+            </h3>
+
+            <div class="form-group">
+                <label>분류 (복수 선택 가능)</label>
+                <div class="button-group" id="kit-class-buttons">
+                    <button type="button" class="class-toggle-btn active" data-value="all">전체</button>
+                    <button type="button" class="class-toggle-btn" data-value="물리학">물리학</button>
+                    <button type="button" class="class-toggle-btn" data-value="화학">화학</button>
+                    <button type="button" class="class-toggle-btn" data-value="생명과학">생명과학</button>
+                    <button type="button" class="class-toggle-btn" data-value="지구과학">지구과학</button>
+                    <button type="button" class="class-toggle-btn" data-value="융합과학">융합과학</button>
+                    <button type="button" class="class-toggle-btn" data-value="기타">기타</button>
+                </div>
+                <!-- Hidden input to store selected value for form submission -->
+                <input type="hidden" id="kit-class-value" value="all">
+            </div>
+
+            <div class="form-group" id="kit-name-group">
+                <label>키트명</label>
+                <select id="kit-name-select" class="form-input" disabled required>
+                    <option value="" disabled selected>분류를 먼저 선택하세요</option>
+                </select>
+
+                <!-- Custom Kit Checkbox -->
+                <div id="custom-kit-checkbox-wrapper" class="custom-kit-checkbox-wrapper custom-kit-check-wrapper">
+                    <input type="checkbox" id="check-custom-kit">
+                    <label for="check-custom-kit">키트 목록에 없는 새로운 키트를 등록할 경우 체크하세요.</label>
+                </div>
+
+                <!-- Custom Kit Inputs -->
+                <div id="custom-kit-inputs" class="custom-kit-inputs custom-kit-box">
+                    <div class="form-group">
+                        <label for="custom-kit-name">등록하려는 키트 이름</label>
+                        <input type="text" id="custom-kit-name" class="form-input" placeholder="키트 이름을 입력하세요">
+                    </div>
+
+                    <!-- Common Kit Person Input (Inside Custom Box for Create Mode) -->
+                    <div id="kit-person-group" class="form-group kit-person-group">
+                        <label for="kit-person">인원수 (명)</label>
+                        <input type="number" id="kit-person" class="form-input" min="1" placeholder="예: 4 (4인용)">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label>구성 약품 (CAS No.)</label>
+                        <div id="cas-input-container">
+                            <input type="text" class="form-input cas-input cas-input-marginBottom" placeholder="CAS1 (예: 7732-18-5)">
+                        </div>
+                        <button type="button" id="btn-add-cas" class="btn-secondary-action btn-add-cas-style">+ CAS 추가</button>
+                        <p class="cas-note">* CAS 입력란이 부족할 경우 추가버튼을 누르세요.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Quantity & Storage -->
+            <h3 class="section-title-mt">
+                관리 정보
+            </h3>
+
+            <div class="form-group">
+                <label>수량</label>
+                <input type="number" id="kit-quantity" class="form-input" value="1" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>구입일</label>
+                <div class="date-input-wrapper">
+                    <div class="date-box">
+                        <input type="text" id="kit-date-year" placeholder="YYYY" maxlength="4" inputmode="numeric" class="date-year-input">
+                        <span class="date-separator">-</span>
+                        <input type="text" id="kit-date-month" placeholder="MM" maxlength="2" inputmode="numeric" class="date-day-input">
+                        <span class="date-separator">-</span>
+                        <input type="text" id="kit-date-day" placeholder="DD" maxlength="2" inputmode="numeric" class="date-day-input">
+                    </div>
+                    <!-- Hidden Date Input for Picker -->
+                    <input type="date" id="kit-date-hidden" class="hidden-date-picker">
+                    <!-- Calendar Button -->
+                    <button type="button" id="btn-open-calendar" class="btn-calendar-open">
+                        <span class="material-symbols-outlined calendar-icon">calendar_month</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group-location">
+                <h3>보관 위치 설정</h3>
+                <div id="kit-storage-selector"></div>
+            </div>
+
+            <!-- SECTION 3: Photo -->
+            <div class="form-group">
+                <label>사진</label>
+                <div class="photo-container">
+                    <div id="kit-photo-preview" class="photo-preview-box">
+                        <img id="kit-preview-img" class="media-cover-kit">
+                        <span class="placeholder-text placeholder-text-kit">사진 없음</span>
+                        <video id="kit-camera-stream" autoplay playsinline class="media-cover-kit"></video>
+                        <canvas id="kit-camera-canvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="photo-buttons">
+                        <button type="button" id="btn-kit-file"><span class="material-symbols-outlined">image</span>
+                            파일에서 선택</button>
+                        <button type="button" id="btn-kit-camera"><span
+                                class="material-symbols-outlined">photo_camera</span> 카메라로 촬영</button>
+                        <button type="button" id="btn-kit-confirm" style="display: none;"><span
+                                class="material-symbols-outlined">check</span> 확인</button>
+                        <button type="button" id="btn-cancel-camera" style="display: none;"><span
+                                class="material-symbols-outlined">close</span> 취소</button>
+                    </div>
+                    <input type="file" id="kit-file-input" accept="image/*" style="display: none;">
+                    <input type="file" id="kit-camera-input" accept="image/*" capture="environment"
+                        style="display: none;">
+                </div>
+            </div>
+
+            <div class="form-bottom-buttons">
+                <button type="button" id="btn-cancel-kit" class="btn-cancel">취소</button>
+                <button type="submit" id="btn-save-kit">저장</button>
+            </div>
+
+        </form>
+    </div>
+</div>

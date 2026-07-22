@@ -1,0 +1,68 @@
+<!-- /pages/lab-timetable.html -->
+<div id="lab-timetable-page" class="layout-container page-container">
+    <!-- SheetJS for Excel Import -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <div class="layout-header header-flex-none">
+        <div class="header-left">
+            <h2>과학과 시간표 설정</h2>
+        </div>
+        <div class="header-right header-right-mt">
+            <!-- Controls: Semester & Teacher Selection -->
+            <select id="timetable-semester-select" class="header-select">
+                <option value="">학년도 선택</option>
+            </select>
+            <select id="timetable-teacher-select" class="header-select">
+                <option value="">교사 선택</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layout-content content-flex-scroll">
+        <!-- Timetable Grid -->
+        <div class="timetable-container">
+            <table class="timetable-grid" id="timetable-grid">
+                <thead>
+                    <tr>
+                        <th class="period-col th-period-width">교시</th>
+                        <th>월</th>
+                        <th>화</th>
+                        <th>수</th>
+                        <th>목</th>
+                        <th>금</th>
+                        <th>토</th>
+                        <th>일</th>
+                    </tr>
+                </thead>
+                <tbody id="timetable-body">
+                    <!-- Javascript will populate rows -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bottom Actions: Save/Cancel -->
+        <div class="form-bottom-buttons bottom-actions-right">
+            <button id="btn-cancel-timetable" class="btn-cancel">취소</button>
+            <button id="btn-save-timetable" class="btn-primary">시간표 저장</button>
+        </div>
+
+        <!-- Divider & Extra Actions -->
+        <div class="import-section">
+            <div class="import-btn-group">
+                <input type="file" id="file-upload-excel" accept=".xlsx, .xls" style="display: none;" />
+                <button id="btn-import-excel" class="btn-secondary btn-import-common">
+                    <span class="material-symbols-outlined icon-sm">upload_file</span>
+                    엑셀 업로드
+                </button>
+                <button id="btn-view-all" class="btn-secondary btn-import-common">
+                    <span class="material-symbols-outlined icon-sm">grid_view</span>
+                    전체 보기
+                </button>
+            </div>
+            <p class="import-note">
+                * 컴시간 알리미에서 다운받은 엑셀 파일(.xlsx)을 업로드하여 시간표를 일괄 등록할 수 있습니다. (단, 과학실 설정에서 입력한 교사과 xlsx파일의 교사명이 알차해야 합니다.)
+            </p>
+        </div>
+    </div>
+</div>
+</div>

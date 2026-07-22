@@ -1,0 +1,390 @@
+<div id="lab-settings-page" class="layout-container">
+
+    <!-- 1. Header (Standardized) -->
+    <div class="layout-header">
+        <h2>과학실 설정</h2>
+    </div>
+
+    <!-- Tab Navigation (Sticky below header) -->
+    <div class="tab-container">
+        <button class="tab-button" data-tab="school-info" id="tab-btn-school">
+            학교 정보 설정
+        </button>
+        <button class="tab-button active" data-tab="lab-management" id="tab-btn-lab">
+            과학실 관리
+        </button>
+        <button class="tab-button" data-tab="user-settings" id="tab-btn-user">
+            사용자 기초설정
+        </button>
+        <button class="tab-button" data-tab="db-backup" id="tab-btn-backup">
+            DB 백업/복원
+        </button>
+    </div>
+
+    <!-- 2. Scrollable Content -->
+    <div id="lab-settings-content" class="layout-content layout-content-settings">
+
+        <!-- Tab 0: School Info Settings -->
+        <div id="school-info" class="tab-content">
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>학교 정보 설정</h3>
+                </div>
+
+                <!-- 1. School Name -->
+                <div class="form-group">
+                    <label for="school-name-input">학교 이름</label>
+                    <input type="text" id="school-name-input" placeholder="예: GOE고등학교" class="form-control"
+                        style="width: 100%;">
+                    <p class="school-info-note">* 이 이름은 키트 목록 출력 등 각종 보고서에 표시됩니다.</p>
+                </div>
+
+                <div class="settings-grid settings-grid-2col">
+                    <!-- 2. Class Counts -->
+                    <div>
+                        <h4 class="grade-title-1">학년별 학급 수</h4>
+                        <div class="grade-input-group">
+                            <div class="grade-row">
+                                <label class="grade-label">1학년</label>
+                                <input type="number" id="sc-grade-1-classes" placeholder="학급 수" min="0"
+                                    class="grade-input">
+                            </div>
+                            <div class="grade-row">
+                                <label class="grade-label">2학년</label>
+                                <input type="number" id="sc-grade-2-classes" placeholder="학급 수" min="0"
+                                    class="grade-input">
+                            </div>
+                            <div class="grade-row">
+                                <label class="grade-label">3학년</label>
+                                <input type="number" id="sc-grade-3-classes" placeholder="학급 수" min="0"
+                                    class="grade-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Max Students -->
+                    <div>
+                        <h4 class="grade-title-2">학급당 최대 인원</h4>
+                        <div class="grade-input-group">
+                            <div class="grade-row">
+                                <label class="grade-label">1학년</label>
+                                <input type="number" id="sc-grade-1-students" placeholder="인원 수" min="0"
+                                    class="grade-input">
+                            </div>
+                            <div class="grade-row">
+                                <label class="grade-label">2학년</label>
+                                <input type="number" id="sc-grade-2-students" placeholder="인원 수" min="0"
+                                    class="grade-input">
+                            </div>
+                            <div class="grade-row">
+                                <label class="grade-label">3학년</label>
+                                <input type="number" id="sc-grade-3-students" placeholder="인원 수" min="0"
+                                    class="grade-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-bottom-buttons form-bottom-mt">
+                    <button id="btn-save-school-info" type="submit" class="btn-primary">학교 정보 저장</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 1: Lab Management -->
+        <div id="lab-management" class="tab-content active">
+            <div class="settings-section">
+                <!-- Removed inner header as page title covers it, or keep as sub-section title? 
+                     User said "Science Lab Settings" title position. 
+                     The inner "Science Lab Info Settings" h3 is fine as a section title.
+                -->
+                <div class="section-header">
+                    <h3>과학실/과학준비실/약품실 정보 설정</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="lab-count">과학실(과학준비실,약품실 등 포함) 개수를 입력하고 설정버튼을 누르세요.</label>
+                    <div class="input-count-wrapper">
+                        <input type="number" id="lab-count" min="1" max="10" placeholder="개수 입력" value="2"
+                            style="flex: 1;">
+                        <button id="btn-set-lab-count" class="btn-primary btn-set-count">설정</button>
+                    </div>
+                </div>
+
+                <div id="lab-rooms-container" class="dynamic-list-container rooms-container">
+                    <label>과학실 이름 입력</label>
+                    <!-- Dynamic Inputs will be appended here -->
+                    <div id="lab-rooms-list"></div>
+                </div>
+
+                <div class="form-bottom-buttons">
+                    <button id="btn-save-labs" type="submit">과학실 정보 저장</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: User Settings -->
+        <div id="user-settings" class="tab-content">
+
+            <!-- Academic Year Selector -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>학년도 설정</h3>
+                    <!-- Year Selection/Creation Logic -->
+                </div>
+                <div class="form-group">
+                    <label for="semester-select">학년도 선택</label>
+                    <div class="semester-select-group">
+                        <select id="semester-select">
+                            <option value="">학년도를 선택하세요</option>
+                            <!-- Options populate dynamically -->
+                        </select>
+                        <button id="btn-add-semester" class="btn-add-semester">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- New Semester Modal (Hidden by default) -->
+                <div id="new-semester-form" class="new-semester-box">
+                    <label style="display: block; margin-bottom: 8px;">새 학년도 선택</label>
+                    <div class="new-semester-row">
+                        <select id="new-semester-name" class="form-input new-semester-input"></select>
+                        <button id="btn-save-semester" class="btn-save-sm">추가</button>
+                        <button id="btn-cancel-semester" class="btn-cancel-sm">취소</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Settings (Visible only when semester is selected) -->
+            <div id="semester-details-container" class="semester-details-hidden">
+
+                <!-- Class Counts -->
+                <div class="settings-section class-count-section">
+                    <h3>학급 수 설정</h3>
+                    <div class="form-group">
+                        <div class="class-count-row">
+                            <div class="class-count-item">
+                                <label>1학년 학급 수</label>
+                                <input type="number" id="count-grade-1" min="0" placeholder="0">
+                            </div>
+                            <div class="class-count-item">
+                                <label>2학년 학급 수</label>
+                                <input type="number" id="count-grade-2" min="0" placeholder="0">
+                            </div>
+                            <div class="class-count-item">
+                                <label>3학년 학급 수</label>
+                                <input type="number" id="count-grade-3" min="0" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Three Columns: Teachers, Subjects, Clubs -->
+                <div class="settings-grid grid-mt">
+                    <!-- Teachers -->
+                    <div class="settings-section">
+                        <h3>과학과 교사</h3>
+                        <div id="teachers-list" class="dynamic-list-container">
+                            <!-- Dynamic Items -->
+                        </div>
+                        <button id="btn-add-teacher" class="btn-add">
+                            <span class="material-symbols-outlined">add</span>추가
+                        </button>
+                    </div>
+
+                    <!-- Subjects -->
+                    <div class="settings-section">
+                        <h3>운영 과목</h3>
+                        <div id="subjects-list" class="dynamic-list-container">
+                            <!-- Dynamic Items -->
+                        </div>
+                        <button id="btn-add-subject" class="btn-add">
+                            <span class="material-symbols-outlined">add</span>추가
+                        </button>
+                    </div>
+
+                    <!-- Clubs -->
+                    <div class="settings-section">
+                        <h3>동아리</h3>
+                        <div id="clubs-list" class="dynamic-list-container">
+                            <!-- Dynamic Items -->
+                        </div>
+                        <button id="btn-add-club" class="btn-add">
+                            <span class="material-symbols-outlined">add</span>추가
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modification Date (Hidden by default, shown on change detection) -->
+                <div id="modification-date-container" class="settings-section modification-box">
+                    <div class="section-header">
+                        <h3>수정 기준 날짜 입력</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="modification-date" class="modification-label">
+                            변경 사항이 감지되었습니다.<br>
+                            새로운 버전(기간)을 생성할 기준 날짜를 선택하세요.
+                        </label>
+                        <input type="date" id="modification-date" class="form-control modification-input">
+                        <p class="modification-note">
+                            * 선택한 날짜부터 새로운 기간으로 적용됩니다.<br>
+                            * 이전 기간은 선택한 날짜의 <strong>전날</strong>까지로 자동 설정됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="form-bottom-buttons btn-area-mt">
+                    <button id="btn-save-user-settings" type="submit">사용자 설정 저장</button>
+                </div>
+
+            </div> <!-- End details container -->
+
+            <!-- AI Chatbot Settings -->
+            <div class="settings-section" style="margin-top: 20px;">
+                <div class="section-header">
+                    <h3>AI 과학실 비서 설정</h3>
+                </div>
+                
+                <!-- AI Provider Select -->
+                <div class="form-group">
+                    <label for="chatbot-provider-select">AI 서비스 제공자</label>
+                    <select id="chatbot-provider-select" class="form-control" style="width: 100%; height: 36px; margin-top: 6px;">
+                        <option value="gemini">Gemini (Google) - 추천</option>
+                        <option value="openai">ChatGPT (OpenAI)</option>
+                        <option value="custom">OpenAI 호환 / Custom (Claude, OpenRouter, Ollama 등)</option>
+                    </select>
+                </div>
+
+                <!-- API Key -->
+                <div class="form-group">
+                    <label for="chatbot-api-key-input" id="chatbot-key-label">Gemini API Key</label>
+                    <input type="password" id="chatbot-api-key-input" placeholder="API Key를 입력하세요" class="form-control" style="width: 100%;">
+                </div>
+
+                <!-- API Base URL (Custom Only) -->
+                <div class="form-group" id="chatbot-api-url-group" style="display: none;">
+                    <label for="chatbot-api-url-input">API Base URL</label>
+                    <input type="text" id="chatbot-api-url-input" placeholder="예: https://openrouter.ai/api/v1 또는 http://localhost:11434/v1" class="form-control" style="width: 100%;">
+                    <p class="school-info-note" style="margin-top: 4px;">* OpenRouter, Claude 프록시 또는 로컬 Ollama 등 OpenAI 호환 API의 기본 주소를 입력합니다.</p>
+                </div>
+
+                <!-- Model Name (OpenAI / Custom Only) -->
+                <div class="form-group" id="chatbot-model-group" style="display: none;">
+                    <label for="chatbot-model-input">모델명 (Model ID)</label>
+                    <input type="text" id="chatbot-model-input" placeholder="예: gpt-4o-mini 또는 anthropic/claude-3.5-sonnet" class="form-control" style="width: 100%;">
+                    <p class="school-info-note" style="margin-top: 4px;">* 사용할 AI 모델의 공식 영문 ID를 입력합니다.</p>
+                </div>
+
+                <p class="school-info-note" style="margin-top: 10px; padding: 0 12px;">
+                    * API Key와 관련 설정은 브라우저의 로컬 스토리지에만 저장되며 외부 서버로 유출되지 않습니다.<br>
+                    * 설정하지 않으면 데이터베이스에 등록된 시약의 분자량 및 MSDS 검색 모드로 작동합니다.
+                </p>
+
+                <div class="form-bottom-buttons" style="margin-top: 12px;">
+                    <button id="btn-save-chatbot-settings" type="button" class="btn-primary" style="width: 100%;">AI 비서 설정 저장</button>
+                </div>
+            </div>
+
+            <!-- AI Chatbot Unanswered Queries List Section -->
+            <div class="settings-section" style="margin-top: 20px;">
+                <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>AI 챗봇 미답변/요청 질문 목록</h3>
+                    <button id="btn-refresh-unanswered" class="btn-primary" style="margin: 0; padding: 4px 10px; font-size: 12px; height: auto; width: auto; font-weight: normal; cursor: pointer;">새로고침</button>
+                </div>
+                <div id="unanswered-list-container" style="margin-top: 10px; max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; background: #fff;">
+                    <p style="padding: 15px; text-align: center; color: #777; font-size: 13px;">불러오는 중...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tab 3: DB Backup/Restore -->
+        <div id="db-backup" class="tab-content">
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>과학실 설정 데이터 백업/복원</h3>
+                </div>
+
+                <div class="settings-grid settings-grid-2col">
+                    <!-- Export Card -->
+                    <div class="backup-card">
+                        <h4 class="backup-title">설정 내보내기 (Backup)</h4>
+                        <p class="backup-desc">
+                            현재 설정된 과학실, 학년도, 교사, 과목 등 모든 기초 데이터를 JSON 파일로 다운로드합니다.
+                        </p>
+                        <button id="btn-export-db" class="btn-primary btn-full-width">
+                            <span class="material-symbols-outlined icon-text">download</span>
+                            데이터 내보내기
+                        </button>
+                    </div>
+
+                    <!-- Import Card -->
+                    <div class="restore-card">
+                        <h4 class="restore-title">설정 복원하기 (Restore)</h4>
+                        <p class="restore-desc">
+                            백업 파일을 업로드하여 설정을 복원합니다.<br>
+                            <strong class="text-danger">주의: 현재의 모든 기초 설정이 삭제되고 덮어쓰기 됩니다.</strong>
+                        </p>
+                        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                        <button id="btn-trigger-import" class="btn-restore">
+                            <span class="material-symbols-outlined icon-text">upload</span>
+                            데이터 복원하기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Restore Warning/Status -->
+                <div id="restore-status" class="restore-status">
+                    <div style="padding: 15px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
+
+            </div>
+        </div>
+
+
+    <div id="toast-container" class="toast-container">
+    </div>
+
+    <!-- Custom Version Choice Modal -->
+    <div id="version-choice-modal" class="custom-modal-overlay modal-overlay-hidden">
+        <div class="custom-modal-content">
+            <h3 class="modal-title">설정 변경 감지</h3>
+            <p class="modal-intro">
+                교사, 운영 과목, 학급 수, 동아리 등 <strong>설정이 변경되었습니다.</strong><br>
+                변경 내용을 어떻게 저장하시겠습니까?
+            </p>
+
+            <div class="choice-container">
+                <!-- Option 1: New Version -->
+                <div class="choice-row choice-row-highlight">
+                    <div class="choice-desc">
+                        <strong class="choice-highlight-text">새로운 기간(버전) 생성</strong>
+                        <p>변경 시점부터 새로운 설정이 적용됩니다.<br>기존 설정은 이전 기간으로 보존됩니다.</p>
+                    </div>
+                    <div class="choice-action">
+                        <button id="btn-choice-new" class="btn-choice-primary">새로운 기간 생성</button>
+                    </div>
+                </div>
+
+                <!-- Option 2: Overwrite -->
+                <div class="choice-row">
+                    <div class="choice-desc">
+                        <strong>현재 기간 유지</strong>
+                        <p>현재 학년도의 설정이 바로 수정됩니다.<br>입력 실수 수정 등 단순 변경 시 선택하세요.</p>
+                    </div>
+                    <div class="choice-action">
+                        <button id="btn-choice-overwrite" class="btn-choice-secondary">현재 기간 유지</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-choice-cancel" class="btn-text-cancel">취소
+                    (돌아가기)</button>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- End layout-container -->
+</content>

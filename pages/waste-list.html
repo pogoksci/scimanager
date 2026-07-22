@@ -1,0 +1,83 @@
+<!-- /pages/waste-list.html -->
+<div class="layout-container">
+    <!-- 1. Fixed Header -->
+    <div class="layout-header">
+        <div class="header-top-row">
+            <h2>폐수 관리</h2>
+        </div>
+
+        <div class="header-actions">
+            <!-- 📊 기간 통계 요약 -->
+            <div id="waste-period-summary" class="waste-period-summary">
+                기간 중 폐수 발생량: 0 g
+            </div>
+
+            <!-- Date Range Picker -->
+            <div class="waste-date-picker">
+                <label>
+                    <input type="checkbox" id="use-recent-disposal-date">
+                    <span>이전위탁처리일부터</span>
+                </label>
+                <div class="divider"></div>
+                <input type="date" id="waste-start-date">
+                <span>~</span>
+                <input type="date" id="waste-end-date">
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="custom-dropdown waste-sort-dropdown" id="waste-sort-dropdown">
+                <button class="dropdown-toggle" id="waste-sort-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-symbols-outlined">sort</span>
+                    <span id="waste-sort-label" data-value="created_asc_group" class="dropdown-label">등록순(분류별)</span>
+                    <span class="material-symbols-outlined arrow">expand_more</span>
+                </button>
+
+                <div class="dropdown-menu" id="waste-sort-menu" role="menu">
+                    <div class="dropdown-item" data-value="created_asc_group">
+                        <span class="material-symbols-outlined">group_work</span>
+                        등록순(분류별)
+                    </div>
+                    <div class="dropdown-item" data-value="created_desc_group">
+                        <span class="material-symbols-outlined">group_work</span>
+                        최근순(분류별)
+                    </div>
+                    <div class="dropdown-item" data-value="created_asc_all">
+                        <span class="material-symbols-outlined">list</span>
+                        등록순(전체)
+                    </div>
+                    <div class="dropdown-item" data-value="created_desc_all">
+                        <span class="material-symbols-outlined">list</span>
+                        최근순(전체)
+                    </div>
+                    <div class="dropdown-item" data-value="disposal_group">
+                        <span class="material-symbols-outlined">local_shipping</span>
+                        폐수위탁처리(분류별)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons Group -->
+            <div class="waste-btn-group">
+                <button id="waste-search-btn" title="검색" aria-label="검색">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <button id="waste-print-btn" title="보고서 출력" aria-label="보고서 출력">
+                    <span class="material-symbols-outlined">print</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Scrollable Content -->
+    <div id="waste-list-container" class="layout-content inventory-list scroll-padding-fab">
+        <div class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            <p>목록을 불러오는 중...</p>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" id="new-waste-btn">
+        <span class="material-symbols-outlined">add</span> 폐수 등록
+    </button>
+</div>

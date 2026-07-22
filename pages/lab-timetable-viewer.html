@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>전체 시간표 보기 - SciManager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <div id="lab-timetable-viewer-page" class="layout-container">
+        <div class="layout-header">
+            <span class="header-title">과학과 전체 시간표</span>
+            <div class="semester-select-container">
+                <select id="semester-select">
+                    <option value="">학년도 로딩 중...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layout-content">
+            <div id="viewer-grid" class="timetable-viewer-grid">
+                <!-- Cards will be injected here -->
+            </div>
+
+            <div class="footer-actions">
+                <button id="btn-back">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    돌아가기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/pages/lab-timetable-viewer.js"></script>
+</body>
+
+</html>

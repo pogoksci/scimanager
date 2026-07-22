@@ -1,0 +1,220 @@
+<!-- /pages/inventory-form.html -->
+<div id="inventory-form-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h2 id="inventory-form-title" class="page-title-inv">약품 등록
+        </h2>
+    </div>
+
+    <div class="layout-content scroll-padding-nav form-container-inv">
+        <form id="inventory-form" autocomplete="off">
+            <div class="form-group">
+                <label for="cas_rn">CAS <span class="required-mark">*</span></label>
+                <input type="text" id="cas_rn" name="cas_rn" placeholder="CAS Registry Number (예: 7647-01-0)" required>
+            </div>
+
+            <div class="form-group" id="chemical_name_group">
+                <label for="chemical_name_ko">약품명 (한글)</label>
+                <input type="text" id="chemical_name_ko" name="chemical_name_ko"
+                    placeholder="약품명을 입력하세요 (이름이 없는 경우에만 활성화됩니다)">
+            </div>
+
+            <div class="form-group">
+                <label for="purchase_volume">구입용량 (숫자) <span class="required-mark">*</span></label>
+                <input type="number" id="purchase_volume" name="purchase_volume" placeholder="구입 용량" min="0" step="any"
+                    autocomplete="off" required>
+            </div>
+
+            <div class="form-group relative-group">
+                <label>단위 <span class="required-mark">*</span></label>
+                <!-- Hidden input for state tracking (no required to avoid scroll issues) -->
+                <input type="text" id="unit_hidden" class="hidden-state-input">
+                <div class="button-group" id="unit_buttons">
+                    <button type="button" data-value="g">g</button>
+                    <button type="button" data-value="mL">mL</button>
+                    <button type="button" data-value="개">개</button>
+                </div>
+            </div>
+
+            <div class="form-group relative-group">
+                <label>시약병 형태 <span class="required-mark">*</span></label>
+                <!-- Hidden input for state tracking (no required to avoid scroll issues) -->
+                <input type="text" id="bottle_type_hidden" class="hidden-state-input">
+                <div class="button-group" id="bottle_type_buttons">
+                    <button type="button" data-value="갈색유리">갈색유리</button>
+                    <button type="button" data-value="투명유리">투명유리</button>
+                    <button type="button" data-value="갈색플라스틱">갈색플라스틱</button>
+                    <button type="button" data-value="흰색플라스틱">흰색플라스틱</button>
+                    <button type="button" data-value="반투명플라스틱">반투명플라스틱</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>사진</label>
+                <div class="photo-container">
+                    <div id="photo-preview" class="photo-preview-box">
+                        <img id="preview-img" class="preview-img">
+                        <span class="placeholder-text">사진 없음</span>
+                        <video id="camera-stream" autoplay playsinline class="camera-stream"></video>
+                        <canvas id="camera-canvas" class="camera-canvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="photo-buttons">
+                        <button type="button" id="photo-btn"><span class="material-symbols-outlined">image</span> 파일에서
+                            선택</button>
+                        <button type="button" id="camera-btn"><span
+                                class="material-symbols-outlined">photo_camera</span>
+                            카메라로
+                            촬영</button>
+                        <button type="button" id="camera-confirm-btn" class="btn-photo-confirm"><span
+                                class="material-symbols-outlined">check</span> 확인</button>
+                        <button type="button" id="camera-cancel-btn" class="btn-photo-cancel"><span
+                                class="material-symbols-outlined">close</span> 취소</button>
+                    </div>
+                </div>
+                <input type="file" id="photo-input" accept="image/*" class="file-input-hidden">
+                <input type="file" id="camera-input" accept="image/*" capture="environment" class="file-input-hidden">
+            </div>
+
+            <div class="form-group">
+                <label>구분</label>
+                <div class="button-group" id="classification_buttons">
+                    <button type="button" data-value="강산">강산</button>
+                    <button type="button" data-value="약산">약산</button>
+                    <button type="button" data-value="강염기">강염기</button>
+                    <button type="button" data-value="약염기">약염기</button>
+                    <button type="button" data-value="알코올">알코올</button>
+                    <button type="button" data-value="오일류">오일류</button>
+                    <button type="button" data-value="유기화합물">유기화합물</button>
+                    <button type="button" data-value="지시약">지시약</button>
+                    <button type="button" data-value="금속류">금속류</button>
+                    <button type="button" data-value="산화염">산화염</button>
+                    <button type="button" data-value="수산화염">수산화염</button>
+                    <button type="button" data-value="염화염">염화염</button>
+                    <button type="button" data-value="질산염">질산염</button>
+                    <button type="button" data-value="탄산염">탄산염</button>
+                    <button type="button" data-value="황산염">황산염</button>
+                    <button type="button" data-value="황화염">황화염</button>
+                    <button type="button" data-value="무기화합물">무기화합물</button>
+                    <button type="button" data-value="세제류">세제류</button>
+                    <button type="button" data-value="비누/화장품재료">비누/화장품재료</button>
+                    <button type="button" data-value="식품류">식품류</button>
+                    <button type="button" data-value="생명과학">생명과학</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>상태</label>
+                <div class="button-group" id="state_buttons">
+                    <button type="button" data-value="액체">액체</button>
+                    <button type="button" data-value="수용액">수용액</button>
+                    <button type="button" data-value="파우더">파우더</button>
+                    <button type="button" data-value="조각">조각</button>
+                    <button type="button" data-value="비드">비드</button>
+                    <button type="button" data-value="펠렛">펠렛</button>
+                    <button type="button" data-value="리본">리본</button>
+                    <button type="button" data-value="막대">막대</button>
+                    <button type="button" data-value="벌크">벌크</button>
+                    <button type="button" data-value="기체">기체</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="concentration_value">농도 (숫자)</label>
+                <input type="number" id="concentration_value" name="concentration_value" placeholder="농도 값 (예: 98, 1.0)"
+                    min="0" step="any" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>농도 단위</label>
+                <div class="button-group" id="concentration_unit_buttons">
+                    <button type="button" data-value="%">%</button>
+                    <button type="button" data-value="M">M (몰농도)</button>
+                    <button type="button" data-value="N">N (노르말 농도)</button>
+                </div>
+
+                <div class="form-group" id="valence_group" style="display: none;">
+                    <label for="valence_input" class="valence-label">가수 (Valence) *</label>
+                    <div class="valence-wrapper">
+                        <input type="number" id="valence_input" name="valence" placeholder="예: 1, 2" min="1" step="1"
+                            class="valence-input" autocomplete="off">
+                        <span class="valence-info">
+                            <span class="material-symbols-outlined info-icon-sm">info</span>
+                            노르말 농도(N) 계산을 위한 가수입니다.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>제조원</label>
+                <div class="button-group" id="manufacturer_buttons">
+                    <button type="button" data-value="대정">대정</button>
+                    <button type="button" data-value="덕산">덕산</button>
+                    <button type="button" data-value="동성">동성</button>
+                    <button type="button" data-value="삼전">삼전</button>
+                    <button type="button" data-value="한양">한양</button>
+                    <button type="button" data-value="태진">태진</button>
+                    <button type="button" data-value="OCI">OCI</button>
+                    <button type="button" data-value="JUNSEI">JUNSEI</button>
+                    <button type="button" data-value="MERCK">MERCK</button>
+                    <button type="button" data-value="Sigma-Aldrich">Sigma-Aldrich</button>
+                    <button type="button" data-value="생물나라">생물나라</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <div class="form-group" id="other_manufacturer_group" style="display: none;">
+                <label for="manufacturer_other">제조원 직접 입력</label>
+                <input type="text" id="manufacturer_other" placeholder="제조사 또는 구입처를 입력하세요">
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="purchase_date">제조일 또는 구입일</label>
+                <div class="date-input-group">
+                    <div class="date-input-box">
+                        <input type="text" id="inv-date-year" placeholder="YYYY" maxlength="4" inputmode="numeric"
+                            class="date-year">
+                        <span class="date-divider">-</span>
+                        <input type="text" id="inv-date-month" placeholder="MM" maxlength="2" inputmode="numeric"
+                            class="date-month-day">
+                        <span class="date-divider">-</span>
+                        <input type="text" id="inv-date-day" placeholder="DD" maxlength="2" inputmode="numeric"
+                            class="date-month-day">
+                    </div>
+                    <!-- Hidden Date Input for Picker -->
+                    <input type="date" id="purchase_date" name="purchase_date" tabindex="-1"
+                        class="date-picker-hidden">
+                    <!-- Calendar Button -->
+                    <button type="button" id="btn-open-calendar-inv" class="btn-calendar-icon">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group-location">
+                <h3>보관 위치 설정</h3>
+
+                <div class="location-step">
+                    <div class="form-group">
+                        <div id="inventory-storage-selector">
+                            <!-- App.StorageSelector will render here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="msds-pdf-input">MSDS PDF 파일</label>
+                <input type="file" id="msds-pdf-input" accept=".pdf">
+                <p class="msds-note">(3MB 이하의 PDF 파일만 업로드 가능)</p>
+            </div>
+
+            <button type="submit" id="inventory-submit-button">약품 입고 정보 저장</button>
+            <p id="statusMessage" class="status-margin"></p>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+<!-- /pages/teaching-tools.html -->
+<div id="teaching-tools-page" class="layout-container">
+    <!-- 1. Fixed Header -->
+    <div class="layout-header">
+        <div class="header-top-row">
+            <h2>교구/설비</h2>
+        </div>
+
+        <div class="header-actions">
+            <!-- Search -->
+            <div class="search-container">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" id="aid-search-input" placeholder="교구/설비 검색...">
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="custom-dropdown" id="aid-sort-dropdown">
+                <button class="dropdown-toggle header-btn-h100" id="aid-sort-toggle" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-symbols-outlined">sort</span>
+                    <span id="aid-sort-label" data-value="section_code">섹션 코드순</span>
+                    <span class="material-symbols-outlined arrow">expand_more</span>
+                </button>
+
+                <div class="dropdown-menu" id="aid-sort-menu" role="menu">
+                    <div class="dropdown-item" data-value="section_code">
+                        <span class="material-symbols-outlined">list_alt</span>
+                        섹션 코드순
+                    </div>
+                    <div class="dropdown-item" data-value="all_name">
+                        <span class="material-symbols-outlined">sort_by_alpha</span>
+                        전체 이름순
+                    </div>
+                    <div class="dropdown-item" data-value="category_name">
+                        <span class="material-symbols-outlined">category</span>
+                        분류 이름순
+                    </div>
+                    <div class="dropdown-item" data-value="location">
+                        <span class="material-symbols-outlined">location_on</span>
+                        보관 장소순
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Print Button -->
+            <button id="aid-print-btn" title="보고서 출력" aria-label="출력" class="header-btn-h100">
+                <span class="material-symbols-outlined">print</span>
+            </button>
+
+            <!-- Refresh Button -->
+            <button id="aid-refresh-btn" title="목록 새로고침" aria-label="새로고침" class="header-btn-h100">
+                <span class="material-symbols-outlined">refresh</span>
+            </button>
+        </div>
+
+        <!-- Section Filter Buttons -->
+        <div class="section-filter-group filter-group">
+            <button id="btn-filter-all" class="filter-toggle-btn filter-btn">전체</button>
+            <button id="btn-filter-aid" class="filter-toggle-btn filter-btn">교구</button>
+            <button id="btn-filter-facility" class="filter-toggle-btn filter-btn">설비</button>
+        </div>
+    </div>
+
+    <!-- Sync Status -->
+    <div id="sync-status" class="sync-status-msg sync-status-pad"></div>
+
+    <!-- 2. Scrollable Content -->
+    <div id="aid-list" class="layout-content inventory-list scroll-padding-fab">
+        <!-- Items will be injected here -->
+        <div class="empty-state">
+            <span class="material-symbols-outlined">hourglass_empty</span>
+            <p>목록을 불러오는 중...</p>
+        </div>
+    </div>
+</div>
+<!-- Register Aid Modal removed (Replaced by tools-form page) -->

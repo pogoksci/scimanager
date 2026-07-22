@@ -1,0 +1,287 @@
+<!-- /pages/data-sync.html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<div id="data-sync-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h2 class="page-title page-title-custom">
+            <span class="material-symbols-outlined">sync</span>
+            데이터 동기화
+        </h2>
+    </div>
+
+    <div class="layout-content scroll-padding-nav" style="padding: 25px">
+        <div class="card">
+            <div class="card-body sync-card-body">
+                <div class="sync-main-icon-wrapper">
+                    <span class="material-symbols-outlined sync-main-icon">cloud_sync</span>
+                </div>
+
+                <!-- 🚀 에듀파인 다운로드 섹션 (위치 변경됨) -->
+                <div class="migration-section">
+                    <h3 class="migration-title">에듀파인 '저장성소모품코드관리' 등록파일 다운로드</h3>
+                    <p class="migration-desc">
+                        현재 약품 재고 데이터를 에듀파인 일괄 등록 양식(저장성소모품코드관리.xlsx)으로 변환하여 다운로드합니다.
+                    </p>
+
+                    <div class="migration-form-box bg-purple-50">
+                        <button id="btn-download-edufine" class="btn btn-primary btn-lg btn-migration-start btn-purple">
+                            <span class="material-symbols-outlined">file_download</span>
+                            <span>저장성소모품코드관리.xlsx 다운로드</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 키트 마이그레이션 섹션 추가 -->
+                <div class="migration-section">
+                    <h3 class="migration-title">키트 정보 마이그레이션</h3>
+                    <p class="migration-desc">
+                        migration-data_kit.csv 파일을 읽어와 키트 정보를 일괄 등록합니다.<br>
+                        (CSV의 no 컬럼 기준 범위 내의 데이터를 마이그레이션합니다.)
+                    </p>
+
+                    <div class="migration-form-box bg-orange-50">
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">1. 파일 선택 (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="user-kit-migration-file-input" accept=".csv, .xlsx, .xls"
+                                class="form-control form-input">
+                        </div>
+
+                        <div class="migration-range-group">
+                            <div class="form-group flex-1">
+                                <label class="form-label">2. 시작 No</label>
+                                <input type="number" id="user-kit-migration-start-id" class="form-control input-bordered"
+                                    placeholder="예: 1">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">3. 끝 No (선택)</label>
+                                <div class="end-id-group">
+                                    <input type="number" id="user-kit-migration-end-id" class="form-control input-flex-1"
+                                        placeholder="미입력 시 1개만">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="user-kit-until-end"> 끝까지
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="btn-user-kit-migration-start" class="btn btn-primary btn-lg btn-migration-start btn-orange">
+                            <span class="material-symbols-outlined">science</span>
+                            <span>키트 마이그레이션 시작</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 교구 마이그레이션 섹션 추가 -->
+                <div class="migration-section">
+                    <h3 class="migration-title">교구 정보 마이그레이션</h3>
+                    <p class="migration-desc">
+                        교구수불관리목록.xlsx 파일을 읽어와 교구 정보를 일괄
+                        등록합니다.<br>
+                        (tools_no 기준 범위 내의 데이터를 마이그레이션합니다.)
+                    </p>
+
+                    <div class="migration-form-box bg-blue-50">
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">1. 파일 선택 (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="tools-migration-file-input" accept=".csv, .xlsx, .xls"
+                                class="form-control form-input">
+                        </div>
+
+                        <div class="migration-range-group">
+                            <div class="form-group flex-1">
+                                <label class="form-label">2. 시작
+                                    tools_no</label>
+                                <input type="number" id="tools-migration-start-id" class="form-control input-bordered"
+                                    placeholder="예: 1">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">3. 끝 tools_no
+                                    (선택)</label>
+                                <div class="end-id-group">
+                                    <input type="number" id="tools-migration-end-id" class="form-control input-flex-1"
+                                        placeholder="미입력 시 1개만">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="tools-until-end"> 끝까지
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="btn-tools-migration-start" class="btn btn-primary btn-lg btn-migration-start btn-blue">
+                            <span class="material-symbols-outlined">construction</span>
+                            <span>교구 마이그레이션 시작</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 설비 마이그레이션 섹션 추가 -->
+                <div class="migration-section">
+                    <h3 class="migration-title">설비 정보 마이그레이션</h3>
+                    <p class="migration-desc">
+                        학교교구기준목록 (안전설비).xlsx, 학교교구기준목록 (일반설비).xlsx 파일을 읽어와 설비 정보를 일괄 등록합니다.
+                    </p>
+
+                    <div class="migration-form-box bg-green-50">
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">1. 학교교구기준목록 (안전설비) 파일 선택
+                                (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="equipment-safety-file-input" accept=".csv, .xlsx, .xls"
+                                class="form-control form-input">
+                        </div>
+
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">2. 학교교구기준목록 (일반설비) 파일 선택
+                                (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="equipment-general-file-input" accept=".csv, .xlsx, .xls"
+                                class="form-control form-input">
+                        </div>
+
+                        <div style="display: none; gap: 15px; margin-bottom: 20px">
+                            <!-- ID 범위 선택 제거됨 (전체 로드) -->
+                        </div>
+
+                        <button id="btn-equipment-migration-start" class="btn btn-primary btn-lg btn-migration-start btn-green">
+                            <span class="material-symbols-outlined">build</span>
+                            <span>설비 마이그레이션 시작</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 API 만료일 설정 섹션 (학교 정보 설정에서 이동) -->
+                <div class="migration-section">
+                    <h3 class="migration-title">외부 API 만료일 설정</h3>
+                    <p class="migration-desc">
+                        CAS, 한국산업안전보건공단, 한국환경공단 등 외부 API의 만료일을 관리합니다.<br>
+                        (만료 1주일 전 홈 화면에 경고가 표시됩니다.)
+                    </p>
+
+                    <div class="migration-form-box bg-red-50">
+                        <div class="form-group settings-grid-3col">
+                            <div>
+                                <label for="api-exp-cas" class="form-label">
+                                    CAS.org API 만료일
+                                    <a href="https://www.cas.org/services/commonchemistry-api" target="_blank" style="font-size: 11px; color: #1976d2; margin-left: 4px; text-decoration: none;">
+                                        (LINK)
+                                    </a>
+                                </label>
+                                <input type="date" id="api-exp-cas" class="form-control form-input">
+                            </div>
+                            <div>
+                                <label for="api-exp-kosha" class="form-label">
+                                    한국산업안전보건공단 물질안전보건자료 API 만료일
+                                    <a href="https://www.data.go.kr/" target="_blank" style="font-size: 11px; color: #1976d2; margin-left: 4px; text-decoration: none;">
+                                        (LINK)
+                                    </a>
+                                </label>
+                                <input type="date" id="api-exp-kosha" class="form-control form-input">
+                            </div>
+                            <div>
+                                <label for="api-exp-kreach" class="form-label">
+                                    한국환경공단 화학물질 정보 조회 서비스 API 만료일
+                                    <a href="https://www.data.go.kr/" target="_blank" style="font-size: 11px; color: #1976d2; margin-left: 4px; text-decoration: none;">
+                                        (LINK)
+                                    </a>
+                                </label>
+                                <input type="date" id="api-exp-kreach" class="form-control form-input">
+                            </div>
+                        </div>
+
+                        <button id="btn-save-api-exp" class="btn btn-primary btn-lg btn-migration-start btn-gray" style="margin-top: 15px;">
+                            <span class="material-symbols-outlined">save</span>
+                            <span>API 만료일 저장</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 데이터 기초자료 동기화 섹션 (위치 이동됨) -->
+                <div class="migration-section">
+                    <h3 class="sync-section-title">데이터 기초자료 동기화</h3>
+                    <p class="sync-description">
+                        프로젝트 폴더의 CSV 파일을 읽어와 데이터베이스를
+                        업데이트합니다.<br>
+                        <strong class="warning-text">주의: 각 항목별로 기존 데이터가 삭제되거나 갱신될 수
+                            있습니다.</strong>
+                    </p>
+
+                    <div class="sync-btn-group">
+                        <button id="btn-sync-hazard" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">warning</span>
+                            <span>유해화학물질 사전 등록(HazardList.xlsx)</span>
+                        </button>
+
+                        <button id="btn-sync-kit" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">inventory_2</span>
+                            <span>실험 키트 사전 등록(experiment_kit.xlsx)</span>
+                        </button>
+
+                        <button id="btn-sync-cas" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">science</span>
+                            <span>물질 정보 보정 등록(casimport-correct.xlsx → ref. DB)</span>
+                        </button>
+
+                        <button id="btn-sync-info-update" class="btn btn-secondary btn-lg btn-sync-info-update">
+                            <span class="material-symbols-outlined">update</span>
+                            <span>약품 정보 수동 보정 (ref. DB → DB)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 약품 정보 마이그레이션 섹션 (위치 이동됨) -->
+                <div class="migration-section">
+                    <h3 class="migration-title">약품 정보 마이그레이션</h3>
+                    <p class="migration-desc">
+                        기존 시스템의 CSV 데이터를 읽어와 약품, 사진, MSDS를
+                        일괄 등록합니다.<br>
+                        (사진/PDF 처리로 인해 시간이 소요됩니다.)
+                    </p>
+
+                    <div class="migration-form-box bg-gray-50">
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">1. 파일 선택 (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="migration-file-input" accept=".csv, .xlsx, .xls" class="form-control form-input">
+                        </div>
+
+                        <div class="migration-range-group">
+                            <div class="form-group flex-1">
+                                <label class="form-label">2. 시작 ID</label>
+                                <input type="number" id="migration-start-id" class="form-control input-bordered" placeholder="예: 1">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">3. 끝 ID (선택)</label>
+                                <div class="end-id-group">
+                                    <input type="number" id="migration-end-id" class="form-control input-flex-1"
+                                        placeholder="미입력 시 1개만">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="migration-until-end"> 끝까지
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="btn-migration-start" class="btn btn-primary btn-lg btn-migration-start">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                            <span>마이그레이션 시작</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 로그 영역 -->
+        <div class="card log-card">
+            <div class="card-header">
+                <h3 class="card-title">진행 로그</h3>
+            </div>
+            <div class="card-body">
+                <div id="sync-log" class="log-container">
+                    <div class="log-placeholder">대기 중...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

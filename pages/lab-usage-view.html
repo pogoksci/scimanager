@@ -1,0 +1,128 @@
+<!-- /pages/lab-usage-view.html -->
+<div id="lab-usage-view-page" class="layout-container">
+    <div class="layout-header">
+        <div class="header-top-row">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <h2 class="header-title-style">과학실 사용기록 조회</h2>
+            </div>
+        </div>
+
+        <!-- Advanced Filter Bar -->
+        <div class="filter-bar-card">
+            <!-- Row 1: Date Period -->
+            <div class="filter-row filter-row-mb">
+                <div class="filter-group filter-group-date">
+                    <label>조회 기간</label>
+                    <div class="date-range-container">
+                        <input type="date" id="filter-start-date" class="form-control input-date-width">
+                        <span>~</span>
+                        <input type="date" id="filter-end-date" class="form-control input-date-width">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Dropdowns + Search Button -->
+            <div class="filter-row filter-row-bottom">
+                <div class="filter-group filter-group-room">
+                    <label>과학실</label>
+                    <select id="filter-room" class="form-select">
+                        <option value="">전체 과학실</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-group-grade">
+                    <label>학년</label>
+                    <select id="filter-grade" class="form-select">
+                        <option value="">전체</option>
+                        <option value="1">1학년</option>
+                        <option value="2">2학년</option>
+                        <option value="3">3학년</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-group-subject">
+                    <label>과목</label>
+                    <select id="filter-subject" class="form-select">
+                        <option value="">전체 과목</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-group-teacher">
+                    <label>교사</label>
+                    <select id="filter-teacher" class="form-select">
+                        <option value="">전체 교사</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-group-btn">
+                    <button id="btn-apply-filters" class="btn-primary btn-apply-filters">
+                        조회하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-content">
+        <div class="table-container-card">
+            <div class="table-status-bar status-bar">
+                <span id="result-count">조회 결과: 0건</span>
+                <div class="status-actions">
+                    <div class="page-size-wrapper">
+                        <label class="page-size-label">표시 개수:</label>
+                        <select id="filter-page-size" class="form-select page-size-select">
+                            <option value="10">10개</option>
+                            <option value="30">30개</option>
+                            <option value="50">50개</option>
+                            <option value="all">전체</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-toggle-sort" class="btn-icon-only btn-sort-toggle" title="정렬 변경 (최신순/과거순)">
+                        <span class="material-symbols-outlined sort-icon">sort</span>
+                    </button>
+
+                    <button id="btn-export-excel" class="btn-primary btn-excel">
+                        <span class="material-symbols-outlined icon-sm-btn">download</span>
+                        Excel 저장
+                    </button>
+                    <button id="btn-print-report" class="btn-secondary btn-print">
+                        <span class="material-symbols-outlined icon-sm-btn">print</span>
+                        인쇄
+                    </button>
+                </div>
+            </div>
+            <div class="table-overlay-scroll">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th class="th-w-100">날짜</th>
+                            <th class="th-w-65">교시</th>
+                            <th class="th-w-130">과학실</th>
+                            <th class="th-w-90">학급</th>
+                            <th class="th-w-140">과목</th>
+                            <th class="th-w-100">담당교사</th>
+                            <th class="th-w-min-250">활동 내용</th>
+                            <th class="th-w-85-center">안전교육</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usage-view-body">
+                        <!-- Data rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div id="pagination-controls" class="pagination-bar">
+                <button id="btn-prev-page" class="btn-icon-only btn-page-nav">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <span id="page-info" class="page-info">1 / 1</span>
+                <button id="btn-next-page" class="btn-icon-only btn-page-nav">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+
+            <div id="usage-view-empty" class="empty-state empty-state-view">
+                <span class="material-symbols-outlined empty-icon">search_off</span>
+                <p class="empty-text">조회된 기록이 없습니다.</p>
+            </div>
+        </div>
+    </div>
+</div>

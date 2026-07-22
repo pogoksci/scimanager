@@ -1,0 +1,2 @@
+Environment: Windows
+Rule: Always use Windows PowerShell native commands (e.g., `Select-String` instead of `grep`, `Get-ChildItem` instead of `ls` or `find`, `Remove-Item` instead of `rm`). Do not attempt to use Linux-specific command line tools.

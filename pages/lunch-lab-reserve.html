@@ -1,0 +1,62 @@
+<!-- /pages/lunch-lab-reserve.html -->
+<div id="lunch-lab-reserve-page" class="layout-container">
+    <div class="layout-header">
+        <h2 class="header-title">런치랩 사전예약</h2>
+        <p class="header-desc">점심시간 과학실 사용을 예약합니다. (학생용)</p>
+    </div>
+
+    <div class="layout-content content-pb">
+
+        <div class="card">
+            <div class="form-group">
+                <label class="form-label required">날짜 선택</label>
+                <input type="date" id="lunch-date" class="form-input">
+                <p class="form-hint">* 원활한 준비를 위해 최소 3일 전 예약이 필요합니다.</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required">과학실 선택</label>
+                <select id="lunch-room" class="form-select">
+                    <option value="">과학실을 선택하세요</option>
+                    <!-- JS로 로드됨 -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required">활동 유형</label>
+                <select id="lunch-activity-type" class="form-select">
+                    <option value="">유형을 선택하세요</option>
+                    <option value="동아리">동아리 활동</option>
+                    <option value="행사">행사 (대회, 프로젝트 등)</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+
+            <!-- 동적 입력 필드 컨테이너 -->
+            <div id="dynamic-fields-container"></div>
+
+            <div class="form-group">
+                <label class="form-label required">신청 대표자 정보</label>
+                <div class="applicant-row">
+                    <input type="text" id="applicant-number" class="form-input input-flex" placeholder="학번 (예: 20101)">
+                    <input type="text" id="applicant-name" class="form-input input-flex" placeholder="이름">
+                </div>
+                <input type="tel" id="applicant-phone" class="form-input" placeholder="연락처">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required">참가 인원</label>
+                <input type="number" id="participant-count" class="form-input" placeholder="숫자만 입력 (명)" min="1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required">담당 교사</label>
+                <input type="text" id="lunch-teacher-name" class="form-input" placeholder="담당 교사 성함 입력">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="btn-submit-reservation" class="btn-primary w-100">예약 신청하기</button>
+            </div>
+        </div>
+    </div>
+</div>

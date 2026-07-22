@@ -1,0 +1,79 @@
+<!-- /pages/waste-form.html -->
+<div id="waste-form-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h3 id="waste-form-title" class="page-title">폐수 등록
+        </h3>
+    </div>
+
+    <div class="layout-content scroll-padding-nav content-pad">
+        <form id="waste-form" autocomplete="off">
+            <div class="form-group">
+                <label for="waste_date">등록일 *</label>
+                <div class="date-wrapper">
+                    <div class="date-display-box">
+                        <input type="text" id="waste-date-year" placeholder="YYYY" maxlength="4" inputmode="numeric" class="date-input-year">
+                        <span class="date-sep">-</span>
+                        <input type="text" id="waste-date-month" placeholder="MM" maxlength="2" inputmode="numeric" class="date-input-day">
+                        <span class="date-sep">-</span>
+                        <input type="text" id="waste-date-day" placeholder="DD" maxlength="2" inputmode="numeric" class="date-input-day">
+                    </div>
+                    <!-- Hidden Date Input for Picker -->
+                    <input type="date" id="waste_date" name="waste_date" tabindex="-1" class="date-picker-hidden">
+                    <!-- Calendar Button -->
+                    <button type="button" id="btn-open-calendar-waste" class="calendar-btn">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>분류 *</label>
+                <div class="button-group" id="waste_classification_buttons">
+                    <button type="button" data-value="산">산</button>
+                    <button type="button" data-value="알칼리">알칼리</button>
+                    <button type="button" data-value="유기물">유기물</button>
+                    <button type="button" data-value="무기물">무기물</button>
+                    <button type="button" data-value="기타">기타</button>
+                </div>
+            </div>
+
+            <div class="form-group amount-section">
+                <label class="amount-label">폐기량 입력 (택 1) *</label>
+
+                <div class="amount-inputs-flex">
+                    <div class="amount-input-col">
+                        <label for="waste_amount_direct" class="amount-sublabel">1. 폐수량 직접 입력 (g)</label>
+                        <input type="number" id="waste_amount_direct" placeholder="예: 500" step="any">
+                    </div>
+
+                    <div class="amount-or-sep">
+                        또는
+                    </div>
+
+                    <div class="amount-input-col">
+                        <label for="waste_total_mass" class="amount-sublabel">2. 폐수통 전체 질량 (g)</label>
+                        <input type="number" id="waste_total_mass" placeholder="예: 2500" step="any">
+                    </div>
+                </div>
+                <p class="amount-hint">* 전체 질량 입력 시 이전 기록과 비교하여 자동
+                    계산
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="waste_manager">담당</label>
+                <input type="text" id="waste_manager" placeholder="담당자 이름">
+            </div>
+
+            <div class="form-group">
+                <label for="waste_remarks">비고</label>
+                <input type="text" id="waste_remarks" placeholder="특이사항 등">
+            </div>
+
+            <div class="form-bottom-buttons bottom-btns-nopad">
+                <button type="button" id="waste-cancel-button" class="btn-cancel-waste">취소</button>
+                <button type="submit" id="waste-submit-button" class="btn-submit-waste">폐수 정보 저장</button>
+            </div>
+        </form>
+    </div>
+</div>

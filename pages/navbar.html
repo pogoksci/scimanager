@@ -1,0 +1,144 @@
+<!-- navbar.html (Material Symbols + 모바일 UX 강화 버전) -->
+<nav class="navbar">
+
+  <!-- 메뉴 버튼 -->
+  <a href="#" class="nav-item start-button" id="menu-toggle-btn">
+    <span class="material-symbols-outlined nav-icon">menu</span>
+    <span>Menu</span>
+  </a>
+
+  <!-- 약품 (Mode: Management) -->
+  <a href="#" id="nav-inventory" class="nav-item mode-management">
+    <span class="material-symbols-outlined nav-icon">science</span>
+    <span>약품</span>
+  </a>
+
+  <!-- 수불 (Mode: Management) -->
+  <a href="#" id="nav-usage" class="nav-item mode-management">
+    <span class="material-symbols-outlined nav-icon">edit_square</span>
+    <span>수불</span>
+  </a>
+
+  <!-- 키트 (Mode: Management) -->
+  <a href="#" id="nav-kit" class="nav-item mode-management">
+    <span class="material-symbols-outlined nav-icon">inventory_2</span>
+    <span>키트</span>
+  </a>
+
+  <!-- 교구 (Mode: Management) -->
+  <a href="#" id="nav-teaching-tools" class="nav-item mode-management">
+    <span class="material-symbols-outlined nav-icon">school</span>
+    <span>교구</span>
+  </a>
+
+  <!-- 폐수 (Mode: Management) -->
+  <a href="#" id="nav-waste" class="nav-item mode-management">
+    <span class="material-symbols-outlined nav-icon">delete_forever</span>
+    <span>폐수</span>
+  </a>
+
+  <!-- 설비 (Hidden for now, as requested to exclude) -->
+  <a href="#" id="nav-facilities" class="nav-item mode-hidden navbar-hidden">
+    <span class="material-symbols-outlined nav-icon">settings_input_component</span>
+    <span>설비</span>
+  </a>
+</nav>
+
+<!-- Start 메뉴 팝업 -->
+<div id="start-menu" class="start-menu-popup">
+  <div class="menu-list">
+    <!-- 1. 약품·키트·교구 -->
+    <a href="#" id="menu-management-btn" class="menu-item">
+      <span class="material-symbols-outlined">science</span> 약품·키트·교구
+    </a>
+
+    <!-- 2. 과학실 안전 (서브메뉴) -->
+    <div class="menu-group">
+      <a href="#" id="menu-safety-toggle" class="menu-item">
+        <span class="material-symbols-outlined">health_and_safety</span> 과학실 안전
+        <span class="material-symbols-outlined toggle-icon navbar-toggle-icon">expand_more</span>
+      </a>
+      <div id="submenu-safety" class="submenu navbar-submenu">
+        <a href="#" id="menu-safety-edu" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">security</span> 과학실 안전 교육
+        </a>
+        <a href="#" id="menu-lab-manual" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">menu_book</span> 과학실 사용 설명서
+        </a>
+        <a href="#" id="menu-emergency" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">warning</span> 비상시 대처 요령
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. 과학실 사용 (New Parent Group) -->
+    <div class="menu-group">
+      <a href="#" id="menu-lab-usage-toggle" class="menu-item">
+        <span class="material-symbols-outlined">calendar_month</span> 과학실 사용
+        <span class="material-symbols-outlined toggle-icon navbar-toggle-icon">expand_more</span>
+      </a>
+      <div id="submenu-lab-usage" class="submenu navbar-submenu">
+        <!-- 3-1. 과학실 사용기록·예약 (Existing) -->
+        <a href="#" id="menu-lablog-btn" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">edit_calendar</span> 사용기록·예약
+        </a>
+        <!-- 3-2. 과학실 사용기록 조회 (Existing) -->
+        <a href="#" id="menu-lablog-viewer-btn" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">history</span> 사용기록 조회
+        </a>
+        <!-- 3-3. 런치랩 사전예약 (New) -->
+        <a href="#" id="menu-lunchlab-reserve-btn" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">restaurant_menu</span> 런치랩 사전예약
+        </a>
+        <!-- 3-4. 런치랩 예약조회 (New) -->
+        <a href="#" id="menu-lunchlab-inquiry-btn" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">manage_search</span> 런치랩 예약조회
+        </a>
+      </div>
+    </div>
+
+    <!-- 4. 설정 (서브메뉴) -->
+    <div class="menu-group">
+      <a href="#" id="menu-settings-toggle" class="menu-item">
+        <span class="material-symbols-outlined">settings</span> 설정
+        <span class="material-symbols-outlined toggle-icon navbar-toggle-icon">expand_more</span>
+      </a>
+      <div id="submenu-settings" class="submenu navbar-submenu">
+        <a href="#" id="menu-lab-settings" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">experiment</span> 과학실 설정
+        </a>
+        <a href="#" id="menu-lab-timetable" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">calendar_month</span> 시간표 설정
+        </a>
+        <a href="#" id="menu-location" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">warehouse</span> 시약장 설정
+        </a>
+        <a href="#" id="menu-equipment-cabinet" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">shelves</span> 교구·물품장 설정
+        </a>
+        <a href="#" id="menu-datasync" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">sync</span> 데이터 동기화
+        </a>
+        <a href="#" id="menu-dbreset" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">restart_alt</span> DB초기화
+        </a>
+        <a href="#" id="menu-export" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">download</span> 내보내기
+        </a>
+      </div>
+    </div>
+
+    <!-- 5. 홈 -->
+    <a href="#" id="menu-home" class="menu-item menu-item-home">
+      <span class="material-symbols-outlined">home</span> 홈
+    </a>
+  </div>
+
+  <div class="menu-footer" id="menu-footer-container">
+    <div style="display: flex; align-items: center;">
+      <span class="material-symbols-outlined user-icon">account_circle</span>
+      <span class="user-id">Guest</span>
+    </div>
+    <div id="auth-action-icon"></div>
+  </div>
+</div>

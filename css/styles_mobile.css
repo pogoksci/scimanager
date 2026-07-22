@@ -1,0 +1,1008 @@
+/* =================================================================
+   Mobile Overrides (Max-Width: 600px)
+   Based on styles.css, optimized for portrait smartphones.
+   ================================================================= */
+
+/* 1. Reset & Global Typography (Density Focus) */
+/* 1. Reset & Global Typography (Ultra Condensed) */
+html,
+body {
+  font-size: 11px !important;
+  /* Reduced from 12px */
+  overflow: hidden !important;
+  /* Prevent double scrollbar */
+  height: 100dvh !important;
+  /* Force viewport height */
+}
+
+input,
+select,
+button,
+.form-input {
+  font-size: 11px !important;
+  height: 32px !important;
+  /* Slightly smaller height */
+}
+
+/* --- List Item Typography Overrides --- */
+/* Target both Waste (inline styles) and Inventory (classes) */
+
+/* 1. Generic overwrites for inline-styled spans (Waste, etc) */
+.inventory-card span[style],
+.inventory-card div[style] {
+  font-size: 11px !important;
+}
+
+/* 2. Titles (Korean Name) */
+.name-kor,
+.inventory-card__line2,
+.inventory-card>div>span:first-child {
+  /* Waste List Title Heuristic */
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+/* 3. Subtitles (Eng Name, Formula) */
+.name-eng,
+.inventory-card__line3,
+.meta-line1 {
+  font-size: 11px !important;
+  color: #555 !important;
+}
+
+/* 4. Location & Specs */
+.inventory-card__location,
+.inventory-card__line4,
+.card-info .area-name,
+.location-text {
+  font-size: 10px !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* 5. Icons */
+/* 5. Icons */
+.material-symbols-outlined,
+.inventory-card .icon-btn .material-symbols-outlined {
+  font-size: 16px !important;
+  /* Adjusted to 16px as requested */
+}
+
+/* 6. Waste Amount / Right Side Info */
+.inventory-card>div:last-child>span,
+.inv-card-right div {
+  font-size: 12px !important;
+  /* Adjusted to 12px */
+}
+
+/* 7. Kits & Teaching Tools Overrides (Inline Styles) */
+.inv-name {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+.inv-location {
+  font-size: 10px !important;
+  letter-spacing: -0.5px !important;
+}
+
+.inv-quantity {
+  font-size: 11px !important;
+}
+
+.kit-tag {
+  font-size: 10px !important;
+  padding: 1px 4px !important;
+}
+
+h2 {
+  font-size: 14px !important;
+  /* Reduced from 15px */
+}
+
+h3,
+.section-title {
+  font-size: 13px !important;
+  /* Reduced from 14px */
+}
+
+/* --- Waste List Header Mobile Layout --- */
+/* --- Waste List Header Mobile Layout --- */
+body:has(#waste-list-container) .header-actions {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto auto !important;
+  /* Col1: Summary, Col2: Spacer, Col3: Dropdown, Col4: Buttons */
+  grid-template-areas:
+    "date date date date"
+    "summ . drop btns" !important;
+  gap: 6px !important;
+  align-items: center !important;
+  padding-bottom: 5px !important;
+  height: auto !important;
+}
+
+/* Row 1: Date Picker */
+.waste-date-picker {
+  grid-area: date !important;
+  width: 100% !important;
+  margin: 0 !important;
+  justify-content: space-between !important;
+}
+
+.waste-date-picker input[type="date"] {
+  width: 95px !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1 !important;
+  display: block !important;
+  cursor: pointer !important;
+  filter: invert(0.4);
+}
+
+/* Row 2: Summary + Dropdown */
+.waste-period-summary {
+  grid-area: summ !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+}
+
+/* Toggle Labels */
+.summary-label-desktop {
+  display: none !important;
+}
+
+.summary-label-mobile {
+  display: inline !important;
+  padding-left: 10px !important;
+}
+
+.waste-sort-dropdown {
+  grid-area: drop !important;
+  margin: 0 !important;
+  width: auto !important;
+  /* Alignment Fix */
+  display: flex !important;
+  align-items: center !important;
+  align-self: center !important;
+}
+
+.waste-sort-dropdown .dropdown-label {
+  display: block !important;
+  white-space: nowrap !important;
+  font-size: 11px !important;
+  max-width: 80px;
+  /* Prevent wide expansion */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.waste-sort-dropdown button {
+  padding: 0 4px !important;
+  height: 28px !important;
+}
+
+/* Buttons */
+.waste-btn-group {
+  grid-area: btns !important;
+  margin: 0 !important;
+  justify-self: end !important;
+  /* Alignment Fix */
+  display: flex !important;
+  align-items: center !important;
+  align-self: center !important;
+  gap: 5px !important;
+  /* Ensure buttons in group have gap */
+}
+
+.waste-btn-group button {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.card-info h3 {
+  font-size: 13px !important;
+  margin-bottom: 2px !important;
+}
+
+.section-count,
+.card-info .cabinet-specs,
+.card-info .area-name,
+.location-text {
+  font-size: 12px !important;
+  /* Adjusted to 12px */
+  letter-spacing: -0.5px;
+}
+
+/* 2. Layout Container Reset (Full Bleed) */
+.layout-container {
+  width: 100% !important;
+  height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.layout-content,
+.inventory-list {
+  padding: 0 10px 70px 10px !important;
+  /* 하단 패딩 40px -> 70px로 확대 */
+  flex: 1 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* 2.1 Scroll Padding Overrides (충분한 하단 여백 확보) */
+.scroll-padding-nav {
+  padding-bottom: 120px !important;
+  /* 기존 50px -> 120px: Navbar 가림 방지 및 여유 스크롤 */
+}
+
+.scroll-padding-fab {
+  padding-bottom: 160px !important;
+  /* Increased to clear centered FAB (approx bottom 80 + height 48 + buffer) */
+}
+
+.layout-header {
+  padding: 8px 10px !important;
+  /* Tighter header padding */
+}
+
+/* 3. Full-Width Cards (List Views) */
+.inventory-card,
+.cabinet-card,
+.hazard-card {
+  margin: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-radius: 0 !important;
+  /* No radius for flat list */
+  border-bottom: 1px solid #eee !important;
+  /* Only separator */
+  box-shadow: none !important;
+  padding: 10px 0 !important;
+  /* Reduce side padding inside item too if user wants max space, or keep 10px */
+  margin-bottom: 0 !important;
+  /* Stack them directly */
+}
+
+/* Ensure no double borders if stacked */
+.inventory-card:last-child {
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.inventory-section-group {
+  margin: 5px 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.inventory-section-header {
+  padding: 8px 12px !important;
+  border-radius: 0 !important;
+}
+
+/* 4. Header Actions & Filtering (Wrap Logic) */
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 5px !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  /* Ensure full width usage */
+}
+
+/* ... */
+
+/* =================================================================
+   16. Search Box Optimization (Mobile)
+   ================================================================= */
+/* Reduce search box width to prevent Sort Dropdown text wrapping */
+/* EXPAND search box to fill gap to Dropdown */
+.header-actions .search-container {
+  flex: 1 1 auto !important;
+  /* Grow and shrink to fill available space */
+  max-width: none !important;
+  /* Remove fixed limits */
+  min-width: 0 !important;
+  /* Allow shrinking to almost nothing if needed */
+}
+
+.header-actions .search-container input {
+  width: 100% !important;
+  min-width: 0 !important;
+  /* Fix for input not shrinking */
+}
+
+.header-actions>* {
+  /* Allow items to shrink/grow slightly to fit lines */
+  flex: 0 1 auto;
+}
+
+
+
+/* Fix for Sort Dropdown Text Wrapping */
+#sort-dropdown .dropdown-toggle,
+#aid-sort-dropdown .dropdown-toggle,
+#kit-sort-dropdown .dropdown-toggle {
+  padding-left: 4px !important;
+  padding-right: 2px !important;
+}
+
+#sort-label,
+.dropdown-toggle span[id*="label"] {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  max-width: none !important;
+  font-size: 11px !important;
+  /* Ensure small font fits */
+}
+
+/* Date Range Picker Optimization */
+#waste-period-summary {
+  width: 100%;
+  margin-left: 0 !important;
+  margin-bottom: 5px;
+  font-size: 12px !important;
+  order: -1;
+  /* Move to top of filter bar */
+}
+
+/* Make date range picker compact */
+.header-actions div[style*="border-radius: 6px"] {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* 5. Detail Page Optimization (Vertical Stacking) */
+
+/* Info Section (Photo Top, Info Bottom) */
+.detail-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  /* Tight packing */
+}
+
+.detail-left {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 15px 0 !important;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eee;
+  margin: 0 auto !important;
+}
+
+#detail-photo {
+  margin: 0 auto !important;
+}
+
+.detail-right {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 15px 20px !important;
+  /* Add side padding for better centering sensation */
+  box-sizing: border-box !important;
+  display: block !important;
+  margin: 0 auto !important;
+  /* Center the block itself if it were smaller, though it's 100% */
+}
+
+.detail-info-list li {
+  padding: 6px 0 !important;
+  /* Compact rows */
+}
+
+.detail-info-list .label {
+  font-size: 11px !important;
+  width: 60px !important;
+  /* Adjust label width for smaller screens */
+}
+
+.detail-info-list .value {
+  font-size: 12px !important;
+}
+
+/* Properties Section (Viewer Top, Properties Bottom) */
+.chem-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 15px !important;
+}
+
+.structure-wrapper {
+  width: 100% !important;
+  margin-bottom: 10px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.structure-box {
+  width: 100% !important;
+  height: 200px !important;
+  /* Reduce height from standard if needed, or keep 240px */
+  margin: 0 auto;
+}
+
+.chem-info {
+  width: 100% !important;
+}
+
+.chem-info-row {
+  padding: 8px !important;
+}
+
+.chem-info-row .label {
+  min-width: 70px !important;
+}
+
+/* 6. Hazard Table Scroll */
+.hazard-table-wrapper {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+}
+
+.hazard-summary-table {
+  min-width: 600px;
+  /* Force minimum width to trigger scroll */
+}
+
+/* 7. Modal & Forms */
+.modal-content {
+  width: 100% !important;
+  height: 100% !important;
+  /* Full screen modals often better on mobile */
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+}
+
+.form-group-location {
+  padding: 10px !important;
+}
+
+/* Grid adjustments for location buttons */
+#location_door_vertical_group,
+#location_door_horizontal_group,
+#location_internal_shelf_group,
+#location_storage_column_group {
+  gap: 5px !important;
+  /* Tighter button gaps */
+}
+
+/* 8. Accordion Overrides */
+.accordion-header,
+.accordion-content,
+.accordion-content *,
+.msds-header,
+.msds-content,
+.msds-simple-content,
+.hazard-table-wrapper,
+.hazard-table-wrapper *,
+.hazard-acc-header,
+.hazard-acc-content,
+.hazard-acc-content *,
+.kit-log-table,
+.kit-log-table *,
+.usage-table,
+.usage-table * {
+  font-size: 11px !important;
+}
+
+/* 9. Table Layout Adjustments (Prevent button wrapping) */
+.kit-log-table,
+.usage-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+}
+
+/* kit-log-table: 날짜(1), 유형(2), 변동(3), 수량(4), 수정/삭제(5) */
+.kit-log-table th:nth-child(1) {
+  width: 75px !important;
+}
+
+.kit-log-table th:nth-child(2) {
+  width: 55px !important;
+}
+
+.kit-log-table th:nth-child(3) {
+  width: 45px !important;
+}
+
+.kit-log-table th:nth-child(4) {
+  width: 45px !important;
+}
+
+.kit-log-table th:nth-child(5) {
+  width: 100px !important;
+}
+
+/* usage-table: 날짜(1), 과목(2), 교시(3), 사용량(4), 재고량(5), 수정/삭제(6) */
+.usage-table th:nth-child(1) {
+  width: 75px !important;
+}
+
+.usage-table th:nth-child(2) {
+  width: 50px !important;
+}
+
+.usage-table th:nth-child(3) {
+  width: 45px !important;
+}
+
+.usage-table th:nth-child(4) {
+  width: 45px !important;
+}
+
+.usage-table th:nth-child(5) {
+  width: 45px !important;
+}
+
+.usage-table th:nth-child(6) {
+  width: 100px !important;
+}
+
+.kit-log-table th,
+.kit-log-table td,
+.usage-table th,
+.usage-table td {
+  padding: 8px 2px !important;
+  /* 가로 패딩 최소화 */
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+.kit-log-table td:last-child,
+.usage-table td:last-child {
+  white-space: nowrap !important;
+  /* 줄바꿈 방지 */
+  padding: 8px 0 !important;
+}
+
+.btn-mini {
+  margin-right: 2px !important;
+  /* 버튼 간격 줄임 */
+  padding: 4px 6px !important;
+  /* 버튼 크기 타이트하게 */
+}
+
+/* 10. Usage Register Optimization */
+.inventory-detail-page {
+  padding: 0 !important;
+  /* 컨테이너 자체 패딩은 0 유지 (내부 요소에서 조절) */
+}
+
+.usage-fixed-header {
+  padding: 15px 10px !important;
+  /* 좌우 여백 10px 복구 */
+}
+
+.detail-scroll-container {
+  padding-top: 0 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  /* padding-bottom은 .scroll-padding-nav 클래스에서 처리됨 */
+}
+
+#usage-detail-section .form-container-card {
+  padding: 15px 10px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-radius: 8px !important;
+}
+
+#usage-detail-section .history-container-card {
+  padding: 15px 10px !important;
+  margin-top: 0 !important;
+  /* 마진 제거 */
+  margin-bottom: 20px !important;
+  border-radius: 8px !important;
+}
+
+/* =================================================================
+   12. Standard FAB (Floating Action Button) for Mobile
+   ================================================================= */
+/* FAB Base Styles */
+/* FAB Base Styles */
+#fab-button,
+.fab {
+  position: fixed !important;
+  bottom: 80px !important;
+  /* Centering Logic */
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+
+  /* Pill Shape & Sizing */
+  width: auto !important;
+  min-width: fit-content !important;
+  /* Ensure it wraps text */
+  height: 48px !important;
+  border-radius: 24px !important;
+  padding: 0 20px !important;
+
+  /* Flex Layout */
+  display: flex;
+  /* Do NOT use !important here, let JS toggle none/flex */
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  /* Visuals */
+  background: #00A0B2 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 137, 123, 0.4) !important;
+  border: none !important;
+  z-index: 9000 !important;
+
+  /* Typography */
+  font-weight: bold !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  /* Prevent text collapse */
+  overflow: visible !important;
+  text-indent: 0 !important;
+}
+
+/* Force all children of FAB (icons, spans) to be white - PROPER ID TARGETING */
+#fab-button *,
+.fab * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  /* Webkit override */
+}
+
+/* Specific fix for material icons inside FAB */
+#fab-button .material-symbols-outlined,
+.fab .material-symbols-outlined {
+  color: #ffffff !important;
+}
+
+/* Fix "Menu" button text/bg color in the expanded menu */
+#fab-menu-container button {
+  background-color: #00A0B2 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+#fab-menu-container button span {
+  color: #ffffff !important;
+}
+
+/* ----------------------------------------------------
+   Context-Aware FAB Visibility (Ghost Busting)
+   ---------------------------------------------------- */
+
+/* 1. Hide Global FAB on Inventory Detail (Chemical Details) */
+/* The user reported "New Kit Registration" appearing here. */
+body:has(#detail-name-kor) #fab-button {
+  display: none !important;
+}
+
+/* 2. Hide Local Waste FAB when NOT on Waste Page (Ghosting on Teaching Tools) */
+/* If #new-waste-btn persists in DOM, force hide it unless we are inside the Waste List container */
+body:not(:has(#waste-list-container)) #new-waste-btn {
+  display: none !important;
+}
+
+/* 3. Hide Global FAB on Waste Page (To prevent overlap with Local Waste FAB) */
+/* Waste page has its own #new-waste-btn */
+body:has(#waste-list-container) #fab-button {
+  display: none !important;
+}
+
+.fab .material-symbols-outlined {
+  margin-right: 8px !important;
+  font-size: 20px !important;
+  display: block !important;
+  /* Prevent baseline alignment issues */
+  line-height: 1 !important;
+}
+
+/* Specific fix for the Save Weekly Log button if it keeps the ID */
+#btn-save-usage-log {
+  width: auto !important;
+  /* Override explicit width if any */
+}
+
+
+/* =================================================================
+   12. Lab Usage Log Mobile Adjustments
+   ================================================================= */
+
+/* Stack Title and Semester Info vertically */
+.page-title-wrapper {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+}
+
+#current-semester-display {
+  font-size: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Stack Weekly Navigation vertically */
+.weekly-nav-container {
+  flex-direction: column !important;
+  gap: 15px !important;
+  align-items: center !important;
+  padding: 15px !important;
+}
+
+/* Make Month Select Row full width */
+.month-select-wrapper {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Ensure Date Nav Controls (Arrows + Date Text) are on their own line */
+.date-nav-wrapper {
+  justify-content: center;
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Adjust Date Text Size for mobile */
+#current-week-label {
+  font-size: 15px !important;
+  min-width: auto !important;
+  /* Allow shrinking if needed */
+}
+
+/* =================================================================
+   13. Force Light Theme Colors (Dark Mode Cleanup)
+   ================================================================= */
+.app-title {
+  color: #333 !important;
+}
+
+.school-name {
+  color: #666 !important;
+}
+
+#navbar-container,
+.navbar {
+  background-color: #fff !important;
+  border-top: 1px solid #ddd !important;
+  color: #333 !important;
+}
+
+.nav-item {
+  color: #555 !important;
+}
+
+.nav-item.active {
+  color: #00a0b2 !important;
+}
+
+/* Ensure no dark backgrounds on body/html */
+html,
+body {
+  background-color: #fff !important;
+  color: #333 !important;
+}
+
+/* =================================================================
+   14. Navbar "Menu" Button Colors (User Request: TEXT ONLY)
+   ================================================================= */
+/* Force White Text & Icons inside the Menu Button without changing layout/background */
+#menu-toggle-btn span,
+#menu-toggle-btn .material-symbols-outlined {
+  fill: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: bold !important;
+}
+
+/* =================================================================
+   15. Start Menu & User Profile Typography (User Request: Unified Size)
+   ================================================================= */
+/* Unify font size for Menu Items and User ID (Request: "Middle Size") */
+#start-menu .menu-item {
+  font-size: 14px !important;
+  /* Unified Medium Size */
+}
+
+/* User Profile Section in Footer */
+#start-menu .user-id {
+  font-size: 14px !important;
+  /* Match Menu Item Size */
+  font-weight: bold !important;
+  /* Ensure visibility */
+  color: #333 !important;
+}
+
+#start-menu .user-icon {
+  font-size: 20px !important;
+  /* Slightly larger icon for balance */
+}
+
+/* =================================================================
+   17. Filter Toggle Buttons (Mobile)
+   ================================================================= */
+/* Center text vertically in "All/Teaching Aids/Facilities" buttons */
+.filter-toggle-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: normal !important;
+  /* Reset line-height to allow flex centering */
+  padding: 0 !important;
+  /* Remove padding that might offset content if height is fixed, though padding: 10px is in inline. Let's keep padding but rely on flex. */
+  padding: 10px !important;
+  /* Re-assert padding */
+}
+
+/* =================================================================
+   18. Teaching Aids Header Layout (Mobile)
+   ================================================================= */
+/* Push Sort Dropdown to the right (next to Print/Refresh buttons) */
+/* Remove auto margin so Search grows to meet it */
+#aid-sort-dropdown {
+  margin-left: 5px !important;
+}
+
+/* =================================================================
+   19. Kit Header Layout (Mobile)
+   ================================================================= */
+/* Push Sort Dropdown to the right */
+/* Remove auto margin so Search grows to meet it */
+#kit-sort-dropdown {
+  margin-left: 5px !important;
+}
+
+/* Removed Section 20 (2-Line Layout) to enforce Single Line Layout */
+/* Certificate Premium Design Mobile Overrides */
+.certificate-preview {
+  padding: 10px !important;
+}
+
+.cert-container {
+  padding: 30px 15px !important;
+  border: 1px solid #ae946d !important;
+  min-height: 80vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+.cert-container::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  right: 3px !important;
+  bottom: 3px !important;
+  border: 3px solid #ae946d !important;
+  pointer-events: none !important;
+}
+
+.cert-container::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 9px !important;
+  left: 9px !important;
+  right: 9px !important;
+  bottom: 9px !important;
+  border: 0.5px solid #ae946d !important;
+  pointer-events: none !important;
+}
+
+.cert-header {
+  margin-bottom: 30px !important;
+}
+
+.cert-title-top {
+  font-size: 0.8rem !important;
+  letter-spacing: 2px !important;
+}
+
+.cert-main-title {
+  font-size: 1.8rem !important;
+}
+
+.cert-student-box {
+  margin: 20px 0 !important;
+}
+
+.cert-name {
+  font-size: 1.6rem !important;
+  padding: 0 15px !important;
+}
+
+.cert-text {
+  font-size: 1.0rem !important;
+  margin: 15px 0 !important;
+}
+
+.cert-date {
+  margin-top: 25px !important;
+}
+
+.cert-footer {
+  margin-top: 40px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 15px !important;
+  padding: 0 !important;
+}
+
+.cert-school-name {
+  font-size: 1.3rem !important;
+  text-align: center !important;
+}
+
+.cert-seal {
+  width: 80px !important;
+  height: 80px !important;
+  font-size: 0.7rem !important;
+}
+
+.cert-serial {
+  position: static !important;
+  margin-top: 20px !important;
+  font-size: 0.7rem !important;
+  text-align: center !important;
+}
+
+/* =================================================================
+   21. Usage Register Detail Page Layout (Mobile)
+   ================================================================= */
+#usage-detail-section .form-row {
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#usage-detail-section .usage-row-flex {
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#usage-detail-section .usage-or-divider {
+  padding: 5px 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+#usage-detail-section .usage-col-flex {
+  width: 100% !important;
+}
+
+/* Ensure the calendar button and input fit together nicely */
+#usage-detail-section .date-input-group {
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+#usage-detail-section .date-input-box {
+  flex: 1 1 auto !important;
+}
+
+#usage-detail-section .btn-search-schedule-custom {
+  flex: 1 1 100% !important;
+  margin-left: 0 !important;
+  margin-top: 5px !important;
+  text-align: center !important;
+  justify-content: center !important;
+}

@@ -1,0 +1,189 @@
+<!-- /pages/tools-form.html -->
+<div id="tools-form-page" class="layout-container">
+    <div class="layout-header no-actions">
+        <h2 id="tools-form-title" class="page-title-custom">교구/설비
+            등록</h2>
+    </div>
+
+    <div class="layout-content scroll-padding-nav form-padding">
+        <form id="tools-form" autocomplete="off">
+            <!-- Toggle Section -->
+            <div class="toggle-section">
+                <div class="button-group toggle-btn-group" id="tools-section-group">
+                    <button type="button" data-value="교구" class="active toggle-btn-item">교구</button>
+                    <button type="button" data-value="설비" class="toggle-btn-item">설비</button>
+                </div>
+            </div>
+
+            <!-- SECTION 1: Basic Info -->
+            <h3 class="section-heading">
+                기본 정보</h3>
+
+            <div class="form-group">
+                <label>과목</label>
+                <div class="button-group" id="stock-period-group">
+                    <button type="button" data-value="과학(2025)" class="active">과학(2025)</button>
+                    <button type="button" data-value="과학(2022)">과학(2022)</button>
+                    <button type="button" data-value="과학(2015)">과학(2015)</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>과목 영역</label> <!-- Changed dynamically for Facility -->
+                <div class="button-group grid-category-group" id="tools-category-group">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="label-tools-code">교구코드</label>
+                <input type="number" id="tools_code" name="tools_code" placeholder="예: 101">
+            </div>
+
+            <div class="form-group">
+                <label id="label-tools-name">교구명 *</label>
+                <input type="text" id="tools_name" name="tools_name" placeholder="품명 입력" required>
+            </div>
+
+            <div class="form-group">
+                <label>규격</label>
+                <input type="text" id="specification" name="specification" placeholder="규격 입력">
+            </div>
+
+            <!-- SECTION 2: Management Info -->
+            <h3 class="section-heading-mt">
+                관리 정보</h3>
+
+            <div class="form-group">
+                <label>순번 (자동생성)</label>
+                <input type="number" id="tools_no" name="tools_no" placeholder="자동 입력됨" readonly
+                    class="readonly-input">
+            </div>
+
+            <div class="form-group">
+                <label for="purchase_date">구입일</label>
+                <div class="date-input-group">
+                    <div class="date-input-box">
+                        <input type="text" id="tool-date-year" placeholder="YYYY" maxlength="4" inputmode="numeric"
+                            class="date-year">
+                        <span class="date-divider">-</span>
+                        <input type="text" id="tool-date-month" placeholder="MM" maxlength="2" inputmode="numeric"
+                            class="date-month-day">
+                        <span class="date-divider">-</span>
+                        <input type="text" id="tool-date-day" placeholder="DD" maxlength="2" inputmode="numeric"
+                            class="date-month-day">
+                    </div>
+                    <!-- Hidden Date Input for Picker -->
+                    <input type="date" id="purchase_date" name="purchase_date" tabindex="-1"
+                        class="date-picker-hidden">
+                    <!-- Calendar Button -->
+                    <button type="button" id="btn-open-calendar-tool" class="btn-calendar-icon">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group-location">
+                <h3>보관 위치 설정</h3>
+                <div id="tools-storage-selector"></div>
+            </div>
+
+            <!-- Reusing aid-photo-container styles -->
+            <div class="form-group">
+                <label>사진</label>
+                <div class="photo-container">
+                    <div id="tools-photo-preview" class="photo-preview-box">
+                        <img id="tools-preview-img" class="preview-img">
+                        <span class="placeholder-text">사진 없음</span>
+                        <video id="tools-camera-stream" autoplay playsinline class="camera-stream"></video>
+                        <canvas id="tools-camera-canvas" class="camera-canvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="photo-buttons">
+                        <button type="button" id="tools-photo-btn"><span class="material-symbols-outlined">image</span>
+                            파일에서
+                            선택</button>
+                        <button type="button" id="tools-camera-btn"><span
+                                class="material-symbols-outlined">photo_camera</span>
+                            카메라로
+                            촬영</button>
+                        <button type="button" id="tools-camera-confirm-btn" class="btn-photo-confirm"><span
+                                class="material-symbols-outlined">check</span> 확인</button>
+                        <button type="button" id="tools-camera-cancel-btn" class="btn-photo-cancel"><span
+                                class="material-symbols-outlined">close</span> 취소</button>
+                    </div>
+                </div>
+                <input type="file" id="tools-photo-input" accept="image/*" class="file-input-hidden">
+                <input type="file" id="tools-camera-input" accept="image/*" capture="environment"
+                    class="file-input-hidden">
+            </div>
+
+
+            <!-- SECTION 3: Standards & Status -->
+            <h3 class="section-heading-mt">
+                기준 및 현황</h3>
+
+            <div class="form-group">
+                <label>사용학년</label>
+                <div class="button-group" id="using-class-group">
+                    <button type="button" data-value="전학년" class="active">전학년</button>
+                    <button type="button" data-value="1학년">1학년</button>
+                    <button type="button" data-value="2학년">2학년</button>
+                    <button type="button" data-value="3학년">3학년</button>
+                    <button type="button" data-value="특수">특수</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>소요기준 (예: 4명당 1개)</label>
+                <div class="std-base-row">
+                    <input type="number" id="std_base_count" placeholder="예: 4" class="std-base-count">
+                    <select id="std_unit" class="std-unit">
+                        <option value="학생(명)">학생(명)당</option>
+                        <option value="실험(실)">실험(실)당</option>
+                    </select>
+                    <input type="number" id="std_target_count" placeholder="예: 1" class="std-target-count">
+                </div>
+                <p class="std-note">입력 시 자동 저장: "4 학생(명)당 1"</p>
+            </div>
+
+            <div class="form-group">
+                <label id="label-requirement">기준량</label>
+                <input type="number" id="requirement" name="requirement" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>보유량</label>
+                <input type="number" id="stock" name="stock" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>보유율 (%)</label>
+                <input type="text" id="proportion" name="proportion" readonly class="proportion-input">
+            </div>
+
+            <div class="form-group">
+                <label>필수구분</label>
+                <div class="button-group" id="recommended-group">
+                    <button type="button" data-value="필수" class="active">필수</button>
+                    <button type="button" data-value="권장">권장</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>기준구분</label>
+                <div class="button-group" id="out-of-standard-group">
+                    <button type="button" data-value="기준내" class="active">기준내</button>
+                    <button type="button" data-value="기준외">기준외</button>
+                </div>
+            </div>
+
+
+            <div class="form-bottom-buttons">
+                <button type="button" id="btn-cancel-tools" class="btn-cancel">취소</button>
+                <button type="submit" id="btn-save-tools">저장</button>
+            </div>
+            <p id="toolsStatusMessage" class="status-message"></p>
+
+        </form>
+    </div>
+</div>

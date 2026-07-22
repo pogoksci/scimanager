@@ -1,0 +1,259 @@
+<!-- /pages/inventory-list.html -->
+<div id="inventory-list-container-page" class="layout-container">
+  <!-- 1. Fixed Header -->
+  <div class="layout-header">
+    <div class="header-top-row">
+      <h2>약품 관리</h2>
+    </div>
+
+    <!-- Actions (Search/Sort) -->
+    <div class="header-actions">
+      <!-- Search -->
+      <div class="search-container">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          id="inventory-search-input"
+          placeholder="약품 검색..."
+        >
+      </div>
+
+      <!-- Sort Dropdown -->
+      <div class="custom-dropdown" id="sort-dropdown">
+        <button
+          class="dropdown-toggle sort-toggle-btn"
+          id="sort-toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <span class="material-symbols-outlined">sort</span>
+          <span id="sort-label" data-value="category_name_kor"
+          >한글명(분류)</span>
+          <span class="material-symbols-outlined arrow">expand_more</span>
+        </button>
+
+        <div class="dropdown-menu" id="sort-menu" role="menu">
+          <div class="dropdown-item" data-value="category_name_kor">
+            <span class="material-symbols-outlined">category</span>
+            한글명(분류)
+          </div>
+          <div class="dropdown-item" data-value="category_name_eng">
+            <span class="material-symbols-outlined">category</span>
+            영문명(분류)
+          </div>
+          <div class="dropdown-item" data-value="name_kor">
+            <span class="material-symbols-outlined">sort_by_alpha</span>
+            한글명(전체)
+          </div>
+          <div class="dropdown-item" data-value="name_eng">
+            <span class="material-symbols-outlined">sort_by_alpha</span>
+            영문명(전체)
+          </div>
+          <div class="dropdown-item" data-value="id_asc">
+            <span class="material-symbols-outlined">format_list_numbered</span>
+            전체(번호순)
+          </div>
+          <div class="dropdown-item" data-value="id_asc_all">
+            <span class="material-symbols-outlined"
+            >format_list_numbered_rtl</span>
+            전체(전량소진포함)
+          </div>
+          <div class="dropdown-item" data-value="formula">
+            <span class="material-symbols-outlined">science</span>
+            화학식
+          </div>
+          <div class="dropdown-item" data-value="storage_location">
+            <span class="material-symbols-outlined">location_on</span>
+            위치
+          </div>
+          <div class="dropdown-item" data-value="created_at_desc">
+            <span class="material-symbols-outlined">schedule</span>
+            등록순서
+          </div>
+          <div class="dropdown-item" data-value="exhausted">
+            <span class="material-symbols-outlined">block</span>
+            소모완료약품
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Report Button -->
+      <div class="inventory-btn-group">
+        <!-- Print Report Button -->
+        <button
+          id="print-report-btn"
+          title="보고서 출력"
+          aria-label="출력"
+          class="action-btn"
+        >
+          <span class="material-symbols-outlined">print</span>
+        </button>
+
+        <!-- Stock Report Button -->
+        <button
+          id="stock-report-btn"
+          title="수불대장 출력"
+          aria-label="수불대장 출력"
+          class="action-btn"
+        >
+          <span class="material-symbols-outlined">history_edu</span>
+        </button>
+
+        <!-- Label Print Button -->
+        <button
+          id="btn-print-labels"
+          title="시약장 라벨 출력"
+          aria-label="라벨 출력"
+        >
+          <span class="material-symbols-outlined">label</span>
+        </button>
+
+        <!-- Refresh Button -->
+        <button
+          id="refresh-btn"
+          title="목록 새로고침"
+          aria-label="새로고침"
+          class="action-btn"
+        >
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Scrollable Content -->
+  <div
+    id="inventory-list-container"
+    class="layout-content inventory-list scroll-padding-fab"
+  >
+    <div class="empty-state">
+      <span class="material-symbols-outlined">hourglass_empty</span>
+      <p>목록을 불러오는 중...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Report Settings Modal -->
+<div id="modal-stock-report" class="modal-overlay" style="display: none">
+  <div class="modal-content modal-content-report">
+    <h3 class="modal-header modal-header-report">
+      수불대장 출력 설정
+    </h3>
+
+    <form id="form-stock-report">
+      <!-- 1. Period -->
+      <div class="form-group form-group-report">
+        <label class="label-report">1. 조회 기간</label>
+        <div class="date-range-group">
+          <input type="date" id="report-start-date" class="form-input" required>
+          <span>~</span>
+          <input type="date" id="report-end-date" class="form-input" required>
+        </div>
+        <!-- Quick Buttons -->
+        <div class="quick-btn-group">
+          <button
+            type="button"
+            class="btn-mini"
+            onclick="App.Inventory.setReportPeriod('cur_year')"
+          >
+            올해(3월~)
+          </button>
+          <button
+            type="button"
+            class="btn-mini"
+            onclick="App.Inventory.setReportPeriod('last_year')"
+          >
+            작년
+          </button>
+          <button
+            type="button"
+            class="btn-mini"
+            onclick="App.Inventory.setReportPeriod('1st_sem')"
+          >
+            1학기
+          </button>
+          <button
+            type="button"
+            class="btn-mini"
+            onclick="App.Inventory.setReportPeriod('2nd_sem')"
+          >
+            2학기
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Target -->
+      <div class="form-group form-group-report">
+        <label class="label-report">2. 출력 대상</label>
+        <label class="radio-label">
+          <input type="radio" name="report-target" value="usage_only" checked>
+          <span class="radio-text">변동 내역이 있는 품목만 (권장)</span>
+        </label>
+        <label class="radio-label-last">
+          <input type="radio" name="report-target" value="all">
+          <span class="radio-text">전체 품목 (이월 재고 확인용)</span>
+        </label>
+        <label class="radio-label-mt">
+          <input type="radio" name="report-target" value="all_with_exhausted">
+          <span class="radio-text">전체 품목 (전량소모약품 포함)</span>
+        </label>
+      </div>
+
+      <!-- 3. Layout -->
+      <div class="form-group form-group-report">
+        <label class="label-report">3. 출력 형식</label>
+        <label class="radio-label">
+          <input type="radio" name="report-layout" value="4_per_page" checked>
+          <span class="radio-text">A4 1장에 4개 출력 (절약형)</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="report-layout" value="1_per_page">
+          <span class="radio-text">A4 1장에 1개 출력 (관리용)</span>
+        </label>
+        <label class="radio-label-last">
+          <input type="radio" name="report-layout" value="feed">
+          <span class="radio-text">이어서 출력 (최대 절약)</span>
+        </label>
+      </div>
+
+      <!-- 4. Sort Order -->
+      <div class="form-group form-group-report">
+        <label class="label-report">4. 정렬 순서</label>
+        <label class="radio-label">
+          <input type="radio" name="report-sort" value="name_kor" checked>
+          <span class="radio-text">1. 전체 가나다순</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="report-sort" value="classification_group">
+          <span class="radio-text">2. 분류별 가나다순 (분류 변경 시 페이지 나눔)</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="report-sort" value="id_asc">
+          <span class="radio-text">3. 등록번호(No)순</span>
+        </label>
+        <label class="radio-label-last">
+          <input type="radio" name="report-sort" value="cas_rn">
+          <span class="radio-text">4. 전체 CAS순</span>
+        </label>
+      </div>
+
+
+      <div class="modal-footer modal-footer-report">
+        <button
+          type="button"
+          id="btn-close-report-modal"
+          class="btn-cancel btn-report-cancel"
+        >
+          취소
+        </button>
+        <button
+          type="submit"
+          class="btn-primary btn-report-submit"
+        >
+          <span class="material-symbols-outlined icon-print-sm">print</span>
+          수불 대장 생성
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

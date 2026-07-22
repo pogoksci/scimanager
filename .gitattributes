@@ -1,0 +1,48 @@
+# -----------------------------
+# 기본 설정
+# -----------------------------
+* text=auto
+
+# -----------------------------
+# 명시적 텍스트 파일
+# -----------------------------
+*.json text
+*.ts text
+*.js text
+*.md text
+*.html text
+*.toml text
+*.yml text
+*.yaml text
+*.sql text
+*.env text
+
+# -----------------------------
+# Supabase 관련 폴더
+# -----------------------------
+supabase/config.toml text
+supabase/functions/** text
+supabase/migrations/** text
+supabase/seed.sql text
+
+# -----------------------------
+# Binary files (do not modify line endings)
+# -----------------------------
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.webp binary
+
+# -----------------------------
+# Windows 안전성 보완 (선택)
+# -----------------------------
+*.sh text eol=lf
+*.bat text eol=crlf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.toml text eol=lf

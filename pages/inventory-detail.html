@@ -1,0 +1,193 @@
+<!-- /pages/inventory-detail.html -->
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script src="./js/ui/concentration-conversion.js"></script>
+
+<div id="inventory-detail-page" class="layout-container">
+  <!-- 1. Header (Universal Layout) -->
+  <div class="layout-header no-actions">
+    <!-- Names Moved Here (Top) -->
+    <div class="detail-name-group">
+      <h2 id="detail-name-kor" class="page-title">정보 로드 중...</h2>
+      <span id="detail-name-eng" class="eng-name"></span>
+      <span id="detail-substance-id" class="substance-id-tag"></span>
+
+      <!-- New Button -->
+      <button id="btn-open-conc-calc" class="usage-mgmt-btn btn-purple">
+        <span class="material-symbols-outlined"
+          style="font-size: 14px; vertical-align: middle; margin-right: 2px;">science</span>
+        농도 변환
+      </button>
+
+      <button id="btn-go-usage" class="usage-mgmt-btn btn-teal" style="display: none;">수불
+        관리</button>
+    </div>
+  </div>
+
+  <!-- 2. Independent Scroll Container -->
+  <div class="layout-content scroll-padding-nav">
+    <!-- 2-Column Grid: Photo & Info -->
+    <div class="detail-grid">
+      <div class="detail-left">
+        <div id="detail-photo" class="photo-preview-box photo-box-style">
+          <span>사진 없음</span>
+        </div>
+      </div>
+      <div class="detail-right">
+        <ul class="detail-info-list">
+          <li><span class="label">CAS:</span> <span id="detail-cas" class="value">-</span></li>
+          <li><span class="label">화학식:</span> <span id="detail-formula" class="value">-</span></li>
+          <li><span class="label">분류:</span> <span id="detail-class" class="value">-</span></li>
+          <li><span class="label">상태:</span> <span id="detail-state" class="value">-</span></li>
+          <li><span class="label">제조사:</span> <span id="detail-manufacturer" class="value">-</span></li>
+          <li><span class="label">재고:</span> <span id="detail-quantity" class="value">-</span></li>
+          <li><span class="label">등록일:</span> <span id="detail-created-at" class="value">-</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Location Info (Full Width) -->
+    <div class="detail-location-section">
+      <strong>보관 위치:</strong>
+      <p id="detail-location" class="location-text">-</p>
+    </div>
+
+    <!-- Substance Structure & Properties -->
+    <div class="detail-section chem-section">
+      <div class="chem-grid">
+        <div class="structure-wrapper" data-view-mode="2d" style="position: relative;">
+          <!-- Zoom Controls (Overlay) -->
+          <div class="zoom-controls">
+            <button id="btn-zoom-in" class="view-mode-btn" title="확대">+</button>
+            <button id="btn-zoom-out" class="view-mode-btn" title="축소">-</button>
+          </div>
+
+          <div id="detail-structure" class="structure-box mode-2d">
+            <span class="structure-placeholder">구조 이미지 없음</span>
+          </div>
+          <div id="detail-structure-3d" class="structure-box mode-3d" style="display:none; position: relative;">
+            <!-- 3D Viewer -->
+          </div>
+
+          <div class="structure-footer structure-footer-flex">
+            <span class="license-notice">3D
+              Viewer powered by
+              PubChem</span>
+            <div style="display: flex; gap: 5px;">
+              <button id="btn-view-2d" class="view-mode-btn active">2D</button>
+              <button id="btn-view-3d" class="view-mode-btn">3D</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chem-info">
+          <div class="chem-info-row">
+            <span class="label">끓는점:</span>
+            <span id="detail-boiling" class="value">-</span>
+          </div>
+          <div class="chem-info-row">
+            <span class="label">녹는점:</span>
+            <span id="detail-melting" class="value">-</span>
+          </div>
+          <div class="chem-info-row">
+            <span class="label">밀도:</span>
+            <span id="detail-density" class="value density-value">-</span>
+          </div>
+          <div class="chem-info-row">
+            <span class="label">농도:</span>
+            <span id="detail-concentration" class="value">-</span>
+          </div>
+          <div class="chem-info-row">
+            <span id="conv-label-1" class="label">변환 농도1:</span>
+            <span id="conv-value-1" class="value">-</span>
+          </div>
+          <div class="chem-info-row">
+            <span id="conv-label-2" class="label">변환 농도2:</span>
+            <span id="conv-value-2" class="value">-</span>
+          </div>
+          <!-- 7th Row: Download Buttons -->
+          <div class="chem-info-row button-row">
+            <button id="btn-download-mol-row" class="download-action-btn">
+              <span class="material-symbols-outlined icon">download</span>
+              <span class="btn-text">Mol</span>
+            </button>
+            <button id="btn-download-msds-row" class="download-action-btn">
+              <span class="material-symbols-outlined icon">picture_as_pdf</span>
+              <span class="btn-text">MSDS PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 3. MSDS Accordion -->
+    <div class="detail-section msds-section">
+      <h3>MSDS (Material Safety Data Sheet)</h3>
+      <div id="msds-accordion" class="accordion">
+        <!-- JS will populate 16 items here -->
+        <p>MSDS 정보 로드 중...</p>
+      </div>
+    </div>
+
+    <!-- 5. Hazard Info -->
+    <div class="detail-section hazard-section">
+      <h3>유해화학물질 분류 정보</h3>
+
+      <!-- New Hazard Table -->
+      <div class="hazard-table-wrapper">
+        <table class="hazard-summary-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="th-w-12">구분</th>
+              <th colspan="2" class="merged-header th-w-25">학교사용</th>
+              <th rowspan="2" class="small-font th-w-12">특수건강진단<br>유해인자</th>
+              <th rowspan="2" class="th-w-12">유독물질</th>
+              <th rowspan="2" class="th-w-12">허가물질</th>
+              <th rowspan="2" class="th-w-12">제한물질</th>
+              <th rowspan="2" class="th-w-12">금지물질</th>
+            </tr>
+            <tr>
+              <th class="small-font th-w-12">유해물질</th>
+              <th class="small-font th-w-12">사고대비물질</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Standard Value Row -->
+            <tr class="hazard-standard-row">
+              <td>기준농도</td>
+              <td id="std-school-hazard-toxic">-</td>
+              <td id="std-school-hazard-accident">-</td>
+              <td id="std-special-health">-</td>
+              <td id="std-toxic">-</td>
+              <td id="std-permitted">-</td>
+              <td id="std-restricted">-</td>
+              <td id="std-prohibited">-</td>
+            </tr>
+            <!-- Value Row -->
+            <tr>
+              <td>해당여부</td>
+              <td id="val-school-hazard-toxic">-</td>
+              <td id="val-school-hazard-accident">-</td>
+              <td id="val-special-health">-</td>
+              <td id="val-toxic">-</td>
+              <td id="val-permitted">-</td>
+              <td id="val-restricted">-</td>
+              <td id="val-prohibited">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="hazard-info-container" class="hazard-card">
+        <p class="hazard-placeholder">분류 정보 로드 중...</p>
+      </div>
+    </div>
+
+    <!-- 6. Actions -->
+    <div class="detail-action-group">
+      <button id="detail-back-btn" class="detail-action detail-action--secondary">목록으로</button>
+      <button id="edit-inventory-btn" class="detail-action detail-action--primary" style="display: none;">수정</button>
+      <button id="delete-inventory-btn" class="detail-action detail-action--danger" style="display: none;">삭제</button>
+    </div>
+  </div>
+</div>
