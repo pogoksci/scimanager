@@ -155,9 +155,6 @@
             // 5. Initial Tab
             switchTab('video-section');
 
-            // 6. Role Check (Admin only can sync)
-            checkAdminRole();
-
         } catch (err) {
             console.error("SafetyEdu Init Error:", err);
             document.getElementById('safety-edu-container').innerHTML = `<div style="padding:20px; color:red;">오류: ${err.message}</div>`;
@@ -166,13 +163,12 @@
 
     function renderBaseLayout(container) {
         const isTeacher = App.Auth && typeof App.Auth.canWrite === 'function' && App.Auth.canWrite();
-        const enableSafetyStats = false; // 임시 블라인드 처리 (추후 true 변경 시 재활성화)
+        const enableSafetyStats = true; // 임시 블라인드 처리 (추후 true 변경 시 재활성화)
 
         container.innerHTML = `
             <div class="safety-main-container">
                 <div class="safety-header-row">
                     <h1 class="safety-section-title">🧯 과학실 안전 교육</h1>
-                    <button id="btn-sync-content" class="safety-sync-btn">🔄 최신 콘텐츠 동기화</button>
                 </div>
                 
                 <div class="safety-tabs-container">
@@ -217,13 +213,16 @@
                                 <div class="form-group" style="margin: 0; min-width: 150px;">
                                     <label for="stats-semester-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학년도 필터</label>
                                     <select id="stats-semester-select" style="width: 100%; height: 34px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="">학년도를 선택하세요</option>
+                                        <option value="all">전체 학년도</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0; min-width: 150px;">
-                                    <label for="stats-class-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학급 필터 (반)</label>
+                                    <label for="stats-class-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학년 필터</label>
                                     <select id="stats-class-select" style="width: 100%; height: 34px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="all">전체 학급</option>
+                                        <option value="all">전학년</option>
+                                        <option value="1">1학년</option>
+                                        <option value="2">2학년</option>
+                                        <option value="3">3학년</option>
                                     </select>
                                 </div>
                             </div>
@@ -264,7 +263,7 @@
                                 <!-- Line Chart -->
                                 <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #ffffff;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📈 시도 회차별 평균 성취도 추이 (상황인식)</h4>
+                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📈 시도 회차별 평균 성취도 추이</h4>
                                         <button id="btn-save-chart-line" class="safety-sync-btn" style="float:none; margin:0; padding: 4px 8px; font-size: 11px; border-radius: 4px; display: flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-outlined" style="font-size:12px;">image</span> 저장
                                         </button>
@@ -277,7 +276,7 @@
                                 <!-- Bar Chart -->
                                 <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #ffffff;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📊 사전 vs 사후 성적 분포 비교 (위기대처)</h4>
+                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📊 사전 vs 사후 성적 분포 비교</h4>
                                         <button id="btn-save-chart-bar" class="safety-sync-btn" style="float:none; margin:0; padding: 4px 8px; font-size: 11px; border-radius: 4px; display: flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-outlined" style="font-size:12px;">image</span> 저장
                                         </button>
@@ -893,26 +892,6 @@
         });
     }
 
-    function checkAdminRole() {
-        if (App.Auth && App.Auth.isAdmin && App.Auth.isAdmin()) {
-            const btn = document.getElementById('btn-sync-content');
-            if (btn) {
-                btn.style.display = 'block';
-                btn.onclick = triggerContentSync;
-            }
-        }
-    }
-
-    async function triggerContentSync() {
-        if (!confirm("구글 사이트(원본)의 최신 내용으로 동기화하시겠습니까?")) return;
-        const btn = document.getElementById('btn-sync-content');
-        btn.disabled = true;
-        btn.textContent = "동기화 중...";
-        const { data, error } = await App.supabase.functions.invoke('sync-content', { body: { target: 'safety' } });
-        if (error) { alert("동기화 실패: " + error.message); btn.textContent = "🔄 최신 콘텐츠 동기화"; btn.disabled = false; }
-        else { alert(data.message || "동기화 완료!"); location.reload(); }
-    }
-
     // ==========================================
     // 안전 퀴즈 통계 분석 및 시각화 엔진 (교사 전용)
     // ==========================================
@@ -932,7 +911,7 @@
 
         // 1. 학년도 목록 로드 및 드롭다운 채우기 (최초 1회)
         if (statsSemesterSelect.options.length <= 1) {
-            statsSemesterSelect.innerHTML = '<option value="">학년도를 선택하세요</option>';
+            statsSemesterSelect.innerHTML = '<option value="all">전체 학년도</option>';
             const { data: semesters, error } = await App.supabase
                 .from('lab_semesters')
                 .select('*')
@@ -950,11 +929,6 @@
                 statsSemesterSelect.appendChild(opt);
             });
 
-            // 가장 최신 학년도 기본 선택
-            if (semesters.length > 0) {
-                statsSemesterSelect.value = semesters[0].id;
-            }
-
             // 이벤트 바인딩
             statsSemesterSelect.onchange = () => loadAndRenderStats();
             statsClassSelect.onchange = () => renderStatsChartsAndTable();
@@ -970,7 +944,6 @@
 
     async function loadAndRenderStats() {
         const statsSemesterSelect = document.getElementById('stats-semester-select');
-        const statsClassSelect = document.getElementById('stats-class-select');
         const semesterId = statsSemesterSelect.value;
 
         if (!semesterId) {
@@ -978,12 +951,16 @@
             return;
         }
 
-        // Supabase 데이터 가져오기
-        const { data, error } = await App.supabase
+        // Supabase 데이터 가져오기 (전체 학년도 또는 특정 학년도)
+        let query = App.supabase
             .from('safety_quiz_results')
-            .select('*')
-            .eq('semester_id', semesterId)
-            .order('created_at', { ascending: true });
+            .select('*');
+
+        if (semesterId && semesterId !== 'all') {
+            query = query.eq('semester_id', semesterId);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: true });
 
         if (error) {
             console.error("통계 데이터 로드 실패:", error);
@@ -992,35 +969,6 @@
         }
 
         statsData = data || [];
-
-        // 학급 필터링 옵션 동적 구성 (학번 앞자리 파싱)
-        const classSet = new Set();
-        statsData.forEach(row => {
-            const no = String(row.student_no).trim();
-            if (no.length >= 3) {
-                const gradeClass = no.substring(0, 3);
-                classSet.add(gradeClass);
-            }
-        });
-
-        // 학급 필터 셀렉트 박스 채우기
-        const currentSelectedClass = statsClassSelect.value;
-        statsClassSelect.innerHTML = '<option value="all">전체 학급</option>';
-        Array.from(classSet).sort().forEach(cls => {
-            const opt = document.createElement('option');
-            opt.value = cls;
-            const grade = cls.substring(0, 1);
-            const clsNo = parseInt(cls.substring(1, 3));
-            opt.textContent = `${grade}학년 ${clsNo}반`;
-            statsClassSelect.appendChild(opt);
-        });
-
-        // 기존 선택 유지
-        if (Array.from(classSet).includes(currentSelectedClass)) {
-            statsClassSelect.value = currentSelectedClass;
-        } else {
-            statsClassSelect.value = 'all';
-        }
 
         // 차트 및 표 렌더링
         renderStatsChartsAndTable();
