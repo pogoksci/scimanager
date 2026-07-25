@@ -234,7 +234,7 @@
                                 </h4>
                                 <p style="font-size: 12.5px; color: #666; margin: 0 0 15px 0; line-height: 1.4;">
                                     * <strong>사전 집단</strong>: 1회차 시도 성적 / <strong>사후 집단</strong>: 2회차 이상 시도한 결과 중 최종 성적.<br>
-                                    * 유의확률(p-value)이 0.05 미만인 경우($p < .05$) 통계적으로 유의미한 향상이 일어났음을 뜻합니다.
+                                    * 유의확률(p-value)이 0.05 미만인 경우(p < .05) 통계적으로 유의미한 향상이 일어났음을 뜻합니다.
                                 </p>
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13.5px; border: 1px solid #e8e8e8;">
