@@ -5,11 +5,23 @@ on:
     branches:
       - main
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
@@ -37,27 +49,14 @@ jobs:
           rsync -av --progress --exclude='.github' --exclude='supabase' --exclude='deploy_dist' . deploy_dist/
           rm -f deploy_dist/.gitignore
 
-      - name: Deploy to ggomcode (gh-pages) 🚀
-        if: github.repository == 'ggomcode/ggomsci'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: deploy_dist
-          clean: true
-          single-commit: true
-          clean-exclude: |
-            .github
+      - name: Setup Pages ⚙️
+        uses: actions/configure-pages@v4
 
-      - name: Deploy to pogoksci.github.io (main) 🚀
-        if: github.repository == 'pogoksci/scimanager'
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload Artifact 📤
+        uses: actions/upload-pages-artifact@v3
         with:
-          token: ${{ secrets.DEPLOY_TOKEN }}
-          repository-name: pogoksci/pogoksci.github.io
-          branch: main
-          folder: deploy_dist
-          clean: true
-          single-commit: true
-          clean-exclude: |
-            .github
+          path: './deploy_dist'
+
+      - name: Deploy to GitHub Pages 🚀
+        id: deployment
+        uses: actions/deploy-pages@v4
