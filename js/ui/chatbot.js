@@ -3162,8 +3162,8 @@ ${propText}
       const explicitQuizTriggers = ["퀴즈", "안전퀴즈", "퀴즈정답", "퀴즈힌트", "퀴즈문제", "안전 퀴즈"];
       const isExplicitQuizHelp = explicitQuizTriggers.some(t => lowerQ.replace(/\s+/g, "").includes(t));
 
-      // 시약/교구/MSDS/분자량/위치/폐기 등 일반 기능 질의 키워드 감지
-      const generalIntentKeywords = ["msds", "분자량", "무게", "mw", "질량", "위치", "보관", "어디", "어딨", "있어", "있나요", "특성", "성질", "녹는점", "끓는점", "밀도", "버려", "폐액", "폐기", "구매", "구입", "수량", "잔여량", "만들", "희석", "제조", "점검", "청소", "세척"];
+      // 시약/교구/MSDS/분자량/위치/폐기/키트/폐수 등 일반 기능 질의 키워드 감지
+      const generalIntentKeywords = ["msds", "분자량", "무게", "mw", "질량", "위치", "보관", "어디", "어딨", "있어", "있나요", "특성", "성질", "녹는점", "끓는점", "밀도", "버려", "폐액", "폐수", "폐기", "키트", "구매", "구입", "수량", "잔여량", "만들", "희석", "제조", "점검", "청소", "세척"];
       const isGeneralIntent = generalIntentKeywords.some(k => lowerQ.includes(k));
 
       // 일반 기능 질의이면서 "퀴즈"가 명시되지 않은 경우 퀴즈 매칭 금지
