@@ -115,9 +115,15 @@ interface CasDetail {
 // CAS
 async function fetchCasDetail(cas_rn: string): Promise<CasDetail> {
   const url = `https://commonchemistry.cas.org/api/detail?cas_rn=${encodeURIComponent(cas_rn)}`;
+  const headers: Record<string, string> = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+  };
+  if (CAS_API_KEY) headers["X-API-KEY"] = CAS_API_KEY;
+
   const response = await fetch(url, {
     method: "GET",
-    headers: { "X-API-KEY": CAS_API_KEY },
+    headers,
   });
   if (!response.ok) throw new Error(`CAS API 요청 실패 (${response.status})`);
   return response.json();
@@ -1096,30 +1102,103 @@ async function handleDownloadMol(req: Request) {
 
   const { data: sub, error } = await supabase
     .from("Substance")
-    .select("uri, cas_rn")
+    .select("uri, cas_rn, canonical_smiles, smile, inchi")
     .eq("id", substanceId)
     .single();
 
-  if (error || !sub || !sub.uri) {
-    return new Response(JSON.stringify({ error: "Substance or URI not found" }), { status: 404, headers: corsHeaders });
+  if (error || !sub) {
+    return new Response(JSON.stringify({ error: "Substance not found" }), { status: 404, headers: corsHeaders });
   }
 
-  const casUrl = `https://commonchemistry.cas.org/api/export?uri=${encodeURIComponent(sub.uri)}&format=mol`;
-  const res = await fetch(casUrl, {
-    headers: { "X-API-KEY": CAS_API_KEY },
-  });
+  let molContent: string | null = null;
+  const userAgentHeader = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  };
 
-  if (!res.ok) {
-    return new Response(JSON.stringify({ error: `CAS API Error: ${res.status}` }), { status: 502, headers: corsHeaders });
+  // 1. CAS Common Chemistry API (Primary)
+  if (sub.uri) {
+    try {
+      const casUrl = `https://commonchemistry.cas.org/api/export?uri=${encodeURIComponent(sub.uri)}&format=mol`;
+      const headers: Record<string, string> = {
+        ...userAgentHeader,
+        "Accept": "*/*"
+      };
+      if (CAS_API_KEY) headers["X-API-KEY"] = CAS_API_KEY;
+
+      const res = await fetch(casUrl, { headers });
+      if (res.ok) {
+        molContent = await res.text();
+        console.log(`[handleDownloadMol] Retrieved MOL file from CAS API for substance ${substanceId}`);
+      } else {
+        console.warn(`[handleDownloadMol] CAS API export returned status ${res.status} for substance ${substanceId}`);
+      }
+    } catch (e) {
+      console.warn(`[handleDownloadMol] CAS API export error:`, e);
+    }
   }
 
-  const molContent = await res.text();
+  // 2. PubChem PUG REST API by CAS RN (Fallback 1)
+  if (!molContent && sub.cas_rn) {
+    try {
+      const pubchemUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(sub.cas_rn)}/record/SDF?recordType=2d`;
+      const res = await fetch(pubchemUrl, { headers: userAgentHeader });
+      if (res.ok) {
+        molContent = await res.text();
+        console.log(`[handleDownloadMol] Retrieved MOL/SDF from PubChem by CAS RN ${sub.cas_rn}`);
+      } else {
+        console.warn(`[handleDownloadMol] PubChem by CAS RN returned status ${res.status}`);
+      }
+    } catch (e) {
+      console.warn(`[handleDownloadMol] PubChem by CAS RN fetch error:`, e);
+    }
+  }
+
+  // 3. PubChem PUG REST API by SMILES (Fallback 2)
+  const smiles = sub.canonical_smiles || sub.smile;
+  if (!molContent && smiles) {
+    try {
+      const pubchemUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/${encodeURIComponent(smiles)}/record/SDF?recordType=2d`;
+      const res = await fetch(pubchemUrl, { headers: userAgentHeader });
+      if (res.ok) {
+        molContent = await res.text();
+        console.log(`[handleDownloadMol] Retrieved MOL/SDF from PubChem by SMILES`);
+      } else {
+        console.warn(`[handleDownloadMol] PubChem by SMILES returned status ${res.status}`);
+      }
+    } catch (e) {
+      console.warn(`[handleDownloadMol] PubChem by SMILES fetch error:`, e);
+    }
+  }
+
+  // 4. NIH NCI Chemical Identifier Resolver / Cactus (Fallback 3)
+  if (!molContent && (sub.cas_rn || smiles)) {
+    try {
+      const query = sub.cas_rn || smiles;
+      const cactusUrl = `https://cactus.nci.nih.gov/chemical/structure/${encodeURIComponent(query)}/file?format=sdf`;
+      const res = await fetch(cactusUrl, { headers: userAgentHeader });
+      if (res.ok) {
+        molContent = await res.text();
+        console.log(`[handleDownloadMol] Retrieved MOL/SDF from NIH Cactus`);
+      } else {
+        console.warn(`[handleDownloadMol] NIH Cactus returned status ${res.status}`);
+      }
+    } catch (e) {
+      console.warn(`[handleDownloadMol] NIH Cactus fetch error:`, e);
+    }
+  }
+
+  if (!molContent) {
+    return new Response(JSON.stringify({ error: "Mol 구조 정보를 찾을 수 없거나 다운로드할 수 없습니다." }), {
+      status: 404,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
+  }
 
   return new Response(molContent, {
     headers: {
       ...corsHeaders,
       "Content-Type": "chemical/x-mdl-molfile",
-      "Content-Disposition": `attachment; filename="${sub.cas_rn}.mol"`,
+      "Content-Disposition": `attachment; filename="${sub.cas_rn || 'structure'}.mol"`,
     },
   });
 }

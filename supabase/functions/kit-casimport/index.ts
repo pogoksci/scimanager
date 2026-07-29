@@ -63,9 +63,15 @@ function toArray<T>(v: unknown): T[] {
 async function fetchCasDetail(cas_rn: string): Promise<CasDetail> {
     try {
         const url = `https://commonchemistry.cas.org/api/detail?cas_rn=${encodeURIComponent(cas_rn)}`;
+        const headers: Record<string, string> = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*"
+        };
+        if (CAS_API_KEY) headers["X-API-KEY"] = CAS_API_KEY;
+
         const response = await fetch(url, {
             method: "GET",
-            headers: { "X-API-KEY": CAS_API_KEY },
+            headers,
         });
         if (!response.ok) return {};
         return await response.json();
