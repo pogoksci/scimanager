@@ -5072,15 +5072,57 @@ body {
   position: relative;
 }
 
-/* Copyright Notice */
+/* Splash Screen Research Title & Target Grade */
+.splash-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 16px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+.project-title {
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.45;
+  margin: 0 0 10px 0;
+  word-break: keep-all;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+.target-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 4px 14px;
+  letter-spacing: -0.2px;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.05);
+}
+
+/* Copyright Notice - 배경색과 동일(#ffffff)하게 처리하여 안 보이게 함 */
 .copyright-notice {
   position: absolute;
   bottom: 72px;
   /* 60px Navbar + 12px Gap */
   left: 15px;
   font-size: 11px;
-  color: #999;
+  color: #ffffff;
+  background-color: #ffffff;
   font-family: "Noto Sans KR", sans-serif;
+  user-select: none;
+  pointer-events: none;
 }
 
 #splash-screen .main-logo {
