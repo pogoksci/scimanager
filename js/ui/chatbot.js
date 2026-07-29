@@ -3158,11 +3158,27 @@ ${propText}
         return null;
       }
 
-      const pool = quizData.FIXED_POOL;
+      // 1. Explicit Quiz Trigger Check
+      const explicitQuizTriggers = ["퀴즈", "안전퀴즈", "퀴즈정답", "퀴즈힌트", "퀴즈문제", "안전 퀴즈"];
+      const isExplicitQuizHelp = explicitQuizTriggers.some(t => lowerQ.replace(/\s+/g, "").includes(t));
 
-      // 1. Explicit Quiz Help Trigger Check
-      const explicitQuizTriggers = ["퀴즈", "안전퀴즈", "퀴즈정답", "퀴즈힌트", "퀴즈문제"];
-      const isExplicitQuizHelp = explicitQuizTriggers.some(t => lowerQ.replace(/\s+/g, "").includes(t)) && cleanQ.length <= 15;
+      // 시약/교구/MSDS/분자량/위치/폐기 등 일반 기능 질의 키워드 감지
+      const generalIntentKeywords = ["msds", "분자량", "무게", "mw", "질량", "위치", "보관", "어디", "어딨", "있어", "있나요", "특성", "성질", "녹는점", "끓는점", "밀도", "버려", "폐액", "폐기", "구매", "구입", "수량", "잔여량", "만들", "희석", "제조", "점검", "청소", "세척"];
+      const isGeneralIntent = generalIntentKeywords.some(k => lowerQ.includes(k));
+
+      // 일반 기능 질의이면서 "퀴즈"가 명시되지 않은 경우 퀴즈 매칭 금지
+      if (isGeneralIntent && !isExplicitQuizHelp) {
+        return null;
+      }
+
+      const cleanText = lowerQ.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ").trim();
+
+      // "퀴즈"라는 단어가 명시되지 않고 15자 이하 단답/단어 입력인 경우 퀴즈 매칭 금지
+      if (!isExplicitQuizHelp && cleanText.length <= 15) {
+        return null;
+      }
+
+      const pool = quizData.FIXED_POOL;
 
       // 2. Stopwords and token extraction
       const stopwords = new Set([
@@ -3171,7 +3187,6 @@ ${propText}
         "무엇", "있나", "있나요", "하나", "하나요", "해야", "합니까", "입니까", "말인가", "말인가요"
       ]);
 
-      const cleanText = lowerQ.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ").trim();
       const qTokens = cleanText.split(/\s+/).filter(t => t.length >= 2 && !stopwords.has(t));
 
       let bestItem = null;
@@ -3180,39 +3195,47 @@ ${propText}
       pool.forEach(item => {
         const itemQ = (item.q || "").toLowerCase();
         const itemCleanQ = itemQ.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, " ").trim();
-        const correctOpt = (item.options[item.correct] || "").toLowerCase();
-        const allOpts = item.options.map(o => (o || "").toLowerCase()).join(" ");
 
-        let score = 0;
+        // 퀴즈 질문 문장과 70% 이상/완전 일치하는 경우
+        if (cleanText.length >= 6 && (itemCleanQ.includes(cleanText) || cleanText.includes(itemCleanQ))) {
+          let score = 100;
+          if (score > maxScore) {
+            maxScore = score;
+            bestItem = item;
+          }
+          return;
+        }
 
-        qTokens.forEach(t => {
-          if (itemCleanQ.includes(t)) score += t.length >= 3 ? 15 : 10;
-          if (correctOpt.includes(t)) score += 8;
-          else if (allOpts.includes(t)) score += 3;
-        });
+        // 퀴즈 명시적 요청 시에만 토큰 및 키워드 점수 계산
+        if (isExplicitQuizHelp) {
+          const correctOpt = (item.options[item.correct] || "").toLowerCase();
+          const allOpts = item.options.map(o => (o || "").toLowerCase()).join(" ");
 
-        if (cleanText.length >= 5 && itemCleanQ.includes(cleanText)) score += 40;
+          let score = 0;
 
-        const specialTerms = [
-          "ghs01", "ghs02", "ghs03", "ghs04", "ghs05", "ghs06", "ghs07", "ghs08", "ghs09",
-          "ghs", "msds", "nfpa", "btb", "pass", "수은", "아세톤", "에탄올", "황산", "염산", "질산",
-          "페놀", "알코올램프", "안구세척기", "보안경", "실험복", "신호어"
-        ];
-        specialTerms.forEach(term => {
-          if (lowerQ.includes(term) && itemQ.includes(term)) score += 20;
-        });
+          qTokens.forEach(t => {
+            if (itemCleanQ.includes(t)) score += t.length >= 3 ? 15 : 10;
+            if (correctOpt.includes(t)) score += 8;
+            else if (allOpts.includes(t)) score += 3;
+          });
 
-        if (score > maxScore) {
-          maxScore = score;
-          bestItem = item;
+          const specialTerms = [
+            "ghs01", "ghs02", "ghs03", "ghs04", "ghs05", "ghs06", "ghs07", "ghs08", "ghs09",
+            "ghs", "msds", "nfpa", "btb", "pass", "수은", "소화기", "안구세척기", "보안경", "실험복", "신호어"
+          ];
+          specialTerms.forEach(term => {
+            if (lowerQ.includes(term) && itemQ.includes(term)) score += 20;
+          });
+
+          if (score > maxScore) {
+            maxScore = score;
+            bestItem = item;
+          }
         }
       });
 
-      // 3. Dynamic Threshold depending on whether query looks like reagent location search
-      const isLocationReq = ["위치", "어디", "어딨", "장소", "보관"].some(k => lowerQ.includes(k)) &&
-        !["퀴즈", "문제", "정답", "의미", "조치", "수칙", "ghs", "pass", "nfpa"].some(k => lowerQ.includes(k));
-
-      const threshold = isLocationReq ? 40 : 20;
+      // 임계값: 명시적 퀴즈 요청 시 20, 아닌 경우 80(거의 완전 문장 일치)
+      const threshold = isExplicitQuizHelp ? 20 : 80;
 
       if (!bestItem || maxScore < threshold) {
         if (isExplicitQuizHelp) {
@@ -3236,7 +3259,7 @@ ${propText}
         return null;
       }
 
-      // 4. Render Quiz Solution Card
+      // Render Quiz Solution Card
       const correctIdx = bestItem.correct;
       const correctText = bestItem.options[correctIdx];
 
