@@ -8836,14 +8836,14 @@ input[type="text"].date-input-month-day {
 /* 📱 모바일 (767px 이하) -> 하단 보텀시트 자동 전환 */
 @media (max-width: 767px) {
   .safety-sheet-popup {
-    bottom: 0;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     left: 0;
     right: 0;
     width: 100vw;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.2);
-    transform: translateY(100%);
-    padding: 12px 16px 24px 16px;
+    transform: translateY(120%);
+    padding: 12px 16px 16px 16px;
   }
 
   .safety-sheet-popup.open {
