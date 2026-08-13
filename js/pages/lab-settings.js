@@ -38,6 +38,10 @@
                     tabContents.forEach(content => {
                         content.id === targetId ? content.classList.add('active') : content.classList.remove('active');
                     });
+
+                    if (targetId === 'chatbot-settings') {
+                        loadUnansweredQueries();
+                    }
                 });
             });
             updateTabStatus();

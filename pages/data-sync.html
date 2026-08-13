@@ -15,78 +15,6 @@
                     <span class="material-symbols-outlined sync-main-icon">cloud_sync</span>
                 </div>
 
-                <h3 class="sync-section-title">데이터 기초자료 동기화</h3>
-                <p class="sync-description">
-                    프로젝트 폴더의 CSV 파일을 읽어와 데이터베이스를
-                    업데이트합니다.<br>
-                    <strong class="warning-text">주의: 각 항목별로 기존 데이터가 삭제되거나 갱신될 수
-                        있습니다.</strong>
-                </p>
-
-                <div class="sync-btn-group">
-                    <button id="btn-sync-hazard" class="btn btn-secondary btn-lg btn-sync-action">
-                        <span class="material-symbols-outlined">warning</span>
-                        <span>유해화학물질 사전 등록(HazardList.xlsx)</span>
-                    </button>
-
-                    <button id="btn-sync-kit" class="btn btn-secondary btn-lg btn-sync-action">
-                        <span class="material-symbols-outlined">inventory_2</span>
-                        <span>실험 키트 사전 등록(experiment_kit.xlsx)</span>
-                    </button>
-
-                    <button id="btn-sync-cas" class="btn btn-secondary btn-lg btn-sync-action">
-                        <span class="material-symbols-outlined">science</span>
-                        <span>물질 정보 보정 등록(casimport-correct.xlsx → ref. DB)</span>
-                    </button>
-
-                    <button id="btn-sync-info-update" class="btn btn-secondary btn-lg btn-sync-info-update">
-                        <span class="material-symbols-outlined">update</span>
-                        <span>약품 정보 수동 보정 (ref. DB → DB)</span>
-                    </button>
-                </div>
-
-
-
-                <!-- 🚀 마이그레이션 섹션 추가 -->
-                <div class="migration-section">
-                    <h3 class="migration-title">약품 정보 마이그레이션</h3>
-                    <p class="migration-desc">
-                        기존 시스템의 CSV 데이터를 읽어와 약품, 사진, MSDS를
-                        일괄 등록합니다.<br>
-                        (사진/PDF 처리로 인해 시간이 소요됩니다.)
-                    </p>
-
-                    <div class="migration-form-box bg-gray-50">
-                        <div class="form-group form-group-mb">
-                            <label class="form-label">1. 파일 선택 (CSV, XLSX,
-                                XLS)</label>
-                            <input type="file" id="migration-file-input" accept=".csv, .xlsx, .xls" class="form-control form-input">
-                        </div>
-
-                        <div class="migration-range-group">
-                            <div class="form-group flex-1">
-                                <label class="form-label">2. 시작 ID</label>
-                                <input type="number" id="migration-start-id" class="form-control input-bordered" placeholder="예: 1">
-                            </div>
-                            <div class="form-group flex-1">
-                                <label class="form-label">3. 끝 ID (선택)</label>
-                                <div class="end-id-group">
-                                    <input type="number" id="migration-end-id" class="form-control input-flex-1"
-                                        placeholder="미입력 시 1개만">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="migration-until-end"> 끝까지
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button id="btn-migration-start" class="btn btn-primary btn-lg btn-migration-start">
-                            <span class="material-symbols-outlined">rocket_launch</span>
-                            <span>마이그레이션 시작</span>
-                        </button>
-                    </div>
-                </div>
-
                 <!-- 🚀 에듀파인 다운로드 섹션 (위치 변경됨) -->
                 <div class="migration-section">
                     <h3 class="migration-title">에듀파인 '저장성소모품코드관리' 등록파일 다운로드</h3>
@@ -268,6 +196,78 @@
                     </div>
                 </div>
 
+                <!-- 🚀 데이터 기초자료 동기화 섹션 (위치 이동됨) -->
+                <div class="migration-section">
+                    <h3 class="sync-section-title">데이터 기초자료 동기화</h3>
+                    <p class="sync-description">
+                        프로젝트 폴더의 CSV 파일을 읽어와 데이터베이스를
+                        업데이트합니다.<br>
+                        <strong class="warning-text">주의: 각 항목별로 기존 데이터가 삭제되거나 갱신될 수
+                            있습니다.</strong>
+                    </p>
+
+                    <div class="sync-btn-group">
+                        <button id="btn-sync-hazard" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">warning</span>
+                            <span>유해화학물질 사전 등록(HazardList.xlsx)</span>
+                        </button>
+
+                        <button id="btn-sync-kit" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">inventory_2</span>
+                            <span>실험 키트 사전 등록(experiment_kit.xlsx)</span>
+                        </button>
+
+                        <button id="btn-sync-cas" class="btn btn-secondary btn-lg btn-sync-action">
+                            <span class="material-symbols-outlined">science</span>
+                            <span>물질 정보 보정 등록(casimport-correct.xlsx → ref. DB)</span>
+                        </button>
+
+                        <button id="btn-sync-info-update" class="btn btn-secondary btn-lg btn-sync-info-update">
+                            <span class="material-symbols-outlined">update</span>
+                            <span>약품 정보 수동 보정 (ref. DB → DB)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🚀 약품 정보 마이그레이션 섹션 (위치 이동됨) -->
+                <div class="migration-section">
+                    <h3 class="migration-title">약품 정보 마이그레이션</h3>
+                    <p class="migration-desc">
+                        기존 시스템의 CSV 데이터를 읽어와 약품, 사진, MSDS를
+                        일괄 등록합니다.<br>
+                        (사진/PDF 처리로 인해 시간이 소요됩니다.)
+                    </p>
+
+                    <div class="migration-form-box bg-gray-50">
+                        <div class="form-group form-group-mb">
+                            <label class="form-label">1. 파일 선택 (CSV, XLSX,
+                                XLS)</label>
+                            <input type="file" id="migration-file-input" accept=".csv, .xlsx, .xls" class="form-control form-input">
+                        </div>
+
+                        <div class="migration-range-group">
+                            <div class="form-group flex-1">
+                                <label class="form-label">2. 시작 ID</label>
+                                <input type="number" id="migration-start-id" class="form-control input-bordered" placeholder="예: 1">
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">3. 끝 ID (선택)</label>
+                                <div class="end-id-group">
+                                    <input type="number" id="migration-end-id" class="form-control input-flex-1"
+                                        placeholder="미입력 시 1개만">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="migration-until-end"> 끝까지
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="btn-migration-start" class="btn btn-primary btn-lg btn-migration-start">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                            <span>마이그레이션 시작</span>
+                        </button>
+                    </div>
+                </div>
 
             </div>
         </div>

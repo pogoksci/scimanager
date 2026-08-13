@@ -113,6 +113,13 @@
                     </div>
                 </div>
 
+                <div class="conc-input-row" style="margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <label class="conc-label">제조자 이름 (직접 입력)</label>
+                        <input type="text" id="calc-maker-name" class="form-input" placeholder="예: 홍길동 (미입력 시 직접 수정 가능)" style="width: 100%;">
+                    </div>
+                </div>
+
                 <!-- Density Input (Hidden by default, shown if needed) -->
                 <div id="conc-density-input-area" class="conc-density-area">
                     <label class="conc-density-label">⚠️ 밀도 정보 필요</label>
@@ -162,6 +169,7 @@
             const targetVol = parseFloat(document.getElementById("calc-target-vol").value);
             const targetConc = parseFloat(document.getElementById("calc-target-conc").value);
             const targetUnit = document.getElementById("calc-target-unit").value;
+            const makerInputVal = document.getElementById("calc-maker-name")?.value?.trim();
             let densityManual = parseFloat(document.getElementById("calc-density-manual")?.value);
 
             if (!targetVol || !targetConc) {
@@ -492,6 +500,11 @@
                  </div>`;
             }
 
+            const makerInputVal = document.getElementById("calc-maker-name")?.value?.trim();
+            const defaultUser = getApp().Auth?.user;
+            const defaultMaker = defaultUser?.name || defaultUser?.user_metadata?.full_name || defaultUser?.email?.split('@')[0] || "";
+            const makerName = makerInputVal || defaultMaker || "";
+
             // Label Preview
             const labelHtml = `
                 <div style="display:flex; flex-direction:column; align-items:center;">
@@ -502,7 +515,7 @@
                         </div>
                         <div style="font-size: 0.85em; margin-bottom: 5px; text-align: left; padding-left: 10px;">
                             <strong>조제일:</strong> ${today}<br>
-                            <strong>제조자:</strong> ${getApp().Auth?.user?.email?.split('@')[0] || '학생'}
+                            <strong>제조자:</strong> <span contenteditable="true" id="label-maker-name" style="border-bottom: 1px dashed #74c0fc; padding: 0 4px; outline: none; min-width: 60px; display: inline-block; cursor: text; color: #0056b3; font-weight: bold;" title="클릭하여 제조자 이름을 직접 입력/수정하세요">${makerName || '이름 입력'}</span>
                         </div>
                         ${isAcid ? '<div style="background:orange; color:white; font-weight:bold; margin-top:10px; padding:2px; font-size:0.8em;">산성 / 부식성 주의</div>' : ''}
                     </div>
@@ -512,7 +525,7 @@
                         <button id="btn-export-pdf" class="btn-sm" style="font-size:12px; padding:4px 8px; cursor:pointer; background:#fff; border:1px solid #ccc; border-radius:4px;">PDF 저장</button>
                     </div>
 
-                    <p style="font-size: 0.8em; color: #666; margin-top: 8px;">▲ 위 내용을 견출지에 적어 용기에 붙이세요.</p>
+                    <p style="font-size: 0.8em; color: #666; margin-top: 8px;">▲ 클릭하여 제조자 이름을 직접 수정할 수 있습니다.</p>
                 </div>
             `;
 
@@ -550,7 +563,16 @@
             const element = document.getElementById("label-capture-area");
             if (!element || !window.html2canvas) return;
 
-            html2canvas(element, { scale: 2 }).then(canvas => {
+            html2canvas(element, {
+                scale: 2,
+                onclone: (clonedDoc) => {
+                    const span = clonedDoc.getElementById("label-maker-name");
+                    if (span) {
+                        span.style.borderBottom = "none";
+                        span.style.color = "#000";
+                    }
+                }
+            }).then(canvas => {
                 const link = document.createElement("a");
                 link.download = `${filename}_Vial_Label.png`;
                 link.href = canvas.toDataURL("image/png");
@@ -562,7 +584,16 @@
             const element = document.getElementById("label-capture-area");
             if (!element || !window.html2canvas || !window.jspdf) return;
 
-            html2canvas(element, { scale: 2 }).then(canvas => {
+            html2canvas(element, {
+                scale: 2,
+                onclone: (clonedDoc) => {
+                    const span = clonedDoc.getElementById("label-maker-name");
+                    if (span) {
+                        span.style.borderBottom = "none";
+                        span.style.color = "#000";
+                    }
+                }
+            }).then(canvas => {
                 const imgData = canvas.toDataURL("image/png");
                 const { jsPDF } = window.jspdf;
 
@@ -575,7 +606,6 @@
 
                 const imgProps = pdf.getImageProperties(imgData);
                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                // Maintain aspect ratio
                 const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');

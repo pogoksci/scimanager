@@ -540,7 +540,7 @@
             const photoName = this.clean(row.photo);
 
             if (photoName) {
-                const oldPhotoUrl = `https://muprmzkvrjacqatqxayf.supabase.co/storage/v1/object/public/reagent-photos/inventory/old_photos/${photoName}`;
+                const oldPhotoUrl = `https://pkjautwtgmmdtgawvmhh.supabase.co/storage/v1/object/public/reagent-photos/inventory/old_photos/${photoName}`;
                 try {
                     // Fetch Blob
                     const blob = await this.fetchBlob(oldPhotoUrl);
@@ -584,7 +584,7 @@
             const pdfName = this.clean(row.pdf);
 
             if (pdfName) {
-                const oldPdfUrl = `https://muprmzkvrjacqatqxayf.supabase.co/storage/v1/object/public/msds-pdf/old_msds-pdf/${pdfName}`;
+                const oldPdfUrl = `https://pkjautwtgmmdtgawvmhh.supabase.co/storage/v1/object/public/msds-pdf/old_msds-pdf/${pdfName}`;
                 try {
                     const blob = await this.fetchBlob(oldPdfUrl);
                     if (blob) {
@@ -656,7 +656,7 @@
             const resolvedCas = casRn || `NC-${row.id}`;
             payload.cas_rns = [resolvedCas];
 
-            const result = await fetch("https://muprmzkvrjacqatqxayf.supabase.co/functions/v1/casimport", {
+            const result = await fetch("https://pkjautwtgmmdtgawvmhh.supabase.co/functions/v1/casimport", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1190,7 +1190,7 @@
             if (photoName) {
                 try {
                     // User confirmed folder is 'old-kit', not 'old_kit'
-                    const oldPhotoUrl = `https://muprmzkvrjacqatqxayf.supabase.co/storage/v1/object/public/kit-photos/old-kit/${encodeURIComponent(photoName)}`;
+                    const oldPhotoUrl = `https://pkjautwtgmmdtgawvmhh.supabase.co/storage/v1/object/public/kit-photos/old-kit/${encodeURIComponent(photoName)}`;
                     const blob = await this.fetchBlob(oldPhotoUrl);
                     if (blob) {
                         // kit-register typically expects a Data URL (data:image/jpeg;base64,...)

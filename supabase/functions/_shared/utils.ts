@@ -2,11 +2,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 /** ✅ 환경 변수 */
-export const SUPABASE_URL = Deno.env.get('PROJECT_URL')!;
-export const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-export const CAS_API_KEY = Deno.env.get('CAS_API_KEY')!;
-export const KOSHA_API_KEY = Deno.env.get('KOSHA_API_KEY')!;
-export const KREACH_API_KEY = Deno.env.get('KREACH_API_KEY')!;
+export const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || Deno.env.get('PROJECT_URL') || '';
+export const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('SERVICE_ROLE_KEY') || '';
+export const CAS_API_KEY = Deno.env.get('CAS_API_KEY') || '';
+export const KOSHA_API_KEY = Deno.env.get('KOSHA_API_KEY') || '';
+export const KREACH_API_KEY = Deno.env.get('KREACH_API_KEY') || '';
 
 /** ✅ 공통 CORS 헤더 */
 export const ALLOWED_ORIGIN = '*';

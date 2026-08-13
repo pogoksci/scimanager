@@ -49,16 +49,17 @@
     "./js/pages/lab-usage-view.js",
     "./js/pages/lunch-lab-reserve.js",
     "./js/pages/lunch-lab-view.js",
-    "./js/pages/safety-edu.js?v=20251227",
+    "./js/pages/safety-edu.js?v=20260723_4",
     "./js/pages/lab-manual.js?v=20251227",
-    "./js/ui/chatbot.js",
+    "./js/pages/emergency-manual.js?v=20251227",
+    "./js/ui/chatbot.js?v=20260723_15",
   ];
   const componentModules = [
     "./js/components/sort-dropdown.js", // 🔹 여기 추가됨
     "./js/utils/kit-sync.js", // ✅ 키트 동기화 유틸
   ];
 
-  const routerModules = ["./js/router/router.js"];
+  const routerModules = ["./js/router/router.js?v=20260723_4"];
 
   // ------------------------------------------------------------
   // 2️⃣ 스크립트 로드 유틸리티
@@ -185,6 +186,11 @@
     // 🤖 챗봇 초기화
     if (App.Chatbot && typeof App.Chatbot.init === "function") {
       App.Chatbot.init();
+    }
+
+    // 🧭 Deep Link Check (새 창 오픈 시 딥링크 처리)
+    if (App.Router && typeof App.Router.checkDeepLink === "function") {
+      App.Router.checkDeepLink();
     }
 
     console.log("✅ 초기화 완료 — App 실행 중");

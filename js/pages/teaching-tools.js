@@ -1135,12 +1135,11 @@
 
             const newStock = tool.stock + diff;
 
-            // Try updating buy_date. If column doesn't exist, this might fail or be ignored.
-            // Teaching tools table schema usually has `buy_date`.
+            // Update purchase_date and stock on tools table
             const { error: updateError } = await App.supabase
                 .from('tools')
                 .update({
-                    buy_date: newDate,
+                    purchase_date: newDate,
                     stock: newStock
                 })
                 .eq('id', toolId);
@@ -1169,7 +1168,7 @@
                 .from('tools')
                 .update({
                     stock: newStock,
-                    buy_date: null
+                    purchase_date: null
                 })
                 .eq('id', toolId);
 

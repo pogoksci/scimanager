@@ -21,6 +21,112 @@
         { id: "09", name: "환경유해성", desc: "수생환경 유해성 (급성/만성)" }
     ];
 
+    const STORAGE_KEY = "SCIMANAGER_SAFETY_QUIZ_STATE";
+
+    function saveQuizState() {
+        try {
+            if (QUIZ_STATE.questions.length > 0 && QUIZ_STATE.currentStep < QUIZ_STATE.questions.length) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(QUIZ_STATE));
+            } else {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+            updateGlobalFloatingQuizBanner();
+        } catch (e) {
+            console.error("Failed to save quiz state:", e);
+        }
+    }
+
+    function loadQuizState() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                const parsed = JSON.parse(data);
+                if (parsed && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+                    QUIZ_STATE = parsed;
+                    updateGlobalFloatingQuizBanner();
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load quiz state:", e);
+        }
+        return false;
+    }
+
+    function clearQuizState() {
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
+        QUIZ_STATE = {
+            currentStep: 0,
+            score: 0,
+            studentNo: "",
+            userName: "",
+            questions: []
+        };
+        updateGlobalFloatingQuizBanner();
+    }
+
+    function updateGlobalFloatingQuizBanner() {
+        let banner = document.getElementById('global-quiz-resume-banner');
+        const stateData = localStorage.getItem(STORAGE_KEY);
+        let parsed = null;
+        if (stateData) {
+            try { parsed = JSON.parse(stateData); } catch (e) {}
+        }
+
+        if (parsed && parsed.questions && parsed.questions.length > 0 && parsed.currentStep < parsed.questions.length) {
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'global-quiz-resume-banner';
+                banner.style.cssText = `
+                    position: fixed;
+                    bottom: 25px;
+                    right: 25px;
+                    z-index: 99999;
+                    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 30px;
+                    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+                    font-size: 14px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                `;
+                banner.onmouseover = () => banner.style.transform = 'scale(1.05)';
+                banner.onmouseout = () => banner.style.transform = 'scale(1)';
+                banner.onclick = async () => {
+                    if (window.App && App.Router) {
+                        await App.Router.go("safetyEdu");
+                        if (typeof App.SafetyEdu?.switchTab === "function") {
+                            App.SafetyEdu.switchTab("quiz-section");
+                        }
+                    }
+                };
+                document.body.appendChild(banner);
+            }
+            const currentNo = parsed.currentStep + 1;
+            const totalNo = parsed.questions.length;
+            banner.innerHTML = `
+                <span class="material-symbols-outlined" style="font-size:20px;">quiz</span>
+                <span>이어서 퀴즈 풀기 (${currentNo} / ${totalNo}번)</span>
+                <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-size:12px; margin-left:4px;">이동 ➔</span>
+            `;
+            banner.style.display = 'flex';
+        } else {
+            if (banner) {
+                banner.style.display = 'none';
+            }
+        }
+    }
+
+    // Auto load quiz state on script initialization
+    loadQuizState();
+
     const SafetyEdu = {};
 
     SafetyEdu.init = async function () {
@@ -49,9 +155,6 @@
             // 5. Initial Tab
             switchTab('video-section');
 
-            // 6. Role Check (Admin only can sync)
-            checkAdminRole();
-
         } catch (err) {
             console.error("SafetyEdu Init Error:", err);
             document.getElementById('safety-edu-container').innerHTML = `<div style="padding:20px; color:red;">오류: ${err.message}</div>`;
@@ -60,20 +163,19 @@
 
     function renderBaseLayout(container) {
         const isTeacher = App.Auth && typeof App.Auth.canWrite === 'function' && App.Auth.canWrite();
+        const enableSafetyStats = true; // 임시 블라인드 처리 (추후 true 변경 시 재활성화)
 
         container.innerHTML = `
             <div class="safety-main-container">
                 <div class="safety-header-row">
                     <h1 class="safety-section-title">🧯 과학실 안전 교육</h1>
-                    <button id="btn-sync-content" class="safety-sync-btn">🔄 최신 콘텐츠 동기화</button>
                 </div>
                 
                 <div class="safety-tabs-container">
                     <button class="nav-tab active" data-target="video-section">영상 교육</button>
                     <button class="nav-tab" data-target="manual-section">매뉴얼/서식</button>
                     <button class="nav-tab" data-target="ghs-section">GHS 기호</button>
-                    <button class="nav-tab" data-target="quiz-section">안전 퀴즈 & 인증</button>
-                    ${isTeacher ? '<button class="nav-tab" data-target="stats-section">안전 통계 분석</button>' : ''}
+                    ${(isTeacher && enableSafetyStats) ? '<button class="nav-tab" data-target="stats-section">안전 통계 분석</button>' : ''}
                 </div>
 
                 <div class="safety-content-scroll-area">
@@ -94,7 +196,7 @@
                         <div id="certificate-area" class="certificate-preview"></div>
                     </div>
 
-                    ${isTeacher ? `
+                    ${(isTeacher && enableSafetyStats) ? `
                     <div id="stats-section" class="tab-content" style="display:none;">
                         <div class="settings-section" style="padding: 10px 0;">
                             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -111,13 +213,16 @@
                                 <div class="form-group" style="margin: 0; min-width: 150px;">
                                     <label for="stats-semester-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학년도 필터</label>
                                     <select id="stats-semester-select" style="width: 100%; height: 34px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="">학년도를 선택하세요</option>
+                                        <option value="all">전체 학년도</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin: 0; min-width: 150px;">
-                                    <label for="stats-class-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학급 필터 (반)</label>
+                                    <label for="stats-class-select" style="font-size: 13px; font-weight: 600; color: #555; display:block; margin-bottom:4px;">학년 필터</label>
                                     <select id="stats-class-select" style="width: 100%; height: 34px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <option value="all">전체 학급</option>
+                                        <option value="all">전학년</option>
+                                        <option value="1">1학년</option>
+                                        <option value="2">2학년</option>
+                                        <option value="3">3학년</option>
                                     </select>
                                 </div>
                             </div>
@@ -129,7 +234,7 @@
                                 </h4>
                                 <p style="font-size: 12.5px; color: #666; margin: 0 0 15px 0; line-height: 1.4;">
                                     * <strong>사전 집단</strong>: 1회차 시도 성적 / <strong>사후 집단</strong>: 2회차 이상 시도한 결과 중 최종 성적.<br>
-                                    * 유의확률(p-value)이 0.05 미만인 경우($p < .05$) 통계적으로 유의미한 향상이 일어났음을 뜻합니다.
+                                    * 유의확률(p-value)이 0.05 미만인 경우(p < .05) 통계적으로 유의미한 향상이 일어났음을 뜻합니다.
                                 </p>
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13.5px; border: 1px solid #e8e8e8;">
@@ -158,7 +263,7 @@
                                 <!-- Line Chart -->
                                 <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #ffffff;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📈 시도 회차별 평균 성취도 추이 (상황인식)</h4>
+                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📈 시도 회차별 평균 성취도 추이</h4>
                                         <button id="btn-save-chart-line" class="safety-sync-btn" style="float:none; margin:0; padding: 4px 8px; font-size: 11px; border-radius: 4px; display: flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-outlined" style="font-size:12px;">image</span> 저장
                                         </button>
@@ -171,7 +276,7 @@
                                 <!-- Bar Chart -->
                                 <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #ffffff;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📊 사전 vs 사후 성적 분포 비교 (위기대처)</h4>
+                                        <h4 style="margin: 0; color: #333; font-size: 1.05rem; font-weight: 600;">📊 사전 vs 사후 성적 분포 비교</h4>
                                         <button id="btn-save-chart-bar" class="safety-sync-btn" style="float:none; margin:0; padding: 4px 8px; font-size: 11px; border-radius: 4px; display: flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-outlined" style="font-size:12px;">image</span> 저장
                                         </button>
@@ -222,6 +327,7 @@
         if (targetId === 'quiz-section') initQuiz();
         if (targetId === 'stats-section') initSafetyStats();
     }
+    SafetyEdu.switchTab = switchTab;
 
     function bindEvents(container) {
         container.querySelectorAll('.nav-tab').forEach(tab => {
@@ -233,7 +339,17 @@
     // --- Quiz Logic ---
     function initQuiz() {
         const root = document.getElementById('quiz-root');
-        if (QUIZ_STATE.questions.length > 0) return; // Already started
+        if (!root) return;
+
+        // If quiz is already in progress or completed, restore the question/result view
+        if (QUIZ_STATE.questions.length > 0) {
+            if (QUIZ_STATE.currentStep >= QUIZ_STATE.questions.length) {
+                showResult();
+            } else {
+                renderNextQuestion();
+            }
+            return;
+        }
 
         root.innerHTML = `
             <div class="quiz-container">
@@ -253,6 +369,18 @@
             </div>
         `;
     }
+
+    SafetyEdu.resetQuiz = function () {
+        QUIZ_STATE.currentStep = 0;
+        QUIZ_STATE.score = 0;
+        QUIZ_STATE.questions = [];
+        const certArea = document.getElementById('certificate-area');
+        if (certArea) {
+            certArea.style.display = 'none';
+            certArea.innerHTML = '';
+        }
+        initQuiz();
+    };
 
     SafetyEdu.startQuiz = async function () {
         const studentNoEl = document.getElementById('quiz-student-no');
@@ -287,10 +415,54 @@
             "스마트 과학실 화학물질 식별"
         ];
         
-        const finalQuestions = [];
-        const dynamicQuestions = [];
+        const usedTexts = new Set();
+        const normalizeKey = (text) => (text || "").replace(/\s+/g, "").toLowerCase();
 
-        // 1. Try to get Dynamic Questions
+        const sectionQuestions = {
+            "실험실 기본 안전 및 보호구": [],
+            "화학물질 취급 및 폐기물 처리": [],
+            "응급 대처 및 화재 예방": [],
+            "GHS 및 MSDS의 이해": [],
+            "스마트 과학실 화학물질 식별": []
+        };
+
+        // 1. Pick 4 questions for fixed sections (1 to 4) without duplicates
+        const fixedBySection = {
+            "실험실 기본 안전 및 보호구": [],
+            "화학물질 취급 및 폐기물 처리": [],
+            "응급 대처 및 화재 예방": [],
+            "GHS 및 MSDS의 이해": []
+        };
+        
+        App.SafetyQuizData.FIXED_POOL.forEach(q => {
+            if (fixedBySection[q.section]) {
+                fixedBySection[q.section].push(q);
+            } else {
+                fixedBySection["실험실 기본 안전 및 보호구"].push(q);
+            }
+        });
+
+        SECTIONS.slice(0, 4).forEach(sec => {
+            const pool = [...fixedBySection[sec]];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+
+            const picked = [];
+            for (const q of pool) {
+                if (picked.length >= 4) break;
+                const key = normalizeKey(q.q);
+                if (!usedTexts.has(key)) {
+                    usedTexts.add(key);
+                    picked.push(App.SafetyQuizData.randomizeFixedQuestion(q));
+                }
+            }
+            sectionQuestions[sec] = picked;
+        });
+
+        // 2. Dynamic Questions for Section 5 (스마트 과학실 화학물질 식별)
+        const dynamicQuestions = [];
         try {
             const { data: invData } = await App.supabase
                 .from('Inventory')
@@ -300,7 +472,7 @@
                     door_horizontal,
                     internal_shelf_level,
                     storage_column,
-                    substance (
+                    Substance (
                         chem_name_kor,
                         substance_name,
                         molecular_formula, 
@@ -329,16 +501,31 @@
                 
                 const massQ = App.SafetyQuizData.getMassComparisonQuestion(invCopy);
                 if (massQ) {
-                    dynamicQuestions.push(massQ);
+                    const key = normalizeKey(massQ.q);
+                    if (!usedTexts.has(key)) {
+                        usedTexts.add(key);
+                        dynamicQuestions.push(massQ);
+                    }
                 }
 
-                while (dynamicQuestions.length < 5 && invCopy.length > 0) {
+                while (dynamicQuestions.length < 4 && invCopy.length > 0) {
                     const idx = Math.floor(Math.random() * invCopy.length);
                     const item = invCopy.splice(idx, 1)[0];
                     const types = App.SafetyQuizData.getDynamicTemplates(item, invData);
-                    if (types.length > 0) {
-                        const qData = types[Math.floor(Math.random() * types.length)];
-                        dynamicQuestions.push(qData);
+                    
+                    // Shuffle candidate templates
+                    for (let i = types.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [types[i], types[j]] = [types[j], types[i]];
+                    }
+
+                    for (const qData of types) {
+                        const key = normalizeKey(qData.q);
+                        if (!usedTexts.has(key)) {
+                            usedTexts.add(key);
+                            dynamicQuestions.push(qData);
+                            break;
+                        }
                     }
                 }
             }
@@ -346,45 +533,23 @@
             console.error("Dynamic question fetch failed, falling back to fixed pool", e);
         }
 
-        // Fill dynamic if not 5
-        if (dynamicQuestions.length < 5) {
+        // Fill dynamic section if less than 4 using fallbacks
+        if (dynamicQuestions.length < 4) {
             const fallbacks = App.SafetyQuizData.getFallbackDynamicQuestions();
-            while (dynamicQuestions.length < 5 && fallbacks.length > 0) {
-                dynamicQuestions.push(fallbacks.pop());
+            for (const candidate of fallbacks) {
+                if (dynamicQuestions.length >= 4) break;
+                const key = normalizeKey(candidate.q);
+                if (!usedTexts.has(key)) {
+                    usedTexts.add(key);
+                    dynamicQuestions.push(candidate);
+                }
             }
         }
-        
-        const sectionQuestions = {
-            "스마트 과학실 화학물질 식별": dynamicQuestions.slice(0, 5)
-        };
 
-        const fixedBySection = {
-            "실험실 기본 안전 및 보호구": [],
-            "화학물질 취급 및 폐기물 처리": [],
-            "응급 대처 및 화재 예방": [],
-            "GHS 및 MSDS의 이해": []
-        };
-        
-        App.SafetyQuizData.FIXED_POOL.forEach(q => {
-            if (fixedBySection[q.section]) {
-                fixedBySection[q.section].push(q);
-            } else {
-                fixedBySection["실험실 기본 안전 및 보호구"].push(q);
-            }
-        });
-
-        SECTIONS.slice(0, 4).forEach(sec => {
-            const pool = [...fixedBySection[sec]];
-            for (let i = pool.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [pool[i], pool[j]] = [pool[j], pool[i]];
-            }
-            
-            const picked = pool.slice(0, 5).map(q => App.SafetyQuizData.randomizeFixedQuestion(q));
-            sectionQuestions[sec] = picked;
-        });
+        sectionQuestions["스마트 과학실 화학물질 식별"] = dynamicQuestions.slice(0, 4);
 
         // Merge all into finalQuestions sequentially
+        const finalQuestions = [];
         SECTIONS.forEach(sec => {
             finalQuestions.push(...sectionQuestions[sec]);
         });
@@ -403,7 +568,7 @@
         }
 
         const q = QUIZ_STATE.questions[step];
-        const sectionIndex = Math.floor(step / 5) + 1;
+        const sectionIndex = Math.floor(step / 4) + 1;
         
         root.innerHTML = `
             <div class="quiz-container">
@@ -419,8 +584,16 @@
                         `).join('')}
                     </div>
                 </div>
-                <div style="margin-top: 25px; text-align: center; font-size: 0.85rem; color: #64748b; line-height: 1.5; background-color: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    💡 잘 모르는 문제는 SciManager의 AI챗봇을 이용하거나 메뉴를 탐험하며 정답을 찾아보세요!
+                <div style="margin-top: 25px; text-align: center; font-size: 0.85rem; color: #475569; line-height: 1.6; background-color: #f0f9ff; padding: 12px 16px; border-radius: 12px; border: 1px solid #bae6fd;">
+                    💡 <strong>정답 탐색 팁:</strong> 퀴즈 창은 그대로 두고, 오른쪽 하단 <strong>AI 챗봇</strong>에게 질문하거나 새 창에서 메뉴를 탐험해 보세요!
+                    <div style="margin-top: 8px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                        <button onclick="window.open('./index.html#inventory', '_blank')" style="padding: 4px 10px; font-size: 11.5px; background: #ffffff; border: 1px solid #7dd3fc; border-radius: 15px; color: #0284c7; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span> 🧪 시약/교구 탐색 (새 창)
+                        </button>
+                        <button onclick="window.open('./index.html#emergencyManual', '_blank')" style="padding: 4px 10px; font-size: 11.5px; background: #ffffff; border: 1px solid #7dd3fc; border-radius: 15px; color: #0284c7; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span> 📖 안전 매뉴얼 (새 창)
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -500,8 +673,9 @@
             <div class="quiz-container" style="text-align:center;">
                 <h2 style="font-size:1.5rem; margin-bottom:20px;">결과: ${score}점</h2>
                 <p>${pass ? `🎉 축하합니다! 과학실 안전교육을 성실히 이수하셨습니다. (시도 회차: ${attemptCount}회)` : `😅 아깝네요. 다시 한 번 도전해 보세요! (시도 회차: ${attemptCount}회)`}</p>
-                <div style="margin-top:30px;">
-                    ${pass ? `<button class="btn-primary" onclick="App.SafetyEdu.showCertificate()">인증서 발급하기</button>` : `<button class="btn-cancel" onclick="location.reload()">다시 하기</button>`}
+                <div style="margin-top:30px; display:flex; gap:10px; justify-content:center;">
+                    ${pass ? `<button class="btn-primary" onclick="App.SafetyEdu.showCertificate()">인증서 발급하기</button>` : ''}
+                    <button class="btn-cancel" onclick="App.SafetyEdu.resetQuiz()">퀴즈 다시 도전하기</button>
                 </div>
             </div>
         `;
@@ -553,10 +727,125 @@
                 <div class="cert-serial">[SciManager Safety Certificate #${serialNum}]</div>
             </div>
             <div style="text-align:center; margin-top:30px;">
-                <button class="btn-primary" onclick="window.print()" style="padding: 15px 40px; font-size: 1.1rem; border-radius: 30px;">프린트 하기</button>
+                <button class="btn-primary" onclick="App.SafetyEdu.printCertificate()" style="padding: 15px 40px; font-size: 1.1rem; border-radius: 30px;">프린트 하기</button>
             </div>
         `;
         area.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    SafetyEdu.printCertificate = function () {
+        const certZone = document.getElementById('print-zone');
+        if (!certZone) return;
+
+        const certHtml = certZone.outerHTML;
+        const printWindow = window.open('', '_blank', 'width=850,height=1100');
+        if (!printWindow) {
+            alert("팝업이 차단되었습니다. 브라우저 설정에서 팝업 허용 후 다시 시도해주세요.");
+            return;
+        }
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="UTF-8">
+                <title>안전 교육 이수증 인쇄</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+                <style>
+                    @page {
+                        size: A4 portrait;
+                        margin: 0;
+                    }
+                    * {
+                        box-sizing: border-box;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 10mm;
+                        background: #fff;
+                        font-family: 'Noto Serif KR', serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                    }
+                    .cert-container {
+                        background: white !important;
+                        padding: 45px 35px !important;
+                        border: 8px solid #ae946d !important;
+                        position: relative !important;
+                        box-shadow: none !important;
+                        font-family: 'Noto Serif KR', serif !important;
+                        color: #333 !important;
+                        line-height: 1.6 !important;
+                        text-align: center !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: space-between !important;
+                        align-items: center !important;
+                        width: 100% !important;
+                        max-width: 185mm !important;
+                        height: 260mm !important;
+                        margin: 0 auto !important;
+                        box-sizing: border-box !important;
+                        visibility: visible !important;
+                    }
+                    .cert-container * {
+                        visibility: visible !important;
+                    }
+                    .cert-container::before {
+                        content: "" !important;
+                        position: absolute !important;
+                        top: 4px !important;
+                        left: 4px !important;
+                        right: 4px !important;
+                        bottom: 4px !important;
+                        border: 2px solid #ae946d !important;
+                        pointer-events: none !important;
+                    }
+                    .cert-container::after {
+                        content: "" !important;
+                        position: absolute !important;
+                        top: 10px !important;
+                        left: 10px !important;
+                        right: 10px !important;
+                        bottom: 10px !important;
+                        border: 1px solid #ae946d !important;
+                        pointer-events: none !important;
+                    }
+                    .cert-header { width: 100%; margin-top: 10px; margin-bottom: 20px; }
+                    .cert-title-top { font-size: 1.1rem; color: #ae946d; letter-spacing: 4px; margin-bottom: 8px; text-transform: uppercase; }
+                    .cert-main-title { font-size: 3rem; font-weight: 900; color: #2c3e50; margin: 0; line-height: 1.2; }
+                    .cert-body { width: 100%; margin: 10px 0; }
+                    .cert-student-box { margin: 20px 0; }
+                    .cert-label { font-size: 1rem; color: #7f8c8d; margin-bottom: 4px; }
+                    .cert-name { font-size: 2.6rem; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #ddd; display: inline-block; padding: 0 35px; }
+                    .cert-text { font-size: 1.25rem; margin: 25px 0; color: #34495e; line-height: 1.8; }
+                    .cert-date { font-size: 1.1rem; margin-top: 25px; color: #7f8c8d; }
+                    .cert-footer { width: 100%; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px; box-sizing: border-box; }
+                    .cert-school-name { font-size: 1.9rem; font-weight: 800; color: #2c3e50; text-align: left; }
+                    .cert-seal { width: 115px; height: 115px; background: radial-gradient(circle, #e67e22 0%, #d35400 100%) !important; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white !important; font-weight: bold; font-size: 0.9rem; text-align: center; border: 3px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+                    .cert-serial { position: absolute; bottom: 18px; right: 25px; font-size: 0.75rem; color: #bdc3c7; }
+                </style>
+            </head>
+            <body>
+                ${certHtml}
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 300);
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     };
 
     // --- Fetch Logic ---
@@ -603,26 +892,6 @@
         });
     }
 
-    function checkAdminRole() {
-        if (App.Auth && App.Auth.isAdmin && App.Auth.isAdmin()) {
-            const btn = document.getElementById('btn-sync-content');
-            if (btn) {
-                btn.style.display = 'block';
-                btn.onclick = triggerContentSync;
-            }
-        }
-    }
-
-    async function triggerContentSync() {
-        if (!confirm("구글 사이트(원본)의 최신 내용으로 동기화하시겠습니까?")) return;
-        const btn = document.getElementById('btn-sync-content');
-        btn.disabled = true;
-        btn.textContent = "동기화 중...";
-        const { data, error } = await App.supabase.functions.invoke('sync-content', { body: { target: 'safety' } });
-        if (error) { alert("동기화 실패: " + error.message); btn.textContent = "🔄 최신 콘텐츠 동기화"; btn.disabled = false; }
-        else { alert(data.message || "동기화 완료!"); location.reload(); }
-    }
-
     // ==========================================
     // 안전 퀴즈 통계 분석 및 시각화 엔진 (교사 전용)
     // ==========================================
@@ -642,7 +911,7 @@
 
         // 1. 학년도 목록 로드 및 드롭다운 채우기 (최초 1회)
         if (statsSemesterSelect.options.length <= 1) {
-            statsSemesterSelect.innerHTML = '<option value="">학년도를 선택하세요</option>';
+            statsSemesterSelect.innerHTML = '<option value="all">전체 학년도</option>';
             const { data: semesters, error } = await App.supabase
                 .from('lab_semesters')
                 .select('*')
@@ -660,11 +929,6 @@
                 statsSemesterSelect.appendChild(opt);
             });
 
-            // 가장 최신 학년도 기본 선택
-            if (semesters.length > 0) {
-                statsSemesterSelect.value = semesters[0].id;
-            }
-
             // 이벤트 바인딩
             statsSemesterSelect.onchange = () => loadAndRenderStats();
             statsClassSelect.onchange = () => renderStatsChartsAndTable();
@@ -680,7 +944,6 @@
 
     async function loadAndRenderStats() {
         const statsSemesterSelect = document.getElementById('stats-semester-select');
-        const statsClassSelect = document.getElementById('stats-class-select');
         const semesterId = statsSemesterSelect.value;
 
         if (!semesterId) {
@@ -688,12 +951,16 @@
             return;
         }
 
-        // Supabase 데이터 가져오기
-        const { data, error } = await App.supabase
+        // Supabase 데이터 가져오기 (전체 학년도 또는 특정 학년도)
+        let query = App.supabase
             .from('safety_quiz_results')
-            .select('*')
-            .eq('semester_id', semesterId)
-            .order('created_at', { ascending: true });
+            .select('*');
+
+        if (semesterId && semesterId !== 'all') {
+            query = query.eq('semester_id', semesterId);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: true });
 
         if (error) {
             console.error("통계 데이터 로드 실패:", error);
@@ -702,35 +969,6 @@
         }
 
         statsData = data || [];
-
-        // 학급 필터링 옵션 동적 구성 (학번 앞자리 파싱)
-        const classSet = new Set();
-        statsData.forEach(row => {
-            const no = String(row.student_no).trim();
-            if (no.length >= 3) {
-                const gradeClass = no.substring(0, 3);
-                classSet.add(gradeClass);
-            }
-        });
-
-        // 학급 필터 셀렉트 박스 채우기
-        const currentSelectedClass = statsClassSelect.value;
-        statsClassSelect.innerHTML = '<option value="all">전체 학급</option>';
-        Array.from(classSet).sort().forEach(cls => {
-            const opt = document.createElement('option');
-            opt.value = cls;
-            const grade = cls.substring(0, 1);
-            const clsNo = parseInt(cls.substring(1, 3));
-            opt.textContent = `${grade}학년 ${clsNo}반`;
-            statsClassSelect.appendChild(opt);
-        });
-
-        // 기존 선택 유지
-        if (Array.from(classSet).includes(currentSelectedClass)) {
-            statsClassSelect.value = currentSelectedClass;
-        } else {
-            statsClassSelect.value = 'all';
-        }
 
         // 차트 및 표 렌더링
         renderStatsChartsAndTable();

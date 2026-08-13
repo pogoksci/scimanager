@@ -25,10 +25,23 @@
         if (!menuContainer) createMenuContainer();
         const current = menuContainer.style.display === "flex";
         const next = force !== undefined ? force : !current;
+
+        const fab = document.getElementById("fab-button");
+        if (next && fab) {
+            const rect = fab.getBoundingClientRect();
+            const bottomOffset = window.innerHeight - rect.top + 10;
+            const centerX = rect.left + (rect.width / 2);
+
+            menuContainer.style.bottom = `${bottomOffset}px`;
+            menuContainer.style.left = `${centerX}px`;
+            menuContainer.style.right = 'auto';
+            menuContainer.style.transform = 'translateX(-50%)';
+            menuContainer.style.alignItems = 'center';
+        }
+
         menuContainer.style.display = next ? "flex" : "none";
 
         // Sync FAB Icon
-        const fab = document.getElementById("fab-button");
         if (fab) {
             const icon = fab.querySelector('.material-symbols-outlined');
             if (icon && fab.dataset.mode === 'menu') {

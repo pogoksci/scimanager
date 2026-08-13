@@ -840,7 +840,7 @@
             if (icon) icon.textContent = "download";
             if (text) text.textContent = "Mol";
 
-            btnDownloadMol.onclick = () => {
+            btnDownloadMol.onclick = async () => {
               const substanceId = data.Substance.id;
               const casRn = data.Substance.cas_rn;
               if (!substanceId) return;
@@ -853,14 +853,29 @@
                   return;
                 }
 
-                const downloadUrl = `${fnBase}/casimport?type=download_mol&substance_id=${substanceId}`;
+                const headers = {};
+                if (app.supabaseAnonKey) {
+                  headers["apikey"] = app.supabaseAnonKey;
+                  headers["Authorization"] = `Bearer ${app.supabaseAnonKey}`;
+                }
 
+                const downloadUrl = `${fnBase}/casimport?type=download_mol&substance_id=${substanceId}`;
+                const res = await fetch(downloadUrl, { headers });
+                if (!res.ok) {
+                  const errData = await res.json().catch(() => ({}));
+                  alert(errData.error || "Mol 파일 다운로드에 실패했습니다.");
+                  return;
+                }
+
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                link.href = downloadUrl;
+                link.href = blobUrl;
                 link.setAttribute('download', `${casRn || 'structure'}.mol`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
 
               } catch (e) {
                 console.error("Download failed:", e);

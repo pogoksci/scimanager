@@ -7,6 +7,12 @@
     <span>Menu</span>
   </a>
 
+  <!-- 과학실 안전 (메인 하단 메뉴: Menu와 약품 사이) -->
+  <a href="#" id="nav-safety" class="nav-item">
+    <span class="material-symbols-outlined nav-icon">health_and_safety</span>
+    <span>안전</span>
+  </a>
+
   <!-- 약품 (Mode: Management) -->
   <a href="#" id="nav-inventory" class="nav-item mode-management">
     <span class="material-symbols-outlined nav-icon">science</span>
@@ -44,6 +50,56 @@
   </a>
 </nav>
 
+<!-- 과학실 안전 보텀시트(모바일) / 팝오버 카드(PC) -->
+<div id="safety-sheet-backdrop" class="safety-sheet-backdrop"></div>
+<div id="safety-sheet-popup" class="safety-sheet-popup">
+  <div class="safety-sheet-header">
+    <div class="safety-sheet-handle"></div>
+    <div class="safety-sheet-title">
+      <span class="material-symbols-outlined">health_and_safety</span>
+      <span>과학실 안전</span>
+    </div>
+  </div>
+  <div class="safety-sheet-menu-list">
+    <a href="#" id="sheet-safety-edu" class="safety-sheet-item">
+      <div class="sheet-icon-box">
+        <span class="material-symbols-outlined">security</span>
+      </div>
+      <div class="sheet-text">
+        <div class="sheet-label">과학실 안전 교육</div>
+        <div class="sheet-desc">안전 영상, 매뉴얼, GHS 기호 및 안전 퀴즈</div>
+      </div>
+    </a>
+    <a href="#" id="sheet-lab-manual" class="safety-sheet-item">
+      <div class="sheet-icon-box">
+        <span class="material-symbols-outlined">menu_book</span>
+      </div>
+      <div class="sheet-text">
+        <div class="sheet-label">과학실 사용 설명서</div>
+        <div class="sheet-desc">스마트 과학실 기구 및 유의사항 가이드</div>
+      </div>
+    </a>
+    <a href="#" id="sheet-emergency" class="safety-sheet-item">
+      <div class="sheet-icon-box">
+        <span class="material-symbols-outlined">warning</span>
+      </div>
+      <div class="sheet-text">
+        <div class="sheet-label">비상시 대처 요령</div>
+        <div class="sheet-desc">응급 사고, 화학 유출 및 화재 대처 수칙</div>
+      </div>
+    </a>
+    <a href="#" id="sheet-safety-quiz" class="safety-sheet-item">
+      <div class="sheet-icon-box" style="background: #fef3c7; color: #d97706;">
+        <span class="material-symbols-outlined">quiz</span>
+      </div>
+      <div class="sheet-text">
+        <div class="sheet-label">스마트 과학실 안전 퀴즈</div>
+        <div class="sheet-desc">과학실 데이터 기반 퀴즈 풀이 및 이수증 발급</div>
+      </div>
+    </a>
+  </div>
+</div>
+
 <!-- Start 메뉴 팝업 -->
 <div id="start-menu" class="start-menu-popup">
   <div class="menu-list">
@@ -64,6 +120,12 @@
         </a>
         <a href="#" id="menu-lab-manual" class="menu-item submenu-item">
           <span class="material-symbols-outlined">menu_book</span> 과학실 사용 설명서
+        </a>
+        <a href="#" id="menu-emergency" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">warning</span> 비상시 대처 요령
+        </a>
+        <a href="#" id="menu-safety-quiz" class="menu-item submenu-item">
+          <span class="material-symbols-outlined">quiz</span> 스마트 과학실 안전 퀴즈
         </a>
       </div>
     </div>
@@ -136,6 +198,6 @@
       <span class="material-symbols-outlined user-icon">account_circle</span>
       <span class="user-id">Guest</span>
     </div>
-    <span class="material-symbols-outlined nav-icon navbar-icon-no-margin" id="auth-action-icon">play_arrow</span>
+    <div id="auth-action-icon"></div>
   </div>
 </div>

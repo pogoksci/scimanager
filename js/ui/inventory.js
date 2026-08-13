@@ -608,7 +608,7 @@
 
   async function deleteInventory(id) {
     const supabase = getSupabase();
-    const fnUrl = App.API?.EDGE?.CASIMPORT || `https://muprmzkvrjacqatqxayf.supabase.co/functions/v1/casimport`;
+    const fnUrl = App.API?.EDGE?.CASIMPORT || `https://pkjautwtgmmdtgawvmhh.supabase.co/functions/v1/casimport`;
 
     try {
       const response = await fetch(`${fnUrl}?type=inventory&id=${id}`, {

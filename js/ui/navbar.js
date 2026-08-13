@@ -288,6 +288,29 @@
       });
     }
 
+    const menuEmergency = document.getElementById("menu-emergency");
+    if (menuEmergency) {
+      menuEmergency.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        await App.Router.go("emergencyManual");
+        closeStartMenu();
+      });
+    }
+
+    const menuSafetyQuiz = document.getElementById("menu-safety-quiz");
+    if (menuSafetyQuiz) {
+      menuSafetyQuiz.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        closeStartMenu();
+        await App.Router.go("safetyEdu");
+        if (typeof App.SafetyEdu?.switchTab === "function") {
+          App.SafetyEdu.switchTab("quiz-section");
+        }
+      });
+    }
+
     const menuHome = document.getElementById("menu-home");
     if (menuHome) {
       menuHome.addEventListener("click", (e) => {
@@ -420,7 +443,7 @@
       dbResetBtn.style.display = (role === 'admin') ? 'flex' : 'none'; // flex for correct alignment
     }
     if (menuDataSync) {
-      menuDataSync.style.display = (role === 'admin') ? 'flex' : 'none'; // flex for correct alignment
+      menuDataSync.style.display = ['admin', 'teacher'].includes(role) ? 'flex' : 'none'; // Admin, Teacher 모두 표시
     }
 
     // 3. 기록 및 예약 (Lablog): Admin, Teacher만 보임
@@ -493,36 +516,40 @@
       if (user) {
         // 로그인 상태
         const name = user.email ? user.email.split('@')[0] : 'User';
-        userIdEl.textContent = name;
-        userIdEl.style.fontWeight = 'bold';
+        const roleLabel = role === 'teacher' ? '교사' : (role === 'admin' ? '관리자' : (role === 'student' ? '학생' : ''));
+        userIdEl.innerHTML = `<span style="font-weight: bold; color: #333; white-space: nowrap;">${name}</span> ${roleLabel ? `<span style="font-size: 11px; background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 10px; margin-left: 4px; font-weight: 500; white-space: nowrap;">${roleLabel}</span>` : ''}`;
 
-        // 아이콘: 로그아웃
-        actionIcon.textContent = "logout"; // Material Symbol 'logout'
+        actionIcon.innerHTML = `
+          <div class="auth-btn-pill auth-btn-logout">
+            <span>로그아웃</span>
+            <span class="material-symbols-outlined" style="font-size: 15px;">logout</span>
+          </div>
+        `;
 
-        // 클릭 동작: 로그아웃 (아이콘 클릭 시에만)
-        actionIcon.onclick = (e) => {
+        // 카드 전체 클릭 동작: 로그아웃 확인
+        footer.onclick = (e) => {
           e.preventDefault();
-          e.stopPropagation(); // 버블링 방지
           if (confirm(`${name}님, 로그아웃 하시겠습니까?`)) {
             App.Auth.logout();
             closeStartMenu();
           }
         };
-        // Footer 전체 클릭 방지
-        footer.onclick = null;
-        footer.style.cursor = 'default';
+        footer.style.cursor = 'pointer';
+        footer.title = "클릭하여 로그아웃";
       } else {
-        // 게스트 상태
-        userIdEl.textContent = "Guest";
-        userIdEl.style.fontWeight = 'normal';
+        // 게스트 상태 (로그인 전)
+        userIdEl.innerHTML = `<span style="font-weight: 600; color: #444; white-space: nowrap;">Guest</span>`;
 
-        // 아이콘: 로그인 (login 아이콘)
-        actionIcon.textContent = "login";
+        actionIcon.innerHTML = `
+          <div class="auth-btn-pill auth-btn-login">
+            <span>로그인</span>
+            <span class="material-symbols-outlined" style="font-size: 15px;">login</span>
+          </div>
+        `;
 
-        // 클릭 동작: 로그인 페이지 이동 (아이콘 클릭 시에만)
-        actionIcon.onclick = (e) => {
+        // 카드 전체 클릭 동작: 카드의 어느 곳을 눌러도 로그인 페이지로 이동!
+        footer.onclick = (e) => {
           e.preventDefault();
-          e.stopPropagation();
 
           // ✅ 현재 페이지 정보 저장 (로그인 후 복귀를 위해)
           const current = App.Router.getCurrentState ? App.Router.getCurrentState() : null;
@@ -540,17 +567,114 @@
           }
           closeStartMenu();
         };
-        // Footer 전체 클릭 방지
-        footer.onclick = null;
-        footer.style.cursor = 'default';
+        footer.style.cursor = 'pointer';
+        footer.title = "클릭하여 로그인하기";
       }
     }
 
   }
 
+  // ---- 안전 보텀시트 / 팝오버 메뉴 제어 ----
+  function setupSafetySheetToggle() {
+    const navSafetyBtn = document.getElementById("nav-safety");
+    const safetySheet = document.getElementById("safety-sheet-popup");
+    const safetyBackdrop = document.getElementById("safety-sheet-backdrop");
+    const startMenu = document.getElementById("start-menu");
+
+    if (!navSafetyBtn || !safetySheet) return;
+
+    function openSafetySheet() {
+      if (startMenu) startMenu.classList.remove("open");
+      safetySheet.classList.add("open");
+      if (safetyBackdrop) safetyBackdrop.classList.add("open");
+      navSafetyBtn.classList.add("active");
+    }
+
+    function closeSafetySheet() {
+      safetySheet.classList.remove("open");
+      if (safetyBackdrop) safetyBackdrop.classList.remove("open");
+      navSafetyBtn.classList.remove("active");
+    }
+
+    navSafetyBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (safetySheet.classList.contains("open")) {
+        closeSafetySheet();
+      } else {
+        openSafetySheet();
+      }
+    });
+
+    if (safetyBackdrop) {
+      safetyBackdrop.addEventListener("click", closeSafetySheet);
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!safetySheet.contains(e.target) && !navSafetyBtn.contains(e.target)) {
+        closeSafetySheet();
+      }
+    });
+
+    // 1) 과학실 안전 교육
+    const sheetEdu = document.getElementById("sheet-safety-edu");
+    if (sheetEdu) {
+      sheetEdu.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        closeSafetySheet();
+        await App.Router.go("safetyEdu");
+        setActive("nav-safety");
+      });
+    }
+
+    // 2) 과학실 사용 설명서
+    const sheetManual = document.getElementById("sheet-lab-manual");
+    if (sheetManual) {
+      sheetManual.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        closeSafetySheet();
+        await App.Router.go("safetyEdu");
+        if (typeof App.SafetyEdu?.switchTab === "function") {
+          App.SafetyEdu.switchTab("manual-section");
+        }
+        setActive("nav-safety");
+      });
+    }
+
+    // 3) 비상시 대처 요령
+    const sheetEmergency = document.getElementById("sheet-emergency");
+    if (sheetEmergency) {
+      sheetEmergency.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        closeSafetySheet();
+        await App.Router.go("emergencyManual");
+        setActive("nav-safety");
+      });
+    }
+
+    // 4) 스마트 과학실 안전 퀴즈
+    const sheetQuiz = document.getElementById("sheet-safety-quiz");
+    if (sheetQuiz) {
+      sheetQuiz.addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.body.classList.remove("home-active");
+        closeSafetySheet();
+        await App.Router.go("safetyEdu");
+        if (typeof App.SafetyEdu?.switchTab === "function") {
+          App.SafetyEdu.switchTab("quiz-section");
+        }
+        setActive("nav-safety");
+      });
+    }
+  }
+
   // ---- 초기화 ----
   function setup() {
     setupStartMenuToggle();
+    setupSafetySheetToggle(); // ✅ 과학실 안전 보텀시트/팝오버 토글
     setupExactIdLinks(); // ✅ 단일 바인딩 (정확 ID)
     console.log("✅ Navbar.setup() 완료 — 정확 ID 바인딩/Start 메뉴 토글");
 

@@ -897,16 +897,65 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  margin-top: 5px;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  margin-top: 10px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
 .menu-footer:hover {
-  background-color: rgba(0, 166, 173, 0.1);
+  background-color: #e6f7ff;
+  border-color: #00a0b2;
+  box-shadow: 0 2px 8px rgba(0, 160, 178, 0.15);
+}
+
+.menu-footer:active {
+  transform: scale(0.98);
+}
+
+.user-id {
+  white-space: nowrap;
+}
+
+.auth-btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.auth-btn-login {
+  background: linear-gradient(135deg, #00a0b2, #00838f);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 160, 178, 0.35);
+}
+
+.auth-btn-login:hover {
+  background: linear-gradient(135deg, #00838f, #006064);
+  box-shadow: 0 3px 8px rgba(0, 160, 178, 0.5);
+}
+
+.auth-btn-logout {
+  background: #f1f3f5;
+  color: #495057;
+  border: 1px solid #ced4da;
+}
+
+.auth-btn-logout:hover {
+  background: #e9ecef;
+  color: #d9534f;
+  border-color: #d9534f;
 }
 
 .user-icon {
@@ -1892,7 +1941,8 @@ input[type="date"] {
 .detail-left .photo-preview-box img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
 .detail-location-section {
@@ -3663,10 +3713,12 @@ input[type="date"] {
 }
 
 .photo-preview-box {
-  height: 240px !important;
-  width: auto !important;
-  aspect-ratio: 3 / 4 !important;
-  max-width: 180px !important;
+  height: 280px !important;
+  min-height: 280px !important;
+  max-height: 280px !important;
+  width: 210px !important;
+  min-width: 210px !important;
+  max-width: 210px !important;
   border: 1px solid #eee;
   border-radius: 8px;
   display: flex;
@@ -3675,13 +3727,18 @@ input[type="date"] {
   overflow: hidden;
   background-color: #fafafa;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .photo-preview-box img,
 .photo-preview-box video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
 }
 
 .inventory-detail-page .photo-preview-box,
@@ -3699,9 +3756,10 @@ input[type="date"] {
 }
 
 .photo-preview-box img {
-  object-fit: contain !important;
+  object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
+  object-position: center !important;
 }
 
 .inv-card-img {
@@ -3813,11 +3871,15 @@ input[type="date"] {
 }
 
 .photo-preview-box img {
-  height: 280px !important;
-  width: auto !important;
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: fill !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
   flex-shrink: 0 !important;
   font-size: 13px;
   color: #999;
@@ -3920,10 +3982,15 @@ input[type="date"] {
 #photo-preview img,
 #tools-photo-preview img,
 #photo-preview video,
-#tools-photo-preview video {
+#tools-photo-preview video,
+.preview-img {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
+  object-position: center !important;
 }
 
 #valence_group {
@@ -5005,15 +5072,57 @@ body {
   position: relative;
 }
 
-/* Copyright Notice */
+/* Splash Screen Research Title & Target Grade */
+.splash-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 16px;
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+.project-title {
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.45;
+  margin: 0 0 10px 0;
+  word-break: keep-all;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+.target-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 4px 14px;
+  letter-spacing: -0.2px;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.05);
+}
+
+/* Copyright Notice - 배경색과 동일(#ffffff)하게 처리하여 안 보이게 함 */
 .copyright-notice {
   position: absolute;
   bottom: 72px;
   /* 60px Navbar + 12px Gap */
   left: 15px;
   font-size: 11px;
-  color: #999;
+  color: #ffffff;
+  background-color: #ffffff;
   font-family: "Noto Sans KR", sans-serif;
+  user-select: none;
+  pointer-events: none;
 }
 
 #splash-screen .main-logo {
@@ -6678,6 +6787,22 @@ input[type="text"].date-input-month-day {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background-color: #fafafa;
+}
+
+#kit-detail-page .kit-photo-box img,
+#teaching-tools-detail-page .photo-preview-box img,
+#detail-aid-photo img,
+#detail-kit-photo img,
+#detail-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
 }
 
 #kit-detail-page .kit-logs-section {
@@ -7752,12 +7877,13 @@ input[type="text"].date-input-month-day {
   display: none;
   /* Toggled via JS to flex */
   position: fixed;
-  bottom: 80px;
-  right: 20px;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
-  z-index: 1100;
+  z-index: 10000;
 }
 
 .fab-menu-item {
@@ -8127,6 +8253,96 @@ input[type="text"].date-input-month-day {
   background-color: #008c9e;
 }
 
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .login-input {
+  padding-right: 44px;
+}
+
+.toggle-pw-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s, background-color 0.2s;
+  touch-action: manipulation;
+}
+
+.toggle-pw-btn:hover {
+  color: #00a0b2;
+  background-color: #f0f0f0;
+}
+
+/* 📱 모바일 가상 키보드 가림 방지 최적화 CSS */
+@media (max-width: 600px) {
+  .login-container {
+    max-width: 360px;
+    width: 92%;
+    margin: 15px auto 30px auto !important;
+    padding: 24px 20px !important;
+    border-radius: 16px;
+  }
+
+  .login-logo {
+    width: 56px !important;
+    height: auto;
+    margin-bottom: 12px !important;
+    transition: all 0.2s ease;
+  }
+
+  .login-title {
+    font-size: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .form-group-left, .form-group-left-20 {
+    margin-bottom: 12px !important;
+  }
+
+  .form-group-left label, .form-group-left-20 label {
+    margin-bottom: 4px !important;
+    font-size: 13px !important;
+  }
+
+  .login-input {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  .btn-login {
+    height: 46px !important;
+    font-size: 15px !important;
+    margin-top: 6px !important;
+  }
+
+  /* 키보드가 올라와 포커스된 상태일 때 슬림화 처리 (비밀번호 가림 완전 방지) */
+  .login-container.keyboard-open {
+    margin-top: 5px !important;
+    padding-top: 14px !important;
+  }
+
+  .login-container.keyboard-open .login-logo {
+    display: none !important; /* 포커스 시 로고 숨김으로 비밀번호 및 버튼 시야 100% 확보 */
+  }
+
+  .login-container.keyboard-open .login-title {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+}
+
 .error-msg {
   color: #d32f2f;
   font-size: 14px;
@@ -8466,9 +8682,13 @@ input[type="text"].date-input-month-day {
     display: none !important;
   }
 
-  .certificate-preview,
-  .certificate-preview * {
-    visibility: visible;
+  body:not(.usage-print-body):not(.waste-print-body) .certificate-preview,
+  body:not(.usage-print-body):not(.waste-print-body) .certificate-preview *,
+  body:not(.usage-print-body):not(.waste-print-body) .cert-container,
+  body:not(.usage-print-body):not(.waste-print-body) .cert-container * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .certificate-preview {
@@ -8482,6 +8702,7 @@ input[type="text"].date-input-month-day {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    z-index: 99999 !important;
   }
 
   .cert-container {
@@ -8522,5 +8743,160 @@ input[type="text"].date-input-month-day {
     bottom: 7mm !important;
     border: 0.5mm solid #ae946d !important;
     visibility: visible !important;
+  }
+}
+
+/* =================================================================
+   과학실 안전 보텀시트(모바일) & 팝오버 카드(PC) 반응형 디자인
+   ================================================================= */
+.safety-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.safety-sheet-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 💻 PC/데스크톱 (기본: 768px 이상) -> 하단 버튼 위 팝오버 카드 */
+.safety-sheet-popup {
+  position: fixed;
+  bottom: 65px;
+  left: 70px;
+  width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.safety-sheet-popup.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.safety-sheet-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.safety-sheet-handle {
+  display: none;
+  width: 36px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+
+.safety-sheet-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.safety-sheet-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.safety-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.safety-sheet-item:hover,
+.safety-sheet-item:active {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  transform: translateX(2px);
+}
+
+.sheet-icon-box {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sheet-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.sheet-desc {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* 📱 모바일 (767px 이하) -> 하단 보텀시트 자동 전환 */
+@media (max-width: 767px) {
+  .safety-sheet-popup {
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+    width: 100vw;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(120%);
+    padding: 12px 16px 16px 16px;
+  }
+
+  .safety-sheet-popup.open {
+    transform: translateY(0);
+  }
+
+  .safety-sheet-handle {
+    display: block;
+  }
+
+  .safety-sheet-backdrop {
+    display: block;
   }
 }

@@ -32,6 +32,7 @@
     export: "pages/export.html",
     safetyEdu: "pages/safety-edu.html",
     labManual: "pages/lab-manual.html",
+    emergencyManual: "pages/emergency-manual.html",
   };
 
   let currentState = null;
@@ -79,6 +80,9 @@
         break;
       case "labManual":
         if (App?.LabManual?.init) await App.LabManual.init();
+        break;
+      case "emergencyManual":
+        if (App?.EmergencyManual?.init) await App.EmergencyManual.init();
         break;
       case "labTimetable":
         if (App?.LabTimetable?.init) await App.LabTimetable.init();
@@ -190,6 +194,22 @@
     }
   });
 
+  function checkDeepLink() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const route = urlParams.get('route') || urlParams.get('view');
+      const id = urlParams.get('id');
+
+      if (route && routes[route]) {
+        go(route, { id: id }, { skipPush: true });
+        return true;
+      }
+    } catch (e) {
+      console.error("Deep link parse error:", e);
+    }
+    return false;
+  }
+
   globalThis.App = globalThis.App || {};
-  globalThis.App.Router = { go, routes, getCurrentState: () => currentState };
+  globalThis.App.Router = { go, routes, checkDeepLink, getCurrentState: () => currentState };
 })();

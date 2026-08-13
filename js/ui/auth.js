@@ -134,20 +134,58 @@
         const form = document.getElementById("login-form");
         if (!form) return;
 
+        const container = document.querySelector(".login-container") || document.getElementById("login-page");
+        const idInput = document.getElementById("login-id");
+        const pwInput = document.getElementById("login-pw");
+        const togglePwBtn = document.getElementById("toggle-pw-visibility");
+        const pwIcon = document.getElementById("pw-visibility-icon");
+
+        // 1. 비밀번호 눈모양 보기/숨기기 토글
+        if (togglePwBtn && pwInput && pwIcon) {
+            togglePwBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isPassword = pwInput.type === "password";
+                pwInput.type = isPassword ? "text" : "password";
+                pwIcon.textContent = isPassword ? "visibility_off" : "visibility";
+            };
+        }
+
+        // 2. 모바일 가상 키보드 포커스 대응 (자동 중앙 스크롤 및 로고 슬림화)
+        [idInput, pwInput].filter(Boolean).forEach(input => {
+            input.addEventListener("focus", () => {
+                if (container) container.classList.add("keyboard-open");
+                setTimeout(() => {
+                    input.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 150);
+            });
+
+            input.addEventListener("blur", () => {
+                setTimeout(() => {
+                    const active = document.activeElement;
+                    if (active !== idInput && active !== pwInput) {
+                        if (container) container.classList.remove("keyboard-open");
+                    }
+                }, 100);
+            });
+        });
+
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const id = document.getElementById("login-id").value.trim();
-            const pw = document.getElementById("login-pw").value.trim();
+            const id = idInput ? idInput.value.trim() : "";
+            const pw = pwInput ? pwInput.value.trim() : "";
             const errorEl = document.getElementById("login-error");
 
             if (!id || !pw) return;
 
             try {
-                errorEl.style.display = "none";
+                if (errorEl) errorEl.style.display = "none";
                 await Auth.login(id, pw);
             } catch (err) {
-                errorEl.textContent = "로그인 실패: 아이디 또는 비밀번호를 확인하세요.";
-                errorEl.style.display = "block";
+                if (errorEl) {
+                    errorEl.textContent = "로그인 실패: 아이디 또는 비밀번호를 확인하세요.";
+                    errorEl.style.display = "block";
+                }
             }
         });
     };

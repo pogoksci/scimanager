@@ -1089,7 +1089,7 @@
               // ------------------------------------------------------------
               console.log(`[Inventory] CAS(${casRn}) not found locally. Delegating to casimport...`);
 
-              const fnUrl = App.API?.EDGE?.CASIMPORT || `https://muprmzkvrjacqatqxayf.supabase.co/functions/v1/casimport`;
+              const fnUrl = App.API?.EDGE?.CASIMPORT || `https://pkjautwtgmmdtgawvmhh.supabase.co/functions/v1/casimport`;
               const headers = {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${App.API?.SUPABASE_ANON_KEY || supabase.supabaseKey}`
